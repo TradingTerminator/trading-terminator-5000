@@ -62,11 +62,12 @@ async function loadSessionTrades(){
 }
 $('reloadTrades').onclick=loadSessionTrades;
 const tickValues={NQ:5,MNQ:0.5,ES:12.5,MES:1.25};
+const stopReasonLabels={market_structure:'Marktstruktur',momentum_loss:'Momentumverlust',absorption:'Absorption',profit_protection:'Gewinnsicherung',fear_of_giving_back:'Angst vor Gewinnabgabe',poor_entry:'Schlechter Entry',other:'Sonstiges'};
 const ticksToPoints=ticks=>ticks*0.25;
 const pointsToTicks=points=>Number(points)*4;
 const usd=n=>Number(n).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const riskRound=n=>Math.round((n+Number.EPSILON)*100)/100;
-function riskCard(a,names,closed){
+function riskCard(a,names,closed,history=[]){
   const recorded=a.initial_risk_usd!=null;
   const ticks=a.initial_sl_points==null?'':escapeHtml(pointsToTicks(a.initial_sl_points));
   const override=!!a.risk_manually_overridden;
@@ -83,6 +84,29 @@ function riskCard(a,names,closed){
     </label>
     ${closed?'<p class="muted">Trade abgeschlossen – Risikobearbeitung deaktiviert.</p>':`<button type="button" class="secondary wide save-risk" data-id="${a.id}">Risiko für dieses Konto speichern</button>`}
     <small class="risk-note muted">${recorded?'Bereits gespeicherte Werte: Änderungen werden im Audit-Log protokolliert.':'Noch nicht gespeichert.'}</small>
+    <div class="stop-panel" style="border-top:1px solid var(--line);margin-top:16px;padding-top:14px" data-allocation-id="${a.id}">
+      <h3>SL-Verschiebungen</h3>
+      <p class="muted">Aktueller SL: <strong>${recorded?(history.length?history[0].new_stop_ticks:-pointsToTicks(a.initial_sl_points))+' Ticks':'Erst Initialrisiko speichern'}</strong> · relativ zum Entry (− Verlustseite, 0 BE, + Gewinnseite)</p>
+      ${recorded&&!closed?`<label>Neuer SL relativ zum Entry (Ticks)
+        <input class="stop-new" type="number" inputmode="numeric" step="1" placeholder="z. B. -20, 0 oder 20">
+      </label>
+      <label>Grund
+        <select class="stop-reason">
+          <option value="">Grund auswählen</option>
+          <option value="market_structure">Marktstruktur</option>
+          <option value="momentum_loss">Momentumverlust</option>
+          <option value="absorption">Absorption</option>
+          <option value="profit_protection">Gewinnsicherung</option>
+          <option value="fear_of_giving_back">Angst vor Gewinnabgabe</option>
+          <option value="poor_entry">Schlechter Entry</option>
+          <option value="other">Sonstiges</option>
+        </select>
+      </label>
+      <label>Notiz (optional)<textarea class="stop-notes" rows="2" placeholder="Warum wurde der SL verschoben?"></textarea></label>
+      <button type="button" class="secondary wide save-stop" data-id="${a.id}" data-previous="${history.length?history[0].new_stop_ticks:-pointsToTicks(a.initial_sl_points)}">SL-Verschiebung speichern</button>`:''}
+      <h3 style="margin-top:14px">SL-Verlauf</h3>
+      ${history.length?history.map(h=>`<div class="account"><strong>${escapeHtml(h.previous_stop_ticks)} → ${escapeHtml(h.new_stop_ticks)} Ticks</strong><div class="muted">${escapeHtml(berlinTime(h.changed_at))} · ${escapeHtml(stopReasonLabels[h.reason]||h.reason)}</div>${h.notes?`<small>${escapeHtml(h.notes)}</small>`:''}</div>`).join(''):'<p class="muted">Noch keine SL-Verschiebungen dokumentiert.</p>'}
+    </div>
   </div>`;
 }
 function updateRiskCard(card){
@@ -105,8 +129,18 @@ async function openTradeDetails(trade){
       .select('id,account_id,role,instrument,planned_quantity,initial_sl_points,calculated_risk_usd,initial_risk_usd,risk_manually_overridden')
       .eq('trade_id',trade.id);
     if(error)throw error;
+    const ids=(data||[]).map(a=>a.id);
+    let stopHistory=[];
+    if(ids.length){
+      const {data:stopData,error:stopError}=await client.from('stop_adjustments')
+        .select('id,allocation_id,previous_stop_ticks,new_stop_ticks,changed_at,reason,notes')
+        .in('allocation_id',ids).order('changed_at',{ascending:false}).order('id',{ascending:false});
+      if(stopError)throw stopError;
+      stopHistory=stopData||[];
+    }
+    const histories=new Map(ids.map(id=>[id,stopHistory.filter(h=>h.allocation_id===id)]));
     const names=new Map(allAccounts.map(a=>[a.id,a.account_name]));
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at)).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. SL-Verschiebungen und Exits folgen in einem späteren Schritt.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exits folgen in einem späteren Schritt.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
     panel.querySelectorAll('.risk-card').forEach(card=>{
       const field=card.querySelector('.risk-usd');
       const original=field.value;
@@ -123,6 +157,35 @@ $('sessionTradeList').addEventListener('click',async e=>{
   const trade=sessionTrades.find(t=>t.id===btn.dataset.id);if(!trade)return;
   btn.disabled=true;
   try{await openTradeDetails(trade)}finally{btn.disabled=false}
+});
+$('tradeDetails').addEventListener('click',async e=>{
+  const btn=e.target.closest('.save-stop');if(!btn||busy)return;
+  const panel=btn.closest('.stop-panel');
+  const field=panel.querySelector('.stop-new');
+  const next=Number(field.value),previous=Number(btn.dataset.previous);
+  const reason=panel.querySelector('.stop-reason').value;
+  if(field.value.trim()===''||!Number.isSafeInteger(next)||!Number.isSafeInteger(previous)){
+    message('Bitte den neuen SL als ganze, vorzeichenbehaftete Tickzahl eingeben.',true);return;
+  }
+  if(next===previous){message('Der neue SL entspricht dem aktuellen SL.',true);return;}
+  if(!reason){message('Bitte einen Grund für die SL-Verschiebung auswählen.',true);return;}
+  if(!confirm('SL von '+previous+' auf '+next+' Ticks verschieben und dauerhaft dokumentieren? Keine Brokerorder.'))return;
+  busy=true;btn.disabled=true;
+  try{
+    const {data,error}=await client.rpc('record_stop_adjustment',{
+      p_allocation_id:btn.dataset.id,
+      p_expected_previous_ticks:previous,
+      p_new_stop_ticks:next,
+      p_reason:reason,
+      p_notes:panel.querySelector('.stop-notes').value.trim()||null
+    });
+    if(error)throw error;
+    if(!data)throw new Error('Keine Bestätigung der Datenbank. Vor einem erneuten Versuch den Verlauf aktualisieren.');
+    const activeTrade=sessionTrades.find(t=>t.id===$('tradeDetails').dataset.tradeId);
+    if(activeTrade)await openTradeDetails(activeTrade);
+    message('SL-Verschiebung gespeichert: '+previous+' → '+next+' Ticks. Initialrisiko unverändert.');
+  }catch(err){message('SL-Verschiebung nicht bestätigt: '+err.message+'\nVor erneutem Versuch den Verlauf kontrollieren.',true);}
+  finally{busy=false;btn.disabled=false;}
 });
 $('tradeDetails').addEventListener('click',async e=>{
   const btn=e.target.closest('.save-risk');if(!btn||busy)return;
