@@ -6,12 +6,30 @@
 <style>
 :root{color-scheme:dark;--bg:#09111c;--panel:#142538;--panel2:#1b3045;--line:#344d63;--text:#e8f2fa;--muted:#a9bfcd;--accent:#08a5a4;--warn:#e9a749}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:auto;padding:18px 16px 110px}header{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:22px;margin:6px 0}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0 0 10px}p{line-height:1.45}small,.muted{color:var(--muted)}section,.card{background:var(--panel);padding:17px;border-radius:15px;margin:15px 0;border:1px solid #263c51}input,select,textarea,button{font:inherit;color:var(--text)}input,select,textarea{display:block;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px;margin:6px 0 13px}input:focus,select:focus,textarea:focus{outline:2px solid var(--accent)}label{display:block;font-weight:600;font-size:14px}button{border:0;background:var(--accent);padding:14px;border-radius:11px;font-weight:700;cursor:pointer;min-height:48px}button.secondary{background:#2c465b}button.ghost{background:transparent;border:1px solid var(--line)}button.danger{background:#7c3944}button:disabled{opacity:.5;cursor:not-allowed}.wide{width:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{display:inline-block;border:1px solid var(--line);padding:5px 9px;border-radius:999px;color:var(--muted);font-size:12px}.notice{padding:12px;border-left:3px solid var(--warn);background:#342b22;border-radius:8px}.ok{color:#77d8b5}.error{color:#ff9c9c}.hidden{display:none!important}.account{border:1px solid var(--line);padding:13px;border-radius:12px;margin:10px 0}.account .grid{margin-top:10px}.account label{font-size:12px}.tabs{position:sticky;top:0;background:#102032;border:1px solid var(--line);border-radius:12px;display:flex;justify-content:center;padding:7px;margin:14px 0;z-index:10}.tabs>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:min(720px,100%)}.tabs button{padding:9px 3px;min-height:54px;background:#21374b;font-size:13px}.tabs button.active{background:#087f80}#message{white-space:pre-wrap;overflow-wrap:anywhere}.stat{background:var(--panel2);padding:14px;border-radius:11px}.stat strong{font-size:24px;display:block;margin-top:5px}details summary{cursor:pointer;padding:8px 0}button+button{margin-top:8px}#logout{padding:8px 10px;min-height:36px;font-size:13px}
+
+/* Mobile: prevent horizontal page panning without disabling vertical scrolling */
+html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none}
+main,#app,section,.card,.account,.stop-panel{min-width:0;max-width:100%}
+.row>*{min-width:0} .row{flex-wrap:wrap}
+input,select,textarea,button{max-width:100%;min-width:0}
+input,select,textarea{font-size:16px}
+#message,.muted,small,p{overflow-wrap:anywhere}
+.stop-stepper{display:grid;grid-template-columns:58px minmax(0,1fr) 58px;gap:8px;align-items:center;margin:8px 0}
+.stop-stepper input{margin:0;text-align:center;font-size:22px;font-weight:700}
+.stop-stepper button{font-size:25px;padding:8px}
+.stop-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:9px 0 14px}
+.stop-presets button{font-size:16px;padding:9px 4px}
+.stop-reason-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 14px}
+.stop-reason-buttons button{padding:10px 6px;font-size:13px;white-space:normal;overflow-wrap:anywhere}
+.stop-reason-buttons button.selected{background:#087f80;outline:2px solid #73e0d4}
+#emailNotice{margin:12px 0;overflow-wrap:anywhere}
+@media(max-width:380px){main{padding-left:10px;padding-right:10px}section,.card{padding:12px}.stop-stepper{grid-template-columns:48px minmax(0,1fr) 48px}}
 </style>
 </head>
 <body><main>
 <header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Journal · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <nav id="tabs" class="tabs hidden"><div><button data-view="live" class="active">◉ Live</button><button data-view="decision">＋ Trade</button><button data-view="accounts">▤ Konten</button></div></nav>
-<section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldelink per E-Mail</button><small>Die GitHub-Pages-Adresse muss in Supabase als Redirect URL zugelassen sein.</small></section>
+<section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldelink per E-Mail senden</button><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Die GitHub-Pages-Adresse muss in Supabase als Redirect URL zugelassen sein.</small></section>
 <div id="app" class="hidden">
 <section id="liveView"><h2>Live-Cockpit</h2><div class="grid"><div class="stat"><small>Session</small><strong id="sessionState">Keine</strong></div><div class="stat"><small>Ausgeführte Entscheidungen</small><strong id="tradeCount">0 / 5</strong></div></div>
 <div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
@@ -37,7 +55,19 @@ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showView(b.dat
 document.addEventListener('click',e=>{if(e.target?.id==='goAccounts')showView('accounts');});
 async function authStatus(){const {data,error}=await client.auth.getUser();currentUser=error?null:data.user;const signed=!!currentUser;$('loginView').classList.toggle('hidden',signed);$('app').classList.toggle('hidden',!signed);$('tabs').classList.toggle('hidden',!signed);$('logout').classList.toggle('hidden',!signed);if(signed){message('Angemeldet: '+currentUser.email);await refresh();}else message(error?'Anmeldestatus: '+error.message:'Bitte anmelden.',!!error);}
 $('login').onclick=async()=>{const {error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)message('Login: '+error.message,true);else await authStatus();};
-$('magic').onclick=async()=>{const {error}=await client.auth.signInWithOtp({email:$('email').value.trim(),options:{emailRedirectTo:location.origin+location.pathname}});message(error?'Anmeldelink: '+error.message:'Wenn die Adresse zulässig ist, wird ein Anmeldelink versendet.',!!error);};
+$('magic').onclick=async()=>{
+  const email=$('email').value.trim(),btn=$('magic'),notice=$('emailNotice');
+  if(!email||!$('email').checkValidity()){notice.classList.remove('hidden');notice.textContent='Bitte zuerst eine gültige E-Mail-Adresse eingeben.';message('Ungültige E-Mail-Adresse.',true);return;}
+  btn.disabled=true;notice.classList.add('hidden');
+  try{
+    const {error}=await client.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
+    if(error)throw error;
+    notice.textContent='✓ Anfrage angenommen. Bitte prüfe dein E-Mail-Postfach (auch Spam). Öffne den Anmeldelink in der E-Mail. Falls deine Supabase-E-Mail-Vorlage stattdessen einen Code enthält, ist die Code-Anmeldung in dieser Version noch nicht eingerichtet.';
+    notice.classList.remove('hidden');
+    message('Anmeldelink angefordert. Bitte E-Mail-Postfach prüfen.');
+  }catch(error){notice.textContent='E-Mail-Anfrage fehlgeschlagen: '+error.message;notice.classList.remove('hidden');message(notice.textContent,true)}
+  finally{btn.disabled=false}
+};
 $('logout').onclick=async()=>{const {error}=await client.auth.signOut();if(error)message(error.message,true);else {currentUser=null;currentSession=null;accounts=[];await authStatus();}};
 async function refresh(){await Promise.all([loadSession(),loadAccounts()]);renderDecision();await loadSessionTrades();}
 async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();}
@@ -87,21 +117,11 @@ function riskCard(a,names,closed,history=[]){
     <div class="stop-panel" style="border-top:1px solid var(--line);margin-top:16px;padding-top:14px" data-allocation-id="${a.id}">
       <h3>SL-Verschiebungen</h3>
       <p class="muted">Aktueller SL: <strong>${recorded?(history.length?history[0].new_stop_ticks:-pointsToTicks(a.initial_sl_points))+' Ticks':'Erst Initialrisiko speichern'}</strong> · relativ zum Entry (− Verlustseite, 0 BE, + Gewinnseite)</p>
-      ${recorded&&!closed?`<label>Neuer SL relativ zum Entry (Ticks)
-        <input class="stop-new" type="number" inputmode="numeric" step="1" placeholder="z. B. -20, 0 oder 20">
-      </label>
-      <label>Grund
-        <select class="stop-reason">
-          <option value="">Grund auswählen</option>
-          <option value="market_structure">Marktstruktur</option>
-          <option value="momentum_loss">Momentumverlust</option>
-          <option value="absorption">Absorption</option>
-          <option value="profit_protection">Gewinnsicherung</option>
-          <option value="fear_of_giving_back">Angst vor Gewinnabgabe</option>
-          <option value="poor_entry">Schlechter Entry</option>
-          <option value="other">Sonstiges</option>
-        </select>
-      </label>
+      ${recorded&&!closed?`<label for="stop-${a.id}">Neuer SL relativ zum Entry (Ticks)</label>
+      <div class="stop-stepper"><button type="button" class="secondary stop-minus" aria-label="SL um einen Tick verringern">−</button><input id="stop-${a.id}" class="stop-new" type="text" inputmode="numeric" pattern="-?[0-9]+" autocomplete="off" placeholder="z. B. -20"><button type="button" class="secondary stop-plus" aria-label="SL um einen Tick erhöhen">+</button></div>
+      <div class="stop-presets">${[-40,-20,-10,0,10,20].map(v=>`<button type="button" class="secondary stop-preset" data-ticks="${v}">${v===0?'BE':v>0?'+'+v:v}</button>`).join('')}</div>
+      <label>Grund auswählen</label><input class="stop-reason" type="hidden" value="">
+      <div class="stop-reason-buttons">${[['market_structure','Marktstruktur'],['momentum_loss','Momentumverlust'],['absorption','Absorption'],['profit_protection','Gewinnsicherung'],['fear_of_giving_back','Angst vor Gewinnabgabe'],['poor_entry','Schlechter Entry'],['other','Sonstiges']].map(([value,label])=>`<button type="button" class="secondary stop-reason-choice" data-reason="${value}" aria-pressed="false">${label}</button>`).join('')}</div>
       <label>Notiz (optional)<textarea class="stop-notes" rows="2" placeholder="Warum wurde der SL verschoben?"></textarea></label>
       <button type="button" class="secondary wide save-stop" data-id="${a.id}" data-previous="${history.length?history[0].new_stop_ticks:-pointsToTicks(a.initial_sl_points)}">SL-Verschiebung speichern</button>`:''}
       <h3 style="margin-top:14px">SL-Verlauf</h3>
@@ -158,13 +178,29 @@ $('sessionTradeList').addEventListener('click',async e=>{
   btn.disabled=true;
   try{await openTradeDetails(trade)}finally{btn.disabled=false}
 });
+$('tradeDetails').addEventListener('click',e=>{
+  const btn=e.target.closest('.stop-minus,.stop-plus,.stop-preset,.stop-reason-choice');
+  if(!btn)return;
+  const panel=btn.closest('.stop-panel');if(!panel)return;
+  if(btn.classList.contains('stop-reason-choice')){
+    panel.querySelector('.stop-reason').value=btn.dataset.reason;
+    panel.querySelectorAll('.stop-reason-choice').forEach(b=>{const selected=b===btn;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});
+    return;
+  }
+  const field=panel.querySelector('.stop-new');
+  if(btn.classList.contains('stop-preset'))field.value=btn.dataset.ticks;
+  else{
+    const raw=field.value.trim();const current=/^-?\d+$/.test(raw)?Number(raw):Number(panel.querySelector('.save-stop').dataset.previous);
+    field.value=String(current+(btn.classList.contains('stop-plus')?1:-1));
+  }
+});
 $('tradeDetails').addEventListener('click',async e=>{
   const btn=e.target.closest('.save-stop');if(!btn||busy)return;
   const panel=btn.closest('.stop-panel');
   const field=panel.querySelector('.stop-new');
   const next=Number(field.value),previous=Number(btn.dataset.previous);
   const reason=panel.querySelector('.stop-reason').value;
-  if(field.value.trim()===''||!Number.isSafeInteger(next)||!Number.isSafeInteger(previous)){
+  if(!/^-?\d+$/.test(field.value.trim())||!Number.isSafeInteger(next)||!Number.isSafeInteger(previous)){
     message('Bitte den neuen SL als ganze, vorzeichenbehaftete Tickzahl eingeben.',true);return;
   }
   if(next===previous){message('Der neue SL entspricht dem aktuellen SL.',true);return;}
