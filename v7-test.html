@@ -17,6 +17,10 @@ input,select,textarea{font-size:16px}
 .stop-stepper{display:grid;grid-template-columns:58px minmax(0,1fr) 58px;gap:8px;align-items:center;margin:8px 0}
 .stop-stepper input{margin:0;text-align:center;font-size:22px;font-weight:700}
 .stop-stepper button{font-size:25px;padding:8px}
+/* iOS Safari: rapid taps must increment ticks, not trigger double-tap zoom */
+button{touch-action:manipulation;}
+.stop-stepper button,.stop-presets button,.stop-reason-buttons button{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.stop-stepper button{min-height:60px;min-width:0;overscroll-behavior:contain}
 .stop-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:9px 0 14px}
 .stop-presets button{font-size:16px;padding:9px 4px}
 .stop-reason-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 14px}
@@ -34,6 +38,7 @@ input,select,textarea{font-size:16px}
 <section id="liveView"><h2>Live-Cockpit</h2><div class="grid"><div class="stat"><small>Session</small><strong id="sessionState">Keine</strong></div><div class="stat"><small>Ausgeführte Entscheidungen</small><strong id="tradeCount">0 / 5</strong></div></div>
 <div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
 <div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><button id="saveHtf" class="secondary wide">Session-Kontext speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
+<div id="sessionSummary" class="card hidden" aria-live="polite"><h3>Session-Auswertung</h3><div id="sessionSummaryBody" class="muted">Noch keine Daten.</div></div>
 <div id="sessionTrades" class="card hidden"><div class="row"><h3>Trades dieser Session</h3><button id="reloadTrades" class="secondary" type="button">Aktualisieren</button></div><div id="sessionTradeList" class="muted">Lade Trades …</div><div id="tradeDetails" class="hidden" aria-live="polite"></div></div>
 </section>
 <section id="accountsView" class="hidden"><h2>Trading-Konten</h2><p class="muted">Konten sind Journal-Einträge. Keine Verbindung zum Broker.</p><div id="accountList"></div><div id="accountEditor" class="account hidden"><h3>Bestehendes Konto bearbeiten</h3><label>Kontoname<input id="editAccountName"></label><label>Kontotyp<select id="editAccountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter<input id="editBroker"></label><div class="grid"><label>Standardinstrument<select id="editInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="editQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="saveAccountEdit" class="wide">Änderungen speichern</button><button id="cancelAccountEdit" class="ghost wide">Abbrechen</button><button id="deactivateAccount" class="danger wide">Konto deaktivieren</button><small>Deaktivieren blendet das Konto aus der aktiven Auswahl aus. Bestehende Trades bleiben erhalten.</small></div><details><summary><strong>+ Neues Konto hinzufügen</strong></summary><label>Kontoname<input id="accountName" placeholder="z. B. AMP Privat"></label><label>Kontotyp<select id="accountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter (optional)<input id="broker" placeholder="z. B. AMP Futures"></label><div class="grid"><label>Standardinstrument<select id="defaultInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="defaultQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="addAccount" class="wide">Konto speichern</button></details></section>
@@ -79,16 +84,51 @@ async function loadSessionTrades(){
   wrap.classList.toggle('hidden',!currentSession);
   details.classList.add('hidden');details.innerHTML='';
   sessionTrades=[];
-  if(!currentSession)return;
+  if(!currentSession){$('sessionSummary').classList.add('hidden');return;}
+  $('sessionSummary').classList.remove('hidden');
   list.textContent='Lade Trades …';
   const {data,error}=await client.from('trades')
-    .select('id,setup_type,instrument,direction,entry_at,exit_at,realized_pnl_usd')
+    .select('id,setup_type,instrument,direction,entry_at,exit_at,realized_pnl_usd,exit_reason,initial_risk_usd,rule_deviation,execution_grade')
     .eq('session_id',currentSession.id).order('entry_at',{ascending:false}).limit(100);
-  if(error){list.textContent='Trades konnten nicht geladen werden: '+error.message;return}
+  if(error){list.textContent='Trades konnten nicht geladen werden: '+error.message;$('sessionSummaryBody').textContent='Auswertung nicht verfügbar – Trades konnten nicht geladen werden.';return}
   sessionTrades=data||[];
+  await renderSessionSummary(sessionTrades);
+  if(sessionTrades.length===100){$('sessionSummaryBody').insertAdjacentHTML('beforeend','<p class="notice">Achtung: Maximal 100 Trades geladen. Die Auswertung kann unvollständig sein.</p>');}
   list.innerHTML=sessionTrades.length?sessionTrades.map(t=>
     `<div class="account"><div class="row"><div><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction.toUpperCase())} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${t.exit_at?'Abgeschlossen':'Offen'}</div></div><button type="button" class="secondary open-trade" data-id="${t.id}">Öffnen</button></div></div>`
   ).join(''):'<p class="muted">Noch keine Entries in dieser Session.</p>';
+}
+async function renderSessionSummary(trades){
+ const target=$('sessionSummaryBody');
+ const closed=trades.filter(t=>t.exit_at),open=trades.length-closed.length;
+ const total=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
+ const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
+ const withoutMarkedDeviation=trades.filter(t=>!t.rule_deviation).length;
+ const graded=trades.filter(t=>t.execution_grade&&t.execution_grade!=='unrated');
+ const aPlus=graded.filter(t=>t.execution_grade==='A+').length;
+ const accountRows=[];
+ if(closed.length){
+   const ids=closed.map(t=>t.id);
+   const {data:alloc,error:allocError}=await client.from('trade_account_allocations').select('id,trade_id,account_id,initial_risk_usd').in('trade_id',ids);
+   if(allocError){target.textContent='Konten-Auswertung nicht verfügbar: '+allocError.message;return;}
+   const allocations=alloc||[];
+   if(allocations.length){
+     const {data:results,error:resultsError}=await client.from('account_trade_results').select('allocation_id,realized_pnl_usd,result_status').in('allocation_id',allocations.map(a=>a.id));
+     if(resultsError){target.textContent='Kontoergebnisse nicht verfügbar: '+resultsError.message;return;}
+     const byId=new Map((results||[]).filter(r=>r.result_status==='final').map(r=>[r.allocation_id,r]));
+     const byAccount=new Map();
+     for(const a of allocations){const r=byId.get(a.id);if(!r)continue;
+       const v=byAccount.get(a.account_id)||{pnl:0,risk:0,count:0};
+       v.pnl+=Number(r.realized_pnl_usd);v.risk+=Number(a.initial_risk_usd||0);v.count++;
+       byAccount.set(a.account_id,v);
+     }
+     for(const [id,v] of byAccount){
+       const name=allAccounts.find(a=>a.id===id)?.account_name||'Konto';
+       accountRows.push(`<div class="row"><span>${escapeHtml(name)} · ${v.count} Trades</span><strong>${usd(v.pnl)} USD${v.risk>0?' · '+(v.pnl/v.risk).toFixed(2)+' R':''}</strong></div>`);
+     }
+   }
+ }
+ target.innerHTML=`<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Realisiert (USD)</small><strong>${usd(total)}</strong></div><div class="stat"><small>Realisiertes R</small><strong>${risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Ohne dokumentierten Regelbruch: ${withoutMarkedDeviation} / ${trades.length} (kein Nachweis der Regelkonformität). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Session-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L daher konsistent brutto oder netto eingeben. Keine Broker-Synchronisation.</p>`;
 }
 $('reloadTrades').onclick=loadSessionTrades;
 const tickValues={NQ:5,MNQ:0.5,ES:12.5,MES:1.25};
@@ -160,7 +200,21 @@ async function openTradeDetails(trade){
     }
     const histories=new Map(ids.map(id=>[id,stopHistory.filter(h=>h.allocation_id===id)]));
     const names=new Map(allAccounts.map(a=>[a.id,a.account_name]));
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exits folgen in einem späteren Schritt.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
+    let existingResults=[];
+    if(trade.exit_at && ids.length){
+      const {data:results,error:resultsError}=await client.from('account_trade_results')
+        .select('allocation_id,realized_pnl_usd,fees_usd,result_status').in('allocation_id',ids);
+      if(resultsError)throw resultsError;
+      existingResults=results||[];
+    }
+    const resultByAllocation=new Map(existingResults.map(r=>[r.allocation_id,r]));
+    const initialRisk=(data||[]).reduce((sum,a)=>sum+Number(a.initial_risk_usd||0),0);
+    const pnlTotal=existingResults.reduce((sum,r)=>sum+Number(r.realized_pnl_usd||0),0);
+    const feesTotal=existingResults.reduce((sum,r)=>sum+Number(r.fees_usd||0),0);
+    const exitSection=trade.exit_at?
+      `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong></div>`}).join('')}<p><strong>Summe: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Gebühren separat: ${usd(feesTotal)} USD. P&L wird als eingegebener Betrag summiert; Gebühren werden nicht automatisch abgezogen.</small></p></div>`:
+      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto den tatsächlich realisierten P&L-Betrag eingeben (mit Minus bei Verlust). Ein Abschluss speichert alle Konten gemeinsam. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Realisierter P&L (USD)<input class="exit-pnl" type="text" inputmode="decimal" placeholder="z. B. 125 oder -75" autocomplete="off"></label><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exit-Ergebnisse werden je Konto separat erfasst.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
     panel.querySelectorAll('.risk-card').forEach(card=>{
       const field=card.querySelector('.risk-usd');
       const original=field.value;
@@ -177,6 +231,47 @@ $('sessionTradeList').addEventListener('click',async e=>{
   const trade=sessionTrades.find(t=>t.id===btn.dataset.id);if(!trade)return;
   btn.disabled=true;
   try{await openTradeDetails(trade)}finally{btn.disabled=false}
+});
+const durationLabel=(start,end)=>{const seconds=Math.max(0,Math.round((new Date(end)-new Date(start))/1000));const mins=Math.floor(seconds/60);return Math.floor(mins/60)+' h '+String(mins%60).padStart(2,'0')+' min'+(mins===0?' '+seconds+' s':'');};
+function parseMoney(raw){const s=raw.trim().replace(',','.');return /^-?\d+(?:\.\d{1,2})?$/.test(s)?Number(s):null;}
+function updateExitPreview(editor){
+  let total=0,risk=0,complete=true;
+  editor.querySelectorAll('.exit-account').forEach(card=>{
+    const pnl=parseMoney(card.querySelector('.exit-pnl').value);
+    const initial=Number(card.dataset.risk);
+    if(pnl===null||!card.dataset.risk||initial<=0)complete=false;
+    else {total+=pnl;risk+=initial;}
+    card.querySelector('.exit-r').textContent=pnl!==null&&initial>0?'R: '+(pnl/initial).toFixed(2):'R: –';
+  });
+  editor.querySelector('.exit-preview').textContent=complete?'Gesamtergebnis: '+usd(total)+' USD · '+(total/risk).toFixed(2)+' R':'Gesamtergebnis: bitte alle Konten ausfüllen';
+}
+$('tradeDetails').addEventListener('input',e=>{const editor=e.target.closest('.exit-editor');if(editor)updateExitPreview(editor);});
+$('tradeDetails').addEventListener('click',async e=>{
+  const btn=e.target.closest('.close-trade-action');if(!btn||busy)return;
+  const editor=btn.closest('.exit-editor'),reason=editor.querySelector('.exit-reason').value;
+  if(!reason){message('Bitte Exit-Grund auswählen.',true);return;}
+  const results=[];
+  for(const card of editor.querySelectorAll('.exit-account')){
+    const pnl=parseMoney(card.querySelector('.exit-pnl').value);
+    const feesRaw=card.querySelector('.exit-fees').value;
+    const fees=feesRaw.trim()===''?0:parseMoney(feesRaw);
+    if(pnl===null||fees===null||fees<0||!card.dataset.risk||Number(card.dataset.risk)<=0){message('Bitte für jedes Konto gültigen P&L, Gebühren und Initialrisiko prüfen.',true);return;}
+    results.push({allocation_id:card.dataset.id,realized_pnl_usd:pnl,fees_usd:fees});
+  }
+  const total=results.reduce((s,r)=>s+r.realized_pnl_usd,0);
+  if(!confirm('Trade mit '+results.length+' Kontoergebnissen und '+usd(total)+' USD Gesamt-P&L endgültig abschließen? Keine Brokerorder.'))return;
+  busy=true;btn.disabled=true;
+  try{
+    const tradeId=$('tradeDetails').dataset.tradeId;
+    const {data,error}=await client.rpc('close_trade_with_account_results',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results});
+    if(error)throw error;
+    if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
+    await loadSessionTrades();
+    const closed=sessionTrades.find(t=>t.id===tradeId);
+    if(closed)await openTradeDetails(closed);
+    message('Trade abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
+  }catch(err){message('Trade-Abschluss nicht bestätigt: '+err.message+'\nVor einem erneuten Versuch die Trade-Liste aktualisieren.',true);}
+  finally{busy=false;btn.disabled=false;}
 });
 $('tradeDetails').addEventListener('click',e=>{
   const btn=e.target.closest('.stop-minus,.stop-plus,.stop-preset,.stop-reason-choice');
@@ -257,7 +352,7 @@ $('changeSessionAccounts').onclick=()=>openSessionSetup('change');
 $('cancelSession').onclick=()=>{renderSession();};
 $('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){message('Wähle mindestens ein Konto.',true);return}if(selection.filter(x=>x.role==='leader').length!==1){message('Genau ein Leader ist erforderlich.',true);return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){message('Ungültige Kontraktzahl.',true);return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();}catch(e){message('Kontenauswahl: '+e.message,true)}finally{busy=false;$('confirmSession').disabled=false}};
 $('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:$('htf').value};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;message('HTF-Kontext gespeichert.')}};
-$('closeSession').onclick=async()=>{if(!currentSession)return;if(!confirm('Session wirklich schließen?'))return;const {error}=await client.from('trading_sessions').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',currentSession.id);if(error)message('Session schließen: '+error.message,true);else{currentSession=null;renderSession();await loadCount();await loadSessionTrades();message('Session geschlossen.')}};
+$('closeSession').onclick=async()=>{if(!currentSession)return;const {count,error:openError}=await client.from('trades').select('id',{count:'exact',head:true}).eq('session_id',currentSession.id).is('exit_at',null);if(openError){message('Offene Trades prüfen: '+openError.message,true);return;}if(count>0){message('Session kann nicht geschlossen werden: '+count+' Trade(s) sind noch offen. Bitte zuerst dokumentieren und abschließen.',true);return;}if(!confirm('Session wirklich schließen?'))return;const {error}=await client.from('trading_sessions').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',currentSession.id);if(error)message('Session schließen: '+error.message,true);else{currentSession=null;renderSession();await loadCount();await loadSessionTrades();message('Session geschlossen.')}};
 async function loadAccounts(){
   const {data,error}=await client.from('trading_accounts').select('id,account_name,account_type,broker,default_instrument,default_quantity,active').order('created_at',{ascending:true});
   if(error){message('Konten laden: '+error.message,true);return}
