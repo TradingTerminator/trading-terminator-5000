@@ -17,7 +17,7 @@
 <div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
 <div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><button id="saveHtf" class="secondary wide">Session-Kontext speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
 </section>
-<section id="accountsView" class="hidden"><h2>Trading-Konten</h2><p class="muted">Konten sind Journal-Einträge. Keine Verbindung zum Broker.</p><div id="accountList"></div><details><summary><strong>+ Neues Konto hinzufügen</strong></summary><label>Kontoname<input id="accountName" placeholder="z. B. AMP Privat"></label><label>Kontotyp<select id="accountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter (optional)<input id="broker" placeholder="z. B. AMP Futures"></label><div class="grid"><label>Standardinstrument<select id="defaultInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="defaultQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="addAccount" class="wide">Konto speichern</button></details></section>
+<section id="accountsView" class="hidden"><h2>Trading-Konten</h2><p class="muted">Konten sind Journal-Einträge. Keine Verbindung zum Broker.</p><div id="accountList"></div><div id="accountEditor" class="account hidden"><h3>Bestehendes Konto bearbeiten</h3><label>Kontoname<input id="editAccountName"></label><label>Kontotyp<select id="editAccountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter<input id="editBroker"></label><div class="grid"><label>Standardinstrument<select id="editInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="editQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="saveAccountEdit" class="wide">Änderungen speichern</button><button id="cancelAccountEdit" class="ghost wide">Abbrechen</button><button id="deactivateAccount" class="danger wide">Konto deaktivieren</button><small>Deaktivieren blendet das Konto aus der aktiven Auswahl aus. Bestehende Trades bleiben erhalten.</small></div><details><summary><strong>+ Neues Konto hinzufügen</strong></summary><label>Kontoname<input id="accountName" placeholder="z. B. AMP Privat"></label><label>Kontotyp<select id="accountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter (optional)<input id="broker" placeholder="z. B. AMP Futures"></label><div class="grid"><label>Standardinstrument<select id="defaultInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="defaultQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="addAccount" class="wide">Konto speichern</button></details></section>
 <section id="decisionView" class="hidden"><h2>Neue Trading-Entscheidung</h2><p class="muted">Eine Entscheidung kann mehrere Konten umfassen. Sie zählt erst beim dokumentierten Entry.</p><div id="decisionSession" class="notice">Bitte zuerst eine Session starten.</div><label>Setup<select id="setup"><option value="">Setup wählen</option><option>Liquidity Play</option><option>Trendbruch</option><option>Momentum</option><option>Kampagne Long</option><option>Kampagne Short</option><option>Countertrade</option></select></label><label>Richtung<select id="direction"><option value="long">Long</option><option value="short">Short</option></select></label><label>Leitinstrument<select id="instrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><h3>Kontozuordnung</h3><div id="allocationList"></div><div class="notice">Das Speichern dokumentiert einen Entry im Journal, führt aber keine Order aus. Maximal 5 Entscheidungen pro Session sind eine Warnschwelle, keine technische Handelssperre.</div><button id="recordEntry" class="wide">Entry dokumentieren</button></section>
 <section><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
 </div></main>
@@ -27,7 +27,7 @@
 'use strict';
 const client=window.supabase.createClient('https://hogrdcqblpcrqgdtsvjv.supabase.co','sb_publishable_i5m3fyK3cNWRPGV41l9ymw_UPBeyGan');
 const $=id=>document.getElementById(id);
-let currentUser=null,currentSession=null,accounts=[],tradeCount=0,busy=false,sessionDraftMode="start";
+let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const message=(s,err=false)=>{$('message').textContent=s;$('message').className=err?'error':'ok'};
 const localDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -51,7 +51,65 @@ $('cancelSession').onclick=()=>{renderSession();};
 $('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){message('Wähle mindestens ein Konto.',true);return}if(selection.filter(x=>x.role==='leader').length!==1){message('Genau ein Leader ist erforderlich.',true);return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){message('Ungültige Kontraktzahl.',true);return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();}catch(e){message('Kontenauswahl: '+e.message,true)}finally{busy=false;$('confirmSession').disabled=false}};
 $('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:$('htf').value};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;message('HTF-Kontext gespeichert.')}};
 $('closeSession').onclick=async()=>{if(!currentSession)return;if(!confirm('Session wirklich schließen?'))return;const {error}=await client.from('trading_sessions').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',currentSession.id);if(error)message('Session schließen: '+error.message,true);else{currentSession=null;renderSession();await loadCount();message('Session geschlossen.')}};
-async function loadAccounts(){const {data,error}=await client.from('trading_accounts').select('id,account_name,account_type,broker,default_instrument,default_quantity,active').eq('active',true).order('created_at',{ascending:true});if(error){message('Konten laden: '+error.message,true);return}accounts=data??[];renderSession();$('accountList').innerHTML=accounts.length?accounts.map(a=>`<div class="account"><strong>${escapeHtml(a.account_name)}</strong><div class="muted">${escapeHtml(a.account_type)} · ${escapeHtml(a.broker||'Kein Broker')} · ${escapeHtml(a.default_instrument)} × ${escapeHtml(a.default_quantity)}</div></div>`).join(''):'<p class="muted">Noch keine aktiven Konten angelegt.</p>';renderDecision();}
+async function loadAccounts(){
+  const {data,error}=await client.from('trading_accounts').select('id,account_name,account_type,broker,default_instrument,default_quantity,active').order('created_at',{ascending:true});
+  if(error){message('Konten laden: '+error.message,true);return}
+  allAccounts=data??[];
+  accounts=allAccounts.filter(a=>a.active);
+  renderSession();
+  $('accountList').innerHTML=allAccounts.length?allAccounts.map(a=>`<div class="account"><div class="row"><div><strong>${escapeHtml(a.account_name)}</strong><div class="muted">${escapeHtml(a.account_type)} · ${escapeHtml(a.broker||'Kein Broker')} · ${escapeHtml(a.default_instrument)} × ${escapeHtml(a.default_quantity)}${a.active?'':' · DEAKTIVIERT'}</div></div><button type="button" class="secondary edit-account" data-id="${a.id}">Bearbeiten</button></div></div>`).join(''):'<p class="muted">Noch keine Konten angelegt.</p>';
+  renderDecision();
+}
+$('accountList').addEventListener('click',e=>{
+  const btn=e.target.closest('.edit-account');
+  if(!btn)return;
+  const a=allAccounts.find(x=>x.id===btn.dataset.id);
+  if(!a)return;
+  editingAccountId=a.id;
+  $('editAccountName').value=a.account_name;
+  $('editAccountType').value=a.account_type;
+  $('editBroker').value=a.broker||'';
+  $('editInstrument').value=a.default_instrument;
+  $('editQty').value=a.default_quantity;
+  $('deactivateAccount').textContent=a.active?'Konto deaktivieren':'Konto wieder aktivieren';
+  $('accountEditor').classList.remove('hidden');
+  $('accountEditor').scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+function closeAccountEditor(){editingAccountId=null;$('accountEditor').classList.add('hidden')}
+$('cancelAccountEdit').onclick=closeAccountEditor;
+$('saveAccountEdit').onclick=async()=>{
+  if(busy||!editingAccountId)return;
+  const name=$('editAccountName').value.trim(),qty=Number($('editQty').value);
+  if(!name||!Number.isFinite(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}
+  busy=true;$('saveAccountEdit').disabled=true;
+  try{
+    const {data,error}=await client.from('trading_accounts').update({
+      account_name:name,account_type:$('editAccountType').value,
+      broker:$('editBroker').value.trim()||null,
+      default_instrument:$('editInstrument').value,
+      default_quantity:qty,updated_at:new Date().toISOString()
+    }).eq('id',editingAccountId).select('id').single();
+    if(error)throw error;
+    if(!data)throw new Error('Keine Kontoänderung bestätigt.');
+    closeAccountEditor();await loadAccounts();message('Kontoänderungen gespeichert.');
+  }catch(e){message('Konto bearbeiten: '+e.message,true)}
+  finally{busy=false;$('saveAccountEdit').disabled=false}
+};
+$('deactivateAccount').onclick=async()=>{
+  if(busy||!editingAccountId)return;
+  const a=allAccounts.find(x=>x.id===editingAccountId);
+  if(!a)return;
+  const next=!a.active;
+  if(!confirm(next?'Konto wieder aktivieren?':'Konto deaktivieren? Bestehende Trades bleiben erhalten.'))return;
+  busy=true;$('deactivateAccount').disabled=true;
+  try{
+    const {data,error}=await client.from('trading_accounts').update({active:next,updated_at:new Date().toISOString()}).eq('id',editingAccountId).select('id').single();
+    if(error)throw error;
+    if(!data)throw new Error('Keine Änderung bestätigt.');
+    closeAccountEditor();await loadAccounts();message(next?'Konto wieder aktiviert.':'Konto deaktiviert. Bestehende Trades bleiben erhalten.');
+  }catch(e){message('Kontostatus ändern: '+e.message,true)}
+  finally{busy=false;$('deactivateAccount').disabled=false}
+};
 $('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isFinite(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();};
 function renderDecision(){const chosen=currentSession?.htf_context?.selected_accounts||[];$('allocationList').innerHTML=chosen.length?chosen.map(v=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label><input style="display:inline;width:auto;margin-right:8px" type="checkbox" class="acct-check" data-id="${a.id}" checked>${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="acct-role" data-id="${a.id}"><option value="follower" ${v.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="acct-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===v.instrument?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="acct-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity)}"></label></div>`}).join(''):'<p class="notice">Wähle zuerst im Live-Cockpit die Konten für diese Session aus.</p>';}
 $('recordEntry').onclick=async()=>{if(busy)return;if(!currentSession){message('Bitte zuerst eine Session starten.',true);return}if(!(currentSession.htf_context?.selected_accounts||[]).length){message('Bitte zuerst die Konten für diese Session auswählen.',true);return}const setup=$('setup').value;if(!setup){message('Bitte ein Setup auswählen.',true);return}const selected=[...document.querySelectorAll('.acct-check:checked')].map(c=>{const id=c.dataset.id;return{account_id:id,role:document.querySelector(`.acct-role[data-id="${id}"]`).value,instrument:document.querySelector(`.acct-instrument[data-id="${id}"]`).value,planned_quantity:Number(document.querySelector(`.acct-qty[data-id="${id}"]`).value)}});if(!selected.length){message('Mindestens ein Konto auswählen.',true);return}if(selected.some(a=>!Number.isFinite(a.planned_quantity)||a.planned_quantity<=0)){message('Kontraktzahl muss größer als 0 sein.',true);return}if(selected.filter(a=>a.role==='leader').length!==1){message('Genau ein ausgewähltes Konto muss Leader sein.',true);return}if(tradeCount>=5&&!confirm('Warnung: Bereits '+tradeCount+' Entscheidungen in dieser Session. Trotzdem dokumentieren?'))return;if(!confirm('Entry jetzt als ausgeführte Trading-Entscheidung dokumentieren? Keine Brokerorder.'))return;busy=true;$('recordEntry').disabled=true;let tradeId=null;try{const {data,error}=await client.from('trades').insert({session_id:currentSession.id,setup_type:setup,instrument:$('instrument').value,direction:$('direction').value,entry_at:new Date().toISOString()}).select('id').single();if(error)throw error;tradeId=data.id;const {error:allocationError}=await client.from('trade_account_allocations').insert(selected.map(a=>({...a,trade_id:tradeId})));if(allocationError)throw allocationError;await loadCount();message('Entry gespeichert: 1 Entscheidung, '+selected.length+' Kontozuordnung(en).');showView('live');}catch(e){message('Speichern fehlgeschlagen: '+e.message+(tradeId?'\nACHTUNG: Trade '+tradeId+' wurde bereits angelegt. Bitte nicht erneut klicken; Kontozuordnungen prüfen.':''),true)}finally{busy=false;$('recordEntry').disabled=false}};
