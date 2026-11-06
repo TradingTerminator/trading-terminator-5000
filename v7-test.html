@@ -61,18 +61,20 @@ async function loadSessionTrades(){
   ).join(''):'<p class="muted">Noch keine Entries in dieser Session.</p>';
 }
 $('reloadTrades').onclick=loadSessionTrades;
-const pointValues={NQ:20,MNQ:2,ES:50,MES:5};
+const tickValues={NQ:5,MNQ:0.5,ES:12.5,MES:1.25};
+const ticksToPoints=ticks=>ticks*0.25;
+const pointsToTicks=points=>Number(points)*4;
 const usd=n=>Number(n).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const riskRound=n=>Math.round((n+Number.EPSILON)*100)/100;
 function riskCard(a,names,closed){
   const recorded=a.initial_risk_usd!=null;
-  const points=a.initial_sl_points==null?'':escapeHtml(a.initial_sl_points);
+  const ticks=a.initial_sl_points==null?'':escapeHtml(pointsToTicks(a.initial_sl_points));
   const override=!!a.risk_manually_overridden;
   return `<div class="account risk-card" data-id="${a.id}" data-instrument="${escapeHtml(a.instrument)}" data-qty="${escapeHtml(a.planned_quantity)}">
     <strong>${escapeHtml(names.get(a.account_id)||'Unbekanntes Konto')}</strong>
     <div class="muted">${escapeHtml(a.role)} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)} · ${recorded?'Initialrisiko: '+usd(a.initial_risk_usd)+' USD':'Initialrisiko: nicht erfasst'}</div>
-    <label>Ursprünglicher SL-Abstand (Punkte)
-      <input class="risk-points" type="number" inputmode="decimal" min="0.01" step="any" placeholder="z. B. 10" value="${points}" ${closed?'disabled':''}>
+    <label>Ursprünglicher SL-Abstand (Ticks)
+      <input class="risk-ticks" type="number" inputmode="numeric" min="1" step="1" placeholder="z. B. 40" value="${ticks}" ${closed?'disabled':''}>
     </label>
     <div class="muted">Berechnetes Risiko: <strong class="risk-calc">${a.calculated_risk_usd==null?'–':usd(a.calculated_risk_usd)+' USD'}</strong></div>
     <label style="margin-top:12px"><input class="risk-override" type="checkbox" style="display:inline;width:auto;margin-right:8px" ${override?'checked':''} ${closed?'disabled':''}>Risiko manuell korrigieren</label>
@@ -84,13 +86,13 @@ function riskCard(a,names,closed){
   </div>`;
 }
 function updateRiskCard(card){
-  const p=card.querySelector('.risk-points');
+  const p=card.querySelector('.risk-ticks');
   const manual=card.querySelector('.risk-override');
   const field=card.querySelector('.risk-usd');
   const calc=card.querySelector('.risk-calc');
-  const points=Number(p.value),qty=Number(card.dataset.qty),value=pointValues[card.dataset.instrument];
-  const valid=p.value.trim()!==''&&Number.isFinite(points)&&points>0&&Number.isFinite(qty)&&qty>0&&!!value;
-  const amount=valid?riskRound(points*qty*value):null;
+  const ticks=Number(p.value),qty=Number(card.dataset.qty),value=tickValues[card.dataset.instrument];
+  const valid=p.value.trim()!==''&&Number.isSafeInteger(ticks)&&ticks>0&&Number.isFinite(qty)&&qty>0&&!!value;
+  const amount=valid?riskRound(ticks*qty*value):null;
   calc.textContent=amount===null?'–':usd(amount)+' USD';
   field.disabled=!manual.checked;
   if(!manual.checked)field.value=amount===null?'':amount.toFixed(2);
@@ -104,13 +106,13 @@ async function openTradeDetails(trade){
       .eq('trade_id',trade.id);
     if(error)throw error;
     const names=new Map(allAccounts.map(a=>[a.id,a.account_name]));
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at)).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<p class="muted">Berechnung ohne Gebühren und Slippage. SL-Verschiebungen und Exits folgen in einem späteren Schritt.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at)).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. SL-Verschiebungen und Exits folgen in einem späteren Schritt.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
     panel.querySelectorAll('.risk-card').forEach(card=>{
       const field=card.querySelector('.risk-usd');
       const original=field.value;
       updateRiskCard(card);
       if(card.querySelector('.risk-override').checked)field.value=original;
-      card.querySelector('.risk-points').addEventListener('input',()=>updateRiskCard(card));
+      card.querySelector('.risk-ticks').addEventListener('input',()=>updateRiskCard(card));
       card.querySelector('.risk-override').addEventListener('change',()=>updateRiskCard(card));
     });
     $('closeTradeDetails').onclick=()=>{panel.classList.add('hidden');panel.innerHTML=''};
@@ -125,10 +127,10 @@ $('sessionTradeList').addEventListener('click',async e=>{
 $('tradeDetails').addEventListener('click',async e=>{
   const btn=e.target.closest('.save-risk');if(!btn||busy)return;
   const card=btn.closest('.risk-card');
-  const pointsInput=card.querySelector('.risk-points');
-  const points=Number(pointsInput.value);
+  const ticksInput=card.querySelector('.risk-ticks');
+  const ticks=Number(ticksInput.value);
   const calc=updateRiskCard(card);
-  if(pointsInput.value.trim()===''||!Number.isFinite(points)||points<=0||calc===null||calc<=0){message('Bitte einen gültigen positiven SL-Abstand eingeben.',true);return}
+  if(ticksInput.value.trim()===''||!Number.isSafeInteger(ticks)||ticks<=0||calc===null||calc<=0){message('Bitte eine positive ganze Tickzahl eingeben.',true);return}
   const override=card.querySelector('.risk-override').checked;
   const usdInput=card.querySelector('.risk-usd');
   const actual=override?Number(usdInput.value):calc;
@@ -136,7 +138,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   if(!confirm('Ursprüngliches Risiko für dieses Konto speichern? Spätere Änderungen werden protokolliert.'))return;
   busy=true;btn.disabled=true;
   try{
-    const payload={initial_sl_points:points,calculated_risk_usd:calc,initial_risk_usd:riskRound(actual),risk_manually_overridden:override};
+    const payload={initial_sl_points:ticksToPoints(ticks),calculated_risk_usd:calc,initial_risk_usd:riskRound(actual),risk_manually_overridden:override};
     const {data,error}=await client.from('trade_account_allocations').update(payload).eq('id',btn.dataset.id).select('id').single();
     if(error)throw error;
     if(!data)throw new Error('Keine Änderung bestätigt.');
