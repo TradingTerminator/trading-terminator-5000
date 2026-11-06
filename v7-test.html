@@ -112,6 +112,47 @@ $('deactivateAccount').onclick=async()=>{
 };
 $('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isFinite(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();};
 function renderDecision(){const chosen=currentSession?.htf_context?.selected_accounts||[];$('allocationList').innerHTML=chosen.length?chosen.map(v=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label><input style="display:inline;width:auto;margin-right:8px" type="checkbox" class="acct-check" data-id="${a.id}" checked>${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="acct-role" data-id="${a.id}"><option value="follower" ${v.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="acct-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===v.instrument?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="acct-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity)}"></label></div>`}).join(''):'<p class="notice">Wähle zuerst im Live-Cockpit die Konten für diese Session aus.</p>';}
-$('recordEntry').onclick=async()=>{if(busy)return;if(!currentSession){message('Bitte zuerst eine Session starten.',true);return}if(!(currentSession.htf_context?.selected_accounts||[]).length){message('Bitte zuerst die Konten für diese Session auswählen.',true);return}const setup=$('setup').value;if(!setup){message('Bitte ein Setup auswählen.',true);return}const selected=[...document.querySelectorAll('.acct-check:checked')].map(c=>{const id=c.dataset.id;return{account_id:id,role:document.querySelector(`.acct-role[data-id="${id}"]`).value,instrument:document.querySelector(`.acct-instrument[data-id="${id}"]`).value,planned_quantity:Number(document.querySelector(`.acct-qty[data-id="${id}"]`).value)}});if(!selected.length){message('Mindestens ein Konto auswählen.',true);return}if(selected.some(a=>!Number.isFinite(a.planned_quantity)||a.planned_quantity<=0)){message('Kontraktzahl muss größer als 0 sein.',true);return}if(selected.filter(a=>a.role==='leader').length!==1){message('Genau ein ausgewähltes Konto muss Leader sein.',true);return}if(tradeCount>=5&&!confirm('Warnung: Bereits '+tradeCount+' Entscheidungen in dieser Session. Trotzdem dokumentieren?'))return;if(!confirm('Entry jetzt als ausgeführte Trading-Entscheidung dokumentieren? Keine Brokerorder.'))return;busy=true;$('recordEntry').disabled=true;let tradeId=null;try{const {data,error}=await client.from('trades').insert({session_id:currentSession.id,setup_type:setup,instrument:$('instrument').value,direction:$('direction').value,entry_at:new Date().toISOString()}).select('id').single();if(error)throw error;tradeId=data.id;const {error:allocationError}=await client.from('trade_account_allocations').insert(selected.map(a=>({...a,trade_id:tradeId})));if(allocationError)throw allocationError;await loadCount();message('Entry gespeichert: 1 Entscheidung, '+selected.length+' Kontozuordnung(en).');showView('live');}catch(e){message('Speichern fehlgeschlagen: '+e.message+(tradeId?'\nACHTUNG: Trade '+tradeId+' wurde bereits angelegt. Bitte nicht erneut klicken; Kontozuordnungen prüfen.':''),true)}finally{busy=false;$('recordEntry').disabled=false}};
+$('recordEntry').onclick=async()=>{
+  if(busy)return;
+  if(!currentSession){message('Bitte zuerst eine Session starten.',true);return}
+  if(!(currentSession.htf_context?.selected_accounts||[]).length){message('Bitte zuerst die Konten für diese Session auswählen.',true);return}
+  const setup=$('setup').value;
+  if(!setup){message('Bitte ein Setup auswählen.',true);return}
+  const selected=[...document.querySelectorAll('.acct-check:checked')].map(c=>{
+    const id=c.dataset.id;
+    return {
+      account_id:id,
+      role:document.querySelector(`.acct-role[data-id="${id}"]`).value,
+      instrument:document.querySelector(`.acct-instrument[data-id="${id}"]`).value,
+      planned_quantity:Number(document.querySelector(`.acct-qty[data-id="${id}"]`).value)
+    };
+  });
+  if(!selected.length){message('Mindestens ein Konto auswählen.',true);return}
+  if(selected.some(a=>!Number.isFinite(a.planned_quantity)||a.planned_quantity<=0)){message('Kontraktzahl muss größer als 0 sein.',true);return}
+  if(selected.filter(a=>a.role==='leader').length!==1){message('Genau ein ausgewähltes Konto muss Leader sein.',true);return}
+  if(tradeCount>=5&&!confirm('Warnung: Bereits '+tradeCount+' Entscheidungen in dieser Session. Trotzdem dokumentieren?'))return;
+  if(!confirm('Entry jetzt als ausgeführte Trading-Entscheidung dokumentieren? Keine Brokerorder.'))return;
+  busy=true;
+  $('recordEntry').disabled=true;
+  try{
+    const {data,error}=await client.rpc('create_trade_with_allocations',{
+      p_session_id:currentSession.id,
+      p_setup_type:setup,
+      p_instrument:$('instrument').value,
+      p_direction:$('direction').value,
+      p_allocations:selected
+    });
+    if(error)throw error;
+    if(!data)throw new Error('Keine Trade-ID von der Datenbank zurückgegeben. Bitte vor erneutem Speichern die Trade-Liste prüfen.');
+    await loadCount();
+    message('Entry atomar gespeichert: 1 Entscheidung, '+selected.length+' Kontozuordnung(en). Trade-ID: '+data);
+    showView('live');
+  }catch(e){
+    message('Speichern nicht bestätigt: '+e.message+'\nBei Netzwerkfehlern vor einem erneuten Versuch bitte die Trades prüfen, um doppelte Entries zu vermeiden.',true);
+  }finally{
+    busy=false;
+    $('recordEntry').disabled=false;
+  }
+};
 client.auth.onAuthStateChange(()=>{setTimeout(authStatus,0)});authStatus();
 </script></body></html>
