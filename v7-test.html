@@ -548,14 +548,50 @@ function makeChartPreview(parent,path,url,onDelete){
  }
  parent.appendChild(wrap);
 }
+let htfRenderSequence=0;
+async function deleteHtfImage(){
+ if(busy||!currentSession)return;
+ const sessionId=currentSession.id;
+ const old=currentSession.htf_context?.htf_image_path;
+ if(!old)return;
+ if(!confirm('HTF-Bild wirklich aus dieser Session entfernen? Dies kann nicht rückgängig gemacht werden.'))return;
+ busy=true;
+ const button=$('htfDelete');if(button)button.disabled=true;
+ try{
+   // First remove the reference. The image must never remain referenced if storage deletion succeeds.
+   const ctx={...(currentSession.htf_context||{})};
+   delete ctx.htf_image_path;
+   const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',sessionId).select('htf_context').single();
+   if(error)throw error;
+   if(currentSession?.id===sessionId)currentSession.htf_context=data.htf_context;
+   await renderHtfImage();
+   const {error:storageError}=await client.storage.from(CHART_BUCKET).remove([old]);
+   message(storageError?'Bild aus Session entfernt, aber Speicherbereinigung fehlgeschlagen: '+storageError.message:'HTF-Bild gelöscht.',!!storageError);
+ }catch(err){message('HTF-Bild konnte nicht gelöscht werden: '+err.message,true);}
+ finally{busy=false;if(button)button.disabled=false;}
+}
 async function renderHtfImage(){
+ const sequence=++htfRenderSequence;
  const box=$('htfScreenshot');box.classList.toggle('hidden',!currentSession);
  const target=$('htfImagePreview');target.replaceChildren();
  if(!currentSession)return;
+ const sessionId=currentSession.id;
  const path=currentSession.htf_context?.htf_image_path;
  if(!path){target.textContent='Noch kein HTF-Bild gespeichert.';return;}
- try{makeChartPreview(target,path,await signedChart(path));}
- catch(err){target.textContent='Bild konnte nicht geladen werden: '+err.message;}
+ try{
+   const url=await signedChart(path);
+   // A second render may have started while the signed URL was loading.
+   if(sequence!==htfRenderSequence||currentSession?.id!==sessionId||currentSession?.htf_context?.htf_image_path!==path)return;
+   target.replaceChildren();
+   makeChartPreview(target,path,url);
+   const btn=document.createElement('button');
+   btn.type='button';btn.id='htfDelete';btn.className='secondary';
+   btn.textContent='HTF-Bild löschen';
+   btn.addEventListener('click',deleteHtfImage);
+   target.appendChild(btn);
+ }catch(err){
+   if(sequence===htfRenderSequence)target.textContent='Bild konnte nicht geladen werden: '+err.message;
+ }
 }
 
 // Shared clipboard/drop selection; actual uploads happen ONLY on explicit save.
