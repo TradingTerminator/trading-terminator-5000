@@ -5,7 +5,7 @@
 <title>Trading Terminator 5000 · V7</title>
 <style>
 :root{color-scheme:dark;--bg:#09111c;--panel:#142538;--panel2:#1b3045;--line:#344d63;--text:#e8f2fa;--muted:#a9bfcd;--accent:#08a5a4;--warn:#e9a749}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:auto;padding:18px 16px 110px}header{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:22px;margin:6px 0}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0 0 10px}p{line-height:1.45}small,.muted{color:var(--muted)}section,.card{background:var(--panel);padding:17px;border-radius:15px;margin:15px 0;border:1px solid #263c51}input,select,textarea,button{font:inherit;color:var(--text)}input,select,textarea{display:block;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px;margin:6px 0 13px}input:focus,select:focus,textarea:focus{outline:2px solid var(--accent)}label{display:block;font-weight:600;font-size:14px}button{border:0;background:var(--accent);padding:14px;border-radius:11px;font-weight:700;cursor:pointer;min-height:48px}button.secondary{background:#2c465b}button.ghost{background:transparent;border:1px solid var(--line)}button.danger{background:#7c3944}button:disabled{opacity:.5;cursor:not-allowed}.wide{width:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{display:inline-block;border:1px solid var(--line);padding:5px 9px;border-radius:999px;color:var(--muted);font-size:12px}.notice{padding:12px;border-left:3px solid var(--warn);background:#342b22;border-radius:8px}.ok{color:#77d8b5}.error{color:#ff9c9c}.hidden{display:none!important}.account{border:1px solid var(--line);padding:13px;border-radius:12px;margin:10px 0}.account .grid{margin-top:10px}.account label{font-size:12px}.tabs{position:sticky;top:0;background:#102032;border:1px solid var(--line);border-radius:12px;display:flex;justify-content:center;padding:7px;margin:14px 0;z-index:10}.tabs>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:min(720px,100%)}.tabs button{padding:9px 3px;min-height:54px;background:#21374b;font-size:13px}.tabs button.active{background:#087f80}#message{white-space:pre-wrap;overflow-wrap:anywhere}.stat{background:var(--panel2);padding:14px;border-radius:11px}.stat strong{font-size:24px;display:block;margin-top:5px}details summary{cursor:pointer;padding:8px 0}button+button{margin-top:8px}#logout{padding:8px 10px;min-height:36px;font-size:13px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:auto;padding:18px 16px 110px}header{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:22px;margin:6px 0}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0 0 10px}p{line-height:1.45}small,.muted{color:var(--muted)}section,.card{background:var(--panel);padding:17px;border-radius:15px;margin:15px 0;border:1px solid #263c51}input,select,textarea,button{font:inherit;color:var(--text)}input,select,textarea{display:block;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px;margin:6px 0 13px}input:focus,select:focus,textarea:focus{outline:2px solid var(--accent)}label{display:block;font-weight:600;font-size:14px}button{border:0;background:var(--accent);padding:14px;border-radius:11px;font-weight:700;cursor:pointer;min-height:48px}button.secondary{background:#2c465b}button.ghost{background:transparent;border:1px solid var(--line)}button.danger{background:#7c3944}button:disabled{opacity:.5;cursor:not-allowed}.wide{width:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{display:inline-block;border:1px solid var(--line);padding:5px 9px;border-radius:999px;color:var(--muted);font-size:12px}.notice{padding:12px;border-left:3px solid var(--warn);background:#342b22;border-radius:8px}.ok{color:#77d8b5}.error{color:#ff9c9c}.hidden{display:none!important}.account{border:0;border-top:1px solid var(--line);padding:13px 0 6px;border-radius:0;margin:10px 0}.account .grid{margin-top:10px}.account label{font-size:12px}.tabs{position:sticky;top:0;background:#102032;border:1px solid var(--line);border-radius:12px;display:flex;justify-content:center;padding:7px;margin:14px 0;z-index:10}.tabs>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:min(720px,100%)}.tabs button{padding:9px 3px;min-height:54px;background:#21374b;font-size:13px}.tabs button.active{background:#087f80}#message{white-space:pre-wrap;overflow-wrap:anywhere}.stat{background:var(--panel2);padding:14px;border-radius:11px}.stat strong{font-size:24px;display:block;margin-top:5px}details summary{cursor:pointer;padding:8px 0}button+button{margin-top:8px}#logout{padding:8px 10px;min-height:36px;font-size:13px}
 
 /* Mobile: prevent horizontal page panning without disabling vertical scrolling */
 html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none}
@@ -28,6 +28,11 @@ button{touch-action:manipulation;}
 .stop-reason-buttons button.selected{background:#087f80;outline:2px solid #73e0d4}
 #emailNotice{margin:12px 0;overflow-wrap:anywhere}
 @media(max-width:380px){main{padding-left:10px;padding-right:10px}section,.card{padding:12px}.stop-stepper{grid-template-columns:48px minmax(0,1fr) 48px}}
+.analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px}
+.analysis-grid label,.session-checks label{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:14px}
+.analysis-grid input,.session-checks input{display:inline-block;width:22px;height:22px;flex:0 0 22px;margin:0;accent-color:var(--accent)}
+.chart-thumb{padding:10px 0;border-bottom:1px solid var(--line)}
+@media(max-width:390px){.analysis-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><main>
@@ -36,9 +41,16 @@ button{touch-action:manipulation;}
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldelink per E-Mail senden</button><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Die GitHub-Pages-Adresse muss in Supabase als Redirect URL zugelassen sein.</small></section>
 <div id="app" class="hidden">
 <section id="liveView"><h2>Live-Cockpit</h2><div class="grid"><div class="stat"><small>Session</small><strong id="sessionState">Keine</strong></div><div class="stat"><small>Ausgeführte Entscheidungen</small><strong id="tradeCount">0 / 5</strong></div></div>
-<div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
-<div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><button id="saveHtf" class="secondary wide">Session-Kontext speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
-<div id="sessionSummary" class="card hidden" aria-live="polite"><h3>Session-Auswertung</h3><div id="sessionSummaryBody" class="muted">Noch keine Daten.</div></div>
+<div id="morningDashboard" class="card"><h3>Rückblick · letzte Session</h3><div id="morningBody" class="muted">Wird geladen …</div><button id="reloadMorning" class="secondary wide" type="button">Rückblick aktualisieren</button></div><div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
+<div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><div class="session-checks"><h3>Session-Vorbereitung · Pflichtcheck</h3>
+<label><input type="checkbox" class="htf-check" data-check="structure"> HTF-Struktur und Extrempunkte geprüft</label>
+<label><input type="checkbox" class="htf-check" data-check="levels"> Relevante Liquidität und Volumenlevels geprüft</label>
+<label><input type="checkbox" class="htf-check" data-check="events"> News-/Makrokalender geprüft</label>
+<label><input type="checkbox" class="htf-check" data-check="risk"> Tagesrisiko und Trade-Limit geprüft</label>
+<div id="sessionCheckStatus" class="muted" role="status"></div></div>
+<button id="saveHtf" class="secondary wide">Session-Kontext und Checks speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
+<div id="htfScreenshot" class="card hidden"><h3>HTF-Chart · ein Bild je Session</h3><input type="file" id="htfFile" accept="image/png,image/jpeg,image/webp"><button id="htfUpload" type="button" class="secondary wide">HTF-Bild speichern / ersetzen</button><div id="htfImagePreview" class="muted">Noch kein Bild geladen.</div></div>
+<div id="progressPanel" class="card hidden"><h3>Fortschritt · letzte 50 abgeschlossene Trades</h3><div id="progressBody">Noch nicht geladen.</div><button type="button" id="reloadProgress" class="secondary wide">Auswertung aktualisieren</button></div><div id="playbookPanel" class="card hidden"><h3>Playbook · gespeicherte Setups</h3><div id="playbookBody">Noch nicht geladen.</div></div><div id="sessionSummary" class="card hidden" aria-live="polite"><h3>Session-Auswertung</h3><div id="sessionSummaryBody" class="muted">Noch keine Daten.</div></div>
 <div id="sessionTrades" class="card hidden"><div class="row"><h3>Trades dieser Session</h3><button id="reloadTrades" class="secondary" type="button">Aktualisieren</button></div><div id="sessionTradeList" class="muted">Lade Trades …</div><div id="tradeDetails" class="hidden" aria-live="polite"></div></div>
 </section>
 <section id="accountsView" class="hidden"><h2>Trading-Konten</h2><p class="muted">Konten sind Journal-Einträge. Keine Verbindung zum Broker.</p><div id="accountList"></div><div id="accountEditor" class="account hidden"><h3>Bestehendes Konto bearbeiten</h3><label>Kontoname<input id="editAccountName"></label><label>Kontotyp<select id="editAccountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter<input id="editBroker"></label><div class="grid"><label>Standardinstrument<select id="editInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="editQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="saveAccountEdit" class="wide">Änderungen speichern</button><button id="cancelAccountEdit" class="ghost wide">Abbrechen</button><button id="deactivateAccount" class="danger wide">Konto deaktivieren</button><small>Deaktivieren blendet das Konto aus der aktiven Auswahl aus. Bestehende Trades bleiben erhalten.</small></div><details><summary><strong>+ Neues Konto hinzufügen</strong></summary><label>Kontoname<input id="accountName" placeholder="z. B. AMP Privat"></label><label>Kontotyp<select id="accountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter (optional)<input id="broker" placeholder="z. B. AMP Futures"></label><div class="grid"><label>Standardinstrument<select id="defaultInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="defaultQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="addAccount" class="wide">Konto speichern</button></details></section>
@@ -74,9 +86,17 @@ $('magic').onclick=async()=>{
   finally{btn.disabled=false}
 };
 $('logout').onclick=async()=>{const {error}=await client.auth.signOut();if(error)message(error.message,true);else {currentUser=null;currentSession=null;accounts=[];await authStatus();}};
-async function refresh(){await Promise.all([loadSession(),loadAccounts()]);renderDecision();await loadSessionTrades();}
-async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();}
-function renderSession(){$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionState').textContent=currentSession?'Offen':'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const selection=currentSession?.htf_context?.selected_accounts||[];$('sessionAccountsSummary').textContent=selection.length?'Für neue Trades: '+selection.map(x=>{const a=accounts.find(a=>a.id===x.account_id);return (a?.account_name||'Konto')+' · '+x.role+' · '+x.instrument+' × '+x.planned_quantity}).join(' | '):'Noch keine Session-Kontenauswahl gespeichert.';}
+async function refresh(){await loadAccounts();await loadSession();renderDecision();await loadMorningDashboard();}
+async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();}
+function renderSession(){$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionState').textContent=currentSession?'Offen':'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
+document.querySelectorAll('.htf-check').forEach(el=>{el.checked=!!checks[el.dataset.check]});
+updateSessionCheckStatus();
+const selection=currentSession?.htf_context?.selected_accounts||[];$('sessionAccountsSummary').textContent=selection.length?'Für neue Trades: '+selection.map(x=>{const a=accounts.find(a=>a.id===x.account_id);return (a?.account_name||'Konto')+' · '+x.role+' · '+x.instrument+' × '+x.planned_quantity}).join(' | '):'Noch keine Session-Kontenauswahl gespeichert.';}
+function updateSessionCheckStatus(){
+ const items=[...document.querySelectorAll('.htf-check')],done=items.filter(el=>el.checked).length;
+ $('sessionCheckStatus').textContent=`${done}/${items.length} Checks erledigt${done===items.length?' · Vorbereitung vollständig':' · offene Punkte vor Entry beachten'}`;
+}
+document.querySelectorAll('.htf-check').forEach(el=>el.addEventListener('change',updateSessionCheckStatus));
 const berlinTime=iso=>iso?new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Berlin',dateStyle:'short',timeStyle:'short'}).format(new Date(iso)):'–';
 let sessionTrades=[];
 async function loadSessionTrades(){
@@ -84,15 +104,16 @@ async function loadSessionTrades(){
   wrap.classList.toggle('hidden',!currentSession);
   details.classList.add('hidden');details.innerHTML='';
   sessionTrades=[];
-  if(!currentSession){$('sessionSummary').classList.add('hidden');return;}
+  if(!currentSession){$('sessionSummary').classList.add('hidden');$('progressPanel').classList.add('hidden');$('playbookPanel').classList.add('hidden');return;}
   $('sessionSummary').classList.remove('hidden');
   list.textContent='Lade Trades …';
   const {data,error}=await client.from('trades')
-    .select('id,setup_type,instrument,direction,entry_at,exit_at,realized_pnl_usd,exit_reason,initial_risk_usd,rule_deviation,execution_grade')
+    .select('id,setup_type,instrument,direction,entry_at,exit_at,realized_pnl_usd,exit_reason,initial_risk_usd,rule_deviation,execution_grade,observations,deviation_reason')
     .eq('session_id',currentSession.id).order('entry_at',{ascending:false}).limit(100);
   if(error){list.textContent='Trades konnten nicht geladen werden: '+error.message;$('sessionSummaryBody').textContent='Auswertung nicht verfügbar – Trades konnten nicht geladen werden.';return}
   sessionTrades=data||[];
   await renderSessionSummary(sessionTrades);
+  await loadProgressAndPlaybook();
   if(sessionTrades.length===100){$('sessionSummaryBody').insertAdjacentHTML('beforeend','<p class="notice">Achtung: Maximal 100 Trades geladen. Die Auswertung kann unvollständig sein.</p>');}
   list.innerHTML=sessionTrades.length?sessionTrades.map(t=>
     `<div class="account"><div class="row"><div><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction.toUpperCase())} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${t.exit_at?'Abgeschlossen':'Offen'}</div></div><button type="button" class="secondary open-trade" data-id="${t.id}">Öffnen</button></div></div>`
@@ -103,7 +124,8 @@ async function renderSessionSummary(trades){
  const closed=trades.filter(t=>t.exit_at),open=trades.length-closed.length;
  const total=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
  const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
- const withoutMarkedDeviation=trades.filter(t=>!t.rule_deviation).length;
+ const reviewedTrades=trades.filter(t=>t.observations?.compliance_reviewed);
+ const withoutMarkedDeviation=reviewedTrades.filter(t=>!t.rule_deviation).length;
  const graded=trades.filter(t=>t.execution_grade&&t.execution_grade!=='unrated');
  const aPlus=graded.filter(t=>t.execution_grade==='A+').length;
  const accountRows=[];
@@ -128,7 +150,7 @@ async function renderSessionSummary(trades){
      }
    }
  }
- target.innerHTML=`<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Realisiert (USD)</small><strong>${usd(total)}</strong></div><div class="stat"><small>Realisiertes R</small><strong>${risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Ohne dokumentierten Regelbruch: ${withoutMarkedDeviation} / ${trades.length} (kein Nachweis der Regelkonformität). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Session-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L daher konsistent brutto oder netto eingeben. Keine Broker-Synchronisation.</p>`;
+ target.innerHTML=`<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Realisiert (USD)</small><strong>${usd(total)}</strong></div><div class="stat"><small>Realisiertes R</small><strong>${risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Geprüft ohne Regelbruch: ${withoutMarkedDeviation} / ${reviewedTrades.length} geprüfte Trades (${trades.length-reviewedTrades.length} ungeprüft). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Session-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L-Eingabe ist brutto vor Gebühren; Netto = Brutto minus Gebühren. Keine Broker-Synchronisation.</p>`;
 }
 $('reloadTrades').onclick=loadSessionTrades;
 const tickValues={NQ:5,MNQ:0.5,ES:12.5,MES:1.25};
@@ -187,8 +209,8 @@ function snapshotExitDraft(){
   if(!editor)return null;
   return {reason:editor.querySelector('.exit-reason')?.value||'',
     accounts:[...editor.querySelectorAll('.exit-account')].map(c=>({
-      id:c.dataset.id,tp:c.querySelector('.exit-tp')?.value||'',
-      pnl:c.querySelector('.exit-pnl')?.value||'',fees:c.querySelector('.exit-fees')?.value||''
+      id:c.dataset.id,unit:c.querySelector('.exit-unit')?.value||'ticks',
+      amount:c.querySelector('.exit-amount')?.value||'',fees:c.querySelector('.exit-fees')?.value||''
     }))};
 }
 function restoreExitDraft(draft){
@@ -199,8 +221,8 @@ function restoreExitDraft(draft){
   for(const item of draft.accounts){
     const c=[...editor.querySelectorAll('.exit-account')].find(el=>el.dataset.id===item.id);
     if(!c)continue;
-    c.querySelector('.exit-tp').value=item.tp;
-    c.querySelector('.exit-pnl').value=item.pnl;
+    c.querySelector('.exit-unit').value=item.unit;
+    c.querySelector('.exit-amount').value=item.amount;
     c.querySelector('.exit-fees').value=item.fees;
   }
   updateExitPreview(editor);
@@ -238,9 +260,27 @@ async function openTradeDetails(trade){
     const pnlTotal=existingResults.reduce((sum,r)=>sum+Number(r.realized_pnl_usd||0),0);
     const feesTotal=existingResults.reduce((sum,r)=>sum+Number(r.fees_usd||0),0);
     const exitSection=trade.exit_at?
-      `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Gebühren separat: ${usd(feesTotal)} USD. P&L wird als eingegebener Betrag summiert; Gebühren werden nicht automatisch abgezogen.</small></p></div>`:
-      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto den tatsächlich realisierten P&L-Betrag eingeben (mit Minus bei Verlust). Ein Abschluss speichert alle Konten gemeinsam. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Dokumentierter TP (Ticks, optional)<input class="exit-tp" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="z. B. 100" autocomplete="off"></label><div class="muted exit-tp-preview">TP: –</div><label>Realisierter P&L (USD)<input class="exit-pnl" type="text" inputmode="decimal" placeholder="z. B. 125 oder -75" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen des P&L wechseln">+/− P&L</button><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exit-Ergebnisse werden je Konto separat erfasst.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
+      `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
+      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Während des Trades oder danach markieren. Ungeprüft ist nicht automatisch negativ.</p>
+<div class="analysis-grid">
+<label><input type="checkbox" data-analysis="structure"> Struktur / Bruch</label>
+<label><input type="checkbox" data-analysis="volume"> Volumen Preis/Zeit</label>
+<label><input type="checkbox" data-analysis="cvd"> CVD</label>
+<label><input type="checkbox" data-analysis="delta"> Delta</label>
+<label><input type="checkbox" data-analysis="tape"> Tape / DOM</label>
+<label><input type="checkbox" data-analysis="liquidity"> Liquidität / Absorption</label>
+</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide">Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
+<h3>Trade-Review · unabhängig vom P&L</h3>
+<p class="muted">Auch nach dem Exit ergänzbar. A+ bedeutet gute Ausführung, nicht zwingend Gewinn.</p>
+<label>Ausführungsqualität<select class="review-grade"><option value="">Noch nicht bewertet</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>unrated</option></select></label>
+<label>Regelprüfung<select class="review-compliance"><option value="unknown">Noch nicht geprüft</option><option value="clean">Geprüft · kein Regelbruch</option><option value="breach">Regelbruch dokumentieren</option></select></label>
+<label>Fehlerart<select class="review-error"><option value="">Kein Fehler ausgewählt</option><option value="fomo">FOMO</option><option value="overtrading">Overtrading</option><option value="poor_entry">Schlechter Entry</option><option value="stop_management">SL-Verhalten</option><option value="early_exit">Zu früher Exit</option><option value="plan_violation">Planabweichung</option><option value="other">Sonstiges</option></select></label>
+<label>Gegenmaßnahme (Wenn–Dann-Regel)<select class="review-reuse"><option value="">Neue Maßnahme schreiben</option></select><textarea class="review-action" rows="2" placeholder="Wenn …, dann …"></textarea></label>
+<label>Wichtigste Erkenntnis<textarea class="review-note" rows="2" placeholder="Was wiederholen oder ändern?"></textarea></label>
+<label><input class="review-playbook" type="checkbox" style="display:inline;width:auto"> Ins Playbook übernehmen</label>
+<button type="button" class="review-save wide secondary">Review speichern</button><div class="review-feedback muted" role="status"></div>
+</div><p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exit-Ergebnisse werden je Konto separat erfasst.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
     panel.querySelectorAll('.risk-card').forEach(card=>{
       const field=card.querySelector('.risk-usd');
       const original=field.value;
@@ -249,10 +289,237 @@ async function openTradeDetails(trade){
       card.querySelector('.risk-ticks').addEventListener('input',()=>updateRiskCard(card));
       card.querySelector('.risk-override').addEventListener('change',()=>updateRiskCard(card));
     });
+    panel.querySelectorAll('.exit-unit').forEach(sel=>{sel.value=preferredExitUnit();});
+    const exitEditor=panel.querySelector('.exit-editor');if(exitEditor)updateExitPreview(exitEditor);
+    await renderTradeImages(trade.id);
+    const analysis=panel.querySelector('.ltf-analysis');
+    if(analysis){
+      const a=trade.observations?.ltf_analysis||{};
+      analysis.querySelectorAll('[data-analysis]').forEach(el=>el.checked=!!a[el.dataset.analysis]);
+      analysis.querySelector('.analysis-note').value=trade.observations?.entry_thesis||'';
+    }
+    const review=panel.querySelector('.review-editor');
+    if(review){
+      const obs=trade.observations||{};
+      review.querySelector('.review-grade').value=trade.execution_grade||'';
+      review.querySelector('.review-compliance').value=obs.compliance_reviewed?(trade.rule_deviation?'breach':'clean'):'unknown';
+      review.querySelector('.review-error').value=obs.review_error||'';
+      review.querySelector('.review-action').value=obs.countermeasure||'';
+      review.querySelector('.review-note').value=obs.review_note||'';
+      review.querySelector('.review-playbook').checked=!!obs.playbook;
+      const measures=[...new Set(sessionTrades.map(t=>t.observations?.countermeasure).filter(Boolean))].slice(0,15);
+      const reuse=review.querySelector('.review-reuse');
+      for(const measure of measures){const option=document.createElement('option');option.value=measure;option.textContent=measure.length>65?measure.slice(0,65)+'…':measure;reuse.appendChild(option);}
+      reuse.addEventListener('change',()=>{if(reuse.value)review.querySelector('.review-action').value=reuse.value;});
+    }
     const jump=panel.querySelector('#jumpAccount');if(jump)jump.addEventListener('change',()=>{if(jump.value)jumpToAccount(jump.value);});
     $('closeTradeDetails').onclick=()=>{panel.classList.add('hidden');panel.innerHTML=''};
   }catch(err){panel.textContent='Trade-Details konnten nicht geladen werden: '+err.message}
 }
+$('tradeDetails').addEventListener('click',async e=>{
+ const btn=e.target.closest('.analysis-save');if(!btn||busy)return;
+ const panel=$('tradeDetails'),trade=sessionTrades.find(t=>t.id===panel.dataset.tradeId);
+ if(!trade)return;
+ const editor=btn.closest('.ltf-analysis'),feedback=editor.querySelector('.analysis-feedback');
+ const entryThesis=editor.querySelector('.analysis-note').value.trim();
+ if(entryThesis.length>2000){feedback.textContent='Maximal 2000 Zeichen.';return;}
+ const checks=Object.fromEntries([...editor.querySelectorAll('[data-analysis]')].map(el=>[el.dataset.analysis,el.checked]));
+ const observations={...(trade.observations||{}),ltf_analysis:checks,entry_thesis:entryThesis};
+ busy=true;btn.disabled=true;feedback.textContent='Analyse wird gespeichert …';
+ try{
+  const {data,error}=await client.from('trades').update({observations}).eq('id',trade.id).select('observations').single();
+  if(error)throw error;
+  trade.observations=data.observations;feedback.textContent='Analyse gespeichert.';
+ }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
+ finally{busy=false;btn.disabled=false;}
+});
+$('tradeDetails').addEventListener('click',async e=>{
+ const btn=e.target.closest('.review-save');if(!btn||busy)return;
+ const form=btn.closest('.review-editor');
+ const trade=sessionTrades.find(t=>t.id===form.dataset.tradeId);if(!trade)return;
+ const compliance=form.querySelector('.review-compliance').value;
+ const errorType=form.querySelector('.review-error').value;
+ const action=form.querySelector('.review-action').value.trim();
+ const note=form.querySelector('.review-note').value.trim();
+ const feedback=form.querySelector('.review-feedback');
+ if(compliance==='breach'&&!errorType){feedback.textContent='Bitte Fehlerart auswählen.';return;}
+ if(errorType&&!action){feedback.textContent='Für dokumentierte Fehler ist eine Wenn–Dann-Gegenmaßnahme erforderlich.';return;}
+ if(action.length>1000||note.length>1500){feedback.textContent='Text zu lang.';return;}
+ const observations={...(trade.observations||{}),compliance_reviewed:compliance!=='unknown',
+ review_error:errorType,countermeasure:action,review_note:note,playbook:form.querySelector('.review-playbook').checked};
+ const patch={execution_grade:form.querySelector('.review-grade').value||null,
+ rule_deviation:compliance==='breach',deviation_reason:compliance==='breach'?errorType:null,observations};
+ busy=true;btn.disabled=true;feedback.textContent='Review wird gespeichert …';
+ try{
+   const {data,error}=await client.from('trades').update(patch).eq('id',trade.id)
+     .select('id,execution_grade,rule_deviation,deviation_reason,observations').single();
+   if(error)throw error;
+   Object.assign(trade,data);
+   feedback.textContent='Review gespeichert.';
+   await renderSessionSummary(sessionTrades);
+   await loadProgressAndPlaybook();
+ }catch(err){feedback.textContent='Review nicht gespeichert: '+err.message;}
+ finally{busy=false;btn.disabled=false;}
+});
+const REVIEW_LABELS={fomo:'FOMO',overtrading:'Overtrading',poor_entry:'Schlechter Entry',stop_management:'SL-Verhalten',early_exit:'Zu früher Exit',plan_violation:'Planabweichung',other:'Sonstiges'};
+async function loadMorningDashboard(){
+ const target=$('morningBody');target.textContent='Rückblick wird geladen …';
+ try{
+ const {data:sessions,error:sErr}=await client.from('trading_sessions')
+  .select('id,session_date,status,htf_context').order('session_date',{ascending:false}).limit(20);
+ if(sErr)throw sErr;
+ const latest=(sessions||[]).find(x=>x.status==='closed')||(sessions||[])[0];
+ if(!latest){target.textContent='Noch keine Session vorhanden.';return;}
+ const {data:trades,error:tErr}=await client.from('trades')
+ .select('id,exit_at,entry_at,realized_pnl_usd,initial_risk_usd,execution_grade,rule_deviation,observations')
+ .eq('session_id',latest.id).order('entry_at',{ascending:false}).limit(100);
+ if(tErr)throw tErr;
+ const all=trades||[],closed=all.filter(t=>t.exit_at);
+ const pnl=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
+ const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
+ const checked=all.filter(t=>t.observations?.compliance_reviewed);
+ const clean=checked.filter(t=>!t.rule_deviation).length;
+ const aplus=all.filter(t=>t.execution_grade==='A+').length;
+ const errors=all.filter(t=>t.observations?.review_error);
+ const best=all.find(t=>t.observations?.review_note)?.observations?.review_note||'Noch keine Erkenntnis dokumentiert.';
+ const limit=all.length===100?'<p class="notice">100-Trades-Limit: möglicherweise unvollständig.</p>':'';
+ target.innerHTML=`<p><strong>${escapeHtml(latest.session_date)}</strong> · ${latest.status==='closed'?'Abgeschlossen':'Noch offen'}</p>
+ <div class="grid"><div class="stat"><small>Brutto-P&L</small><strong>${usd(pnl)} USD</strong></div>
+ <div class="stat"><small>R (Brutto)</small><strong>${risk>0?(pnl/risk).toFixed(2):'–'}</strong></div>
+ <div class="stat"><small>Trades</small><strong>${all.length}</strong></div>
+ <div class="stat"><small>A+ bewertet</small><strong>${aplus}</strong></div></div>
+ <p>Regelkonform: ${clean}/${checked.length} geprüfte Trades · ${all.length-checked.length} ungeprüft</p>
+ <p>Fehler dokumentiert: ${errors.length}</p>
+ <p><strong>Erkenntnis:</strong> ${escapeHtml(best)}</p>${limit}`;
+ }catch(err){target.textContent='Rückblick nicht verfügbar: '+err.message;}
+}
+$('reloadMorning').addEventListener('click',loadMorningDashboard);
+const CHART_BUCKET='trading-chart-screenshots';
+function chartPath(type,id,filename){return `${currentUser.id}/${type}/${id}/${filename}`;}
+function safeImage(file){
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Nur PNG, JPEG oder WebP erlaubt.');
+ if(file.size>10*1024*1024)throw Error('Maximal 10 MB pro Bild.');
+}
+async function uploadChart(file,path){
+ safeImage(file);
+ const {error}=await client.storage.from(CHART_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
+ if(error)throw error;
+}
+async function signedChart(path){
+ const {data,error}=await client.storage.from(CHART_BUCKET).createSignedUrl(path,1800);
+ if(error)throw error;
+ return data.signedUrl;
+}
+function makeChartPreview(parent,path,url,onDelete){
+ const wrap=document.createElement('div');wrap.className='chart-thumb';
+ const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+ const img=document.createElement('img');img.src=url;img.alt='Trading-Chart';img.loading='lazy';
+ img.style.cssText='display:block;max-width:100%;max-height:260px;object-fit:contain;border-radius:8px';
+ link.appendChild(img);wrap.appendChild(link);
+ if(onDelete){
+ const btn=document.createElement('button');btn.type='button';btn.className='secondary';btn.textContent='Bild löschen';
+ btn.addEventListener('click',()=>onDelete(path,wrap));wrap.appendChild(btn);
+ }
+ parent.appendChild(wrap);
+}
+async function renderHtfImage(){
+ const box=$('htfScreenshot');box.classList.toggle('hidden',!currentSession);
+ const target=$('htfImagePreview');target.replaceChildren();
+ if(!currentSession)return;
+ const path=currentSession.htf_context?.htf_image_path;
+ if(!path){target.textContent='Noch kein HTF-Bild gespeichert.';return;}
+ try{makeChartPreview(target,path,await signedChart(path));}
+ catch(err){target.textContent='Bild konnte nicht geladen werden: '+err.message;}
+}
+$('htfUpload').addEventListener('click',async()=>{
+ if(busy||!currentSession)return;
+ const file=$('htfFile').files?.[0];if(!file){message('Bitte zuerst ein HTF-Bild auswählen.',true);return;}
+ busy=true;$('htfUpload').disabled=true;
+ let path;
+ try{
+   path=chartPath('session',currentSession.id,crypto.randomUUID()+'.'+(file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg'));
+   await uploadChart(file,path);
+   const old=currentSession.htf_context?.htf_image_path;
+   const ctx={...(currentSession.htf_context||{}),htf_image_path:path};
+   const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();
+   if(error)throw error;
+   currentSession.htf_context=data.htf_context;
+   $('htfFile').value='';
+   try{await renderHtfImage();}catch(e){message('Bild gespeichert, Vorschaufehler: '+e.message,true);}
+   message('HTF-Bild gespeichert.'); 
+   if(old&&old!==path){
+     const {error:cleanupError}=await client.storage.from(CHART_BUCKET).remove([old]);
+     if(cleanupError)message('Neues Bild gespeichert. Altes Bild konnte nicht bereinigt werden.',true);
+   }
+ }catch(err){
+   if(path&&currentSession?.htf_context?.htf_image_path!==path)await client.storage.from(CHART_BUCKET).remove([path]);
+   message('HTF-Bild nicht gespeichert: '+err.message,true);
+ }finally{busy=false;$('htfUpload').disabled=false;}
+});
+async function renderTradeImages(tradeId){
+ const panel=$('tradeDetails');if(panel.dataset.tradeId!==tradeId)return;
+ const gallery=panel.querySelector('.ltf-gallery');if(!gallery)return;
+ gallery.replaceChildren();
+ const prefix=chartPath('trade',tradeId,'');
+ const {data,error}=await client.storage.from(CHART_BUCKET).list(prefix,{limit:100,sortBy:{column:'created_at',order:'desc'}});
+ if(error){gallery.textContent='Bilder konnten nicht geladen werden: '+error.message;return;}
+ if(!data?.length){gallery.textContent='Noch keine LTF-Bilder.';return;}
+ for(const f of data){
+  if(!f.name||!f.id)continue;
+  const path=prefix+f.name;
+  try{const url=await signedChart(path);
+   makeChartPreview(gallery,path,url,async(p,wrap)=>{
+    if(!confirm('Dieses Screenshot endgültig löschen?'))return;
+    const {error}=await client.storage.from(CHART_BUCKET).remove([p]);
+    if(error)message('Löschen fehlgeschlagen: '+error.message,true);
+    else{wrap.remove();message('Bild gelöscht.');}
+   });
+  }catch(err){const p=document.createElement('p');p.textContent='Bild nicht verfügbar: '+err.message;gallery.appendChild(p);}
+ }
+}
+$('tradeDetails').addEventListener('click',async e=>{
+ const btn=e.target.closest('.ltf-upload');if(!btn||busy)return;
+ const tradeId=$('tradeDetails').dataset.tradeId;
+ const input=btn.closest('.trade-images').querySelector('.ltf-file');
+ const feedback=btn.closest('.trade-images').querySelector('.ltf-feedback');
+ const files=[...input.files||[]];if(!files.length){feedback.textContent='Bitte Bilder auswählen.';return;}
+ if(files.length>10){feedback.textContent='Bitte höchstens 10 Bilder auf einmal auswählen.';return;}
+ busy=true;btn.disabled=true;
+ let uploaded=0;
+ try{
+ for(const file of files){
+  const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  await uploadChart(file,chartPath('trade',tradeId,crypto.randomUUID()+'.'+ext));uploaded++;
+ }
+ feedback.textContent=uploaded+' Bild(er) gespeichert.';
+ input.value='';await renderTradeImages(tradeId);
+ }catch(err){feedback.textContent=uploaded+' Bild(er) gespeichert, danach Fehler: '+err.message;}
+ finally{busy=false;btn.disabled=false;}
+});
+async function loadProgressAndPlaybook(){
+ const progress=$('progressPanel'),playbook=$('playbookPanel');
+ progress.classList.remove('hidden');playbook.classList.remove('hidden');
+ const {data,error}=await client.from('trades')
+ .select('id,setup_type,direction,instrument,entry_at,exit_at,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd')
+ .order('entry_at',{ascending:false}).limit(1000);
+ if(error){$('progressBody').textContent='Ladefehler: '+error.message;$('playbookBody').textContent='Ladefehler: '+error.message;return;}
+ const all=data||[],closed=all.filter(t=>t.exit_at).slice(0,50);
+ const reviewed=closed.filter(t=>t.observations?.compliance_reviewed);
+ const clean=reviewed.filter(t=>!t.rule_deviation).length;
+ const graded=closed.filter(t=>t.execution_grade&&t.execution_grade!=='unrated');
+ const aplus=graded.filter(t=>t.execution_grade==='A+').length;
+ const pnl=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
+ const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
+ const counts={};for(const t of closed){const key=t.observations?.review_error;if(key)counts[key]=(counts[key]||0)+1;}
+ const errors=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>escapeHtml(REVIEW_LABELS[k]||k)+': '+v).join(' · ');
+ $('progressBody').innerHTML=`<p><strong>${closed.length}/50</strong> abgeschlossene Trades · <strong>${usd(pnl)} USD</strong> Brutto · <strong>${risk>0?(pnl/risk).toFixed(2):'–'} R</strong></p>
+ <p>Regelprüfung: ${reviewed.length}/${closed.length} dokumentiert · ${reviewed.length?Math.round(clean/reviewed.length*100)+' % ohne Regelbruch':'noch keine Quote'}</p>
+ <p>A+: ${aplus}/${graded.length} bewertete Trades${graded.length?' ('+Math.round(aplus/graded.length*100)+' %)':''}</p>
+ <p>Fehler: ${errors||'keine dokumentiert'}</p>${all.length===1000?'<p class="notice">Nur die neuesten 1000 Trades durchsucht. Ältere Playbook-Einträge fehlen möglicherweise.</p>':''}`;
+ const saved=all.filter(t=>t.observations?.playbook);
+ $('playbookBody').innerHTML=saved.length?saved.map(t=>`<div class="account"><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction)} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${escapeHtml(t.execution_grade||'unbewertet')}</div><p>${escapeHtml(t.observations?.review_note||'Keine Notiz')}</p></div>`).join(''):'Noch keine Setups übernommen.';
+}
+$('reloadProgress').addEventListener('click',loadProgressAndPlaybook);
 $('sessionTradeList').addEventListener('click',async e=>{
   const btn=e.target.closest('.open-trade');if(!btn)return;
   const trade=sessionTrades.find(t=>t.id===btn.dataset.id);if(!trade)return;
@@ -261,24 +528,51 @@ $('sessionTradeList').addEventListener('click',async e=>{
 });
 const durationLabel=(start,end)=>{const seconds=Math.max(0,Math.round((new Date(end)-new Date(start))/1000));const mins=Math.floor(seconds/60);return Math.floor(mins/60)+' h '+String(mins%60).padStart(2,'0')+' min'+(mins===0?' '+seconds+' s':'');};
 function parseMoney(raw){const s=raw.trim().replace(',','.');return /^-?\d+(?:\.\d{1,2})?$/.test(s)?Number(s):null;}
+const EXIT_UNIT_KEY='tt5000_exit_unit_v7';
+function preferredExitUnit(){try{return localStorage.getItem(EXIT_UNIT_KEY)==='usd'?'usd':'ticks';}catch(_){return 'ticks';}}
+function tickDollarValue(card){return ({NQ:5,MNQ:.5,ES:12.5,MES:1.25}[card.dataset.instrument]||0)*Number(card.dataset.quantity);}
+function exitResult(card){
+  const unit=card.querySelector('.exit-unit').value;
+  const raw=card.querySelector('.exit-amount').value.trim().replace(',','.');
+  const amount=/^-?\d+(?:\.\d{1,2})?$/.test(raw)?Number(raw):null;
+  const tickValue=tickDollarValue(card);
+  if(amount===null||!Number.isFinite(amount)||!(tickValue>0))return null;
+  if(unit==='ticks'&&!Number.isInteger(amount))return null;
+  const dollars=unit==='ticks'?amount*tickValue:amount;
+  if(!Number.isFinite(dollars))return null;
+  return {dollars:Math.round(dollars*100)/100,ticks:unit==='ticks'?amount:null,unit};
+}
 function updateExitPreview(editor){
-  let total=0,risk=0,complete=true;
+  let total=0,risk=0,totalFees=0,complete=true;
   editor.querySelectorAll('.exit-account').forEach(card=>{
-    const pnl=parseMoney(card.querySelector('.exit-pnl').value);
-    const initial=Number(card.dataset.risk);
-    if(pnl===null||!card.dataset.risk||initial<=0)complete=false;
-    else {total+=pnl;risk+=initial;}
-    card.querySelector('.exit-r').textContent=pnl!==null&&initial>0?'R: '+(pnl/initial).toFixed(2):'R: –';
-    const tpRaw=card.querySelector('.exit-tp').value.trim();
-    const tpOk=/^[1-9]\d*$/.test(tpRaw)&&Number.isSafeInteger(Number(tpRaw));
-    const instrument=card.dataset.instrument;
-    const quantity=Number(card.dataset.quantity);
-    const tickValue={NQ:5,MNQ:.5,ES:12.5,MES:1.25}[instrument];
-    card.querySelector('.exit-tp-preview').textContent=tpRaw===''?'TP: nicht erfasst':tpOk&&tickValue&&quantity>0?'TP: '+(Number(tpRaw)*.25).toFixed(2)+' Punkte · theoretisch '+usd(Number(tpRaw)*tickValue*quantity)+' USD brutto':'TP: ungültige Tickzahl';
+    const result=exitResult(card),initial=Number(card.dataset.risk),tickValue=tickDollarValue(card);
+    if(!result||!card.dataset.risk||initial<=0)complete=false;
+    else {total+=result.dollars;risk+=initial;}
+    const feesInput=card.querySelector('.exit-fees').value;
+    const fee=feesInput.trim()===''?0:parseMoney(feesInput);
+    const net=result&&fee!==null&&fee>=0?result.dollars-fee:null;
+    if(fee===null||fee<0)complete=false;else totalFees+=fee;
+    card.querySelector('.exit-r').textContent=result&&initial>0
+      ?'Brutto-R: '+(result.dollars/initial).toFixed(2)+(net!==null?' · Netto nach Gebühren: '+usd(net)+' USD':' · Gebühren prüfen')
+      :'R: –';
+    const unit=card.querySelector('.exit-unit').value;
+    card.querySelector('.exit-equivalent').textContent=!result?'Entspricht: –':unit==='ticks'
+      ?'Entspricht '+usd(result.dollars)+' USD brutto · '+(result.ticks*.25).toFixed(2)+' Punkte'
+      :'Entspricht '+(result.dollars/tickValue).toLocaleString('de-DE',{maximumFractionDigits:2})+' Ticks (rechnerisch)';
   });
-  editor.querySelector('.exit-preview').textContent=complete?'Gesamtergebnis: '+usd(total)+' USD · '+(total/risk).toFixed(2)+' R':'Gesamtergebnis: bitte alle Konten ausfüllen';
+  editor.querySelector('.exit-preview').textContent=complete
+    ?'Gesamt brutto: '+usd(total)+' USD · Gebühren: '+usd(totalFees)+' USD · Netto: '+usd(total-totalFees)+' USD · Brutto-R: '+(total/risk).toFixed(2)
+    :'Gesamtergebnis: bitte alle Konten ausfüllen';
 }
 $('tradeDetails').addEventListener('change',e=>{
+  if(e.target.matches('.exit-unit')){
+    const card=e.target.closest('.exit-account');
+    // The entered number remains untouched when switching units; no silent reinterpretation of stored data.
+    try{localStorage.setItem(EXIT_UNIT_KEY,e.target.value);}catch(_){}
+    card.querySelector('.exit-amount').value='';
+    card.querySelector('.exit-amount').placeholder=e.target.value==='ticks'?'z. B. 100 oder -40':'z. B. 500 oder -75';
+    const editor=e.target.closest('.exit-editor');updateExitPreview(editor);
+  }
   if(e.target.matches('.exit-reason')){
     const editor=e.target.closest('.exit-editor');
     const feedback=editor?.querySelector('.exit-feedback');
@@ -292,7 +586,7 @@ $('tradeDetails').addEventListener('input',e=>{
 });
 $('tradeDetails').addEventListener('click',e=>{
   const b=e.target.closest('.exit-negate');if(!b)return;
-  const field=b.closest('.exit-account').querySelector('.exit-pnl');
+  const field=b.closest('.exit-account').querySelector('.exit-amount');
   const raw=field.value.trim();
   field.value=raw===''?'-1':raw.startsWith('-')?raw.slice(1):'-'+raw;
   field.dispatchEvent(new Event('input',{bubbles:true}));
@@ -312,29 +606,31 @@ $('tradeDetails').addEventListener('click',async e=>{
   if(!reason){fail('Bitte Exit-Grund auswählen.',editor.querySelector('.exit-reason'));return;}
   const results=[];
   for(const card of editor.querySelectorAll('.exit-account')){
-    const pnl=parseMoney(card.querySelector('.exit-pnl').value);
+    const result=exitResult(card);
     const feesRaw=card.querySelector('.exit-fees').value;
     const fees=feesRaw.trim()===''?0:parseMoney(feesRaw);
-    if(pnl===null){fail('Realisierter P&L fehlt oder ist ungültig. Auch bei 0 USD bitte 0 eingeben.',card.querySelector('.exit-pnl'));return;}
+    if(!result){fail('Bitte gültiges Ergebnis eingeben: Ticks als ganze Zahl oder USD mit maximal zwei Nachkommastellen.',card.querySelector('.exit-amount'));return;}
     if(fees===null||fees<0){fail('Gebühren dürfen nicht negativ oder ungültig sein.',card.querySelector('.exit-fees'));return;}
     if(!card.dataset.risk||Number(card.dataset.risk)<=0){fail('Für dieses Konto fehlt das ursprüngliche Risiko. Bitte zuerst speichern.');return;}
-    const tpRaw=card.querySelector('.exit-tp').value.trim();
-    const tp=tpRaw===''?null:Number(tpRaw);
-    if(tpRaw!==''&&(!/^[1-9]\d*$/.test(tpRaw)||!Number.isSafeInteger(tp)||tp>2147483647)){fail('TP-Ticks müssen eine positive ganze Zahl sein.',card.querySelector('.exit-tp'));return;}
-    results.push({allocation_id:card.dataset.id,realized_pnl_usd:pnl,fees_usd:fees,tp_ticks:tp});
+    results.push({allocation_id:card.dataset.id,realized_pnl_usd:result.dollars,fees_usd:fees,tp_ticks:null});
   }
   const total=results.reduce((s,r)=>s+r.realized_pnl_usd,0);
-  if(!confirm('Trade mit '+results.length+' Kontoergebnissen und '+usd(total)+' USD Gesamt-P&L endgültig abschließen? Keine Brokerorder.'))return;
+  const totalFees=results.reduce((s,r)=>s+r.fees_usd,0);
+  if(!confirm('Trade mit '+results.length+' Kontoergebnissen abschließen? Brutto '+usd(total)+' USD, Gebühren '+usd(totalFees)+' USD, Netto '+usd(total-totalFees)+' USD. Keine Brokerorder.'))return;
   busy=true;btn.disabled=true;btn.textContent='Wird abgeschlossen …';feedback.textContent='Abschluss wird gespeichert …';feedback.style.color='';
   try{
     const tradeId=$('tradeDetails').dataset.tradeId;
     const {data,error}=await client.rpc('close_trade_with_account_results',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results});
     if(error)throw error;
     if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
-    await loadSessionTrades();
-    const closed=sessionTrades.find(t=>t.id===tradeId);
-    if(closed)await openTradeDetails(closed);
-    message('Trade abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
+    message('Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
+    try{
+      await loadSessionTrades();
+      const closed=sessionTrades.find(t=>t.id===tradeId);
+      if(closed)await openTradeDetails(closed);
+    }catch(refreshError){
+      message('Trade gespeichert, aber Ansicht nicht vollständig aktualisiert: '+refreshError.message,true);
+    }
   }catch(err){fail('Trade-Abschluss nicht bestätigt: '+err.message+' — vor einem erneuten Versuch die Trade-Liste aktualisieren.');}
   finally{busy=false;btn.disabled=false;btn.textContent='Trade endgültig abschließen';}
 });
@@ -419,9 +715,9 @@ function getSessionSelection(){return [...document.querySelectorAll('.sess-check
 $('startSession').onclick=()=>{if(currentSession)return;openSessionSetup('start');};
 $('changeSessionAccounts').onclick=()=>openSessionSetup('change');
 $('cancelSession').onclick=()=>{renderSession();};
-$('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){message('Wähle mindestens ein Konto.',true);return}if(selection.filter(x=>x.role==='leader').length!==1){message('Genau ein Leader ist erforderlich.',true);return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){message('Ungültige Kontraktzahl.',true);return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();}catch(e){message('Kontenauswahl: '+e.message,true)}finally{busy=false;$('confirmSession').disabled=false}};
-$('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:$('htf').value};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;message('HTF-Kontext gespeichert.')}};
-$('closeSession').onclick=async()=>{if(!currentSession)return;const {count,error:openError}=await client.from('trades').select('id',{count:'exact',head:true}).eq('session_id',currentSession.id).is('exit_at',null);if(openError){message('Offene Trades prüfen: '+openError.message,true);return;}if(count>0){message('Session kann nicht geschlossen werden: '+count+' Trade(s) sind noch offen. Bitte zuerst dokumentieren und abschließen.',true);return;}if(!confirm('Session wirklich schließen?'))return;const {error}=await client.from('trading_sessions').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',currentSession.id);if(error)message('Session schließen: '+error.message,true);else{currentSession=null;renderSession();await loadCount();await loadSessionTrades();message('Session geschlossen.')}};
+$('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){message('Wähle mindestens ein Konto.',true);return}if(selection.filter(x=>x.role==='leader').length!==1){message('Genau ein Leader ist erforderlich.',true);return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){message('Ungültige Kontraktzahl.',true);return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();await renderHtfImage();}catch(e){message('Kontenauswahl: '+e.message,true)}finally{busy=false;$('confirmSession').disabled=false}};
+$('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:$('htf').value,preflight_checks:Object.fromEntries([...document.querySelectorAll('.htf-check')].map(el=>[el.dataset.check,el.checked]))};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;message('HTF-Kontext gespeichert.')}};
+$('closeSession').onclick=async()=>{if(!currentSession)return;const {count,error:openError}=await client.from('trades').select('id',{count:'exact',head:true}).eq('session_id',currentSession.id).is('exit_at',null);if(openError){message('Offene Trades prüfen: '+openError.message,true);return;}if(count>0){message('Session kann nicht geschlossen werden: '+count+' Trade(s) sind noch offen. Bitte zuerst dokumentieren und abschließen.',true);return;}if(!confirm('Session wirklich schließen?'))return;const {error}=await client.from('trading_sessions').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',currentSession.id);if(error)message('Session schließen: '+error.message,true);else{currentSession=null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();message('Session geschlossen.')}};
 async function loadAccounts(){
   const {data,error}=await client.from('trading_accounts').select('id,account_name,account_type,broker,default_instrument,default_quantity,active').order('created_at',{ascending:true});
   if(error){message('Konten laden: '+error.message,true);return}
