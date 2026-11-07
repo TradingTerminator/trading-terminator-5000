@@ -35,11 +35,11 @@ button{touch-action:manipulation;}
 .chart-thumb{padding:10px 0;border-bottom:1px solid var(--line)}
 @media(max-width:390px){.analysis-grid{grid-template-columns:1fr}}
 .image-dropzone{border:2px dashed #53758c;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:rgba(61,112,143,.09);margin:10px 0}.image-dropzone.drag-over,.image-dropzone:focus-visible{border-color:#11c8c4;background:rgba(17,200,196,.14);outline:2px solid #11c8c4;outline-offset:2px}.image-dropzone input[type=file]{max-width:100%}.image-pick-status{font-size:13px;color:#a9c5d7}.trade-cta{background:#079f9f;color:white;font-weight:750;font-size:17px;min-height:56px;margin:14px 0 5px}.trade-cta:focus-visible{outline:3px solid #fff;outline-offset:3px}#decisionView{scroll-margin-top:80px}.setup-select-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 10px}.setup-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.setup-card{border:2px solid #3c5a71;border-radius:12px;min-height:96px;padding:12px;text-align:left;background:#193149;color:#f1f8ff;display:flex;flex-direction:column;justify-content:center;gap:6px;white-space:normal}.setup-card.selected{border-color:#10c7c1;background:#14515a;box-shadow:0 0 0 2px rgba(16,199,193,.18)}.setup-card strong{font-size:15px}.setup-card small{font-size:12px;color:#b9d2e1}.setup-manager-row{border-top:1px solid #3c5a71;padding:12px 0}.setup-manager-row .row{gap:8px}.setup-manager-row input,.setup-manager-row textarea{margin-bottom:8px}@media(max-width:520px){.setup-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.setup-card{min-height:90px}.setup-select-head button{width:auto}}.setup-card-image{width:100%;height:100px;object-fit:cover;border-radius:7px;margin-bottom:4px}.setup-image-editor{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.setup-image-editor input{flex:1 1 200px}.setup-image-editor button{flex:1 1 130px}@media(max-width:520px){.tabs>div{display:flex;flex-wrap:wrap;gap:4px}.tabs button{flex:1 1 auto;min-width:72px}}
-.emotion-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.emotion-options button{padding:13px 8px;min-height:52px;border:1px solid #53728a;border-radius:10px;background:#1b344a;color:#f2f7ff;white-space:normal;font-weight:600}.emotion-options button.emotion-selected{border:2px solid #19c8bb;background:#17535a}.emotion-warning{padding:12px;border:2px solid #e8a63c;border-radius:10px;background:#4c351b;color:#ffe3b5;font-weight:700}.emotion-section h3{margin-top:0}@media(max-width:480px){.emotion-options button{font-size:14px}}</style>
+.emotion-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.emotion-options button{padding:13px 8px;min-height:52px;border:1px solid #53728a;border-radius:10px;background:#1b344a;color:#f2f7ff;white-space:normal;font-weight:600}.emotion-options button.emotion-selected{border:2px solid #19c8bb;background:#17535a}.emotion-warning{padding:12px;border:2px solid #e8a63c;border-radius:10px;background:#4c351b;color:#ffe3b5;font-weight:700}.emotion-section h3{margin-top:0}@media(max-width:480px){.emotion-options button{font-size:14px}}.training-priority,.training-trade{display:block;width:100%;text-align:left;margin:10px 0;padding:14px;border:1px solid #3c5a71;border-radius:12px;background:#193149;color:#f1f8ff;white-space:normal}.training-priority .row{justify-content:space-between;gap:12px}.training-bar{height:10px;border-radius:20px;background:#31475a;margin-top:10px;overflow:hidden}.training-bar-fill{height:100%;background:#dc2626}.training-measure{border-left:3px solid #dc2626;padding:10px;background:#263b4d;border-radius:6px;white-space:pre-wrap}.training-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:12px}.training-shots img{width:100%;height:95px;object-fit:cover;border-radius:8px}.emotion-options button:disabled{opacity:.7;cursor:default}.tabs{overflow-x:auto}.tabs>div{min-width:max-content}#topFiveBody .training-priority{padding:10px 12px;margin:7px 0}#topFiveBody .training-bar{height:8px}#openReviewsBody .training-trade{padding:9px 12px}</style>
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Sammeltest 66–73 · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
-<nav id="tabs" class="tabs hidden"><div><button data-view="live" class="active">◉ Live</button><button data-view="decision">＋ Trade</button><button data-view="accounts">▤ Konten</button><button data-view="settings">⚙ Einstellungen</button></div></nav>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Konsolidierungsbatch · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<nav id="tabs" class="tabs hidden"><div><button data-view="live" class="active">◉ Live</button><button data-view="decision">＋ Trade</button><button data-view="accounts">▤ Konten</button><button data-view="analytics">▥ Analyse</button><button data-view="training">◎ Training</button><button data-view="settings">⚙ Einstellungen</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldelink per E-Mail senden</button><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Die GitHub-Pages-Adresse muss in Supabase als Redirect URL zugelassen sein.</small></section>
 <div id="app" class="hidden">
 <section id="liveView"><h2>Live-Cockpit</h2><div class="grid"><div class="stat"><small>Session</small><strong id="sessionState">Keine</strong></div><div class="stat"><small>Ausgeführte Entscheidungen</small><strong id="tradeCount">0 / 5</strong></div></div>
@@ -47,7 +47,7 @@ button{touch-action:manipulation;}
 <p class="muted">Diese Checkliste ist nur lokal auf diesem Gerät. Keine echten Brokerorders.</p>
 <div id="testChecklist"></div>
 <button type="button" id="resetTestChecklist" class="secondary wide">Testhaken zurücksetzen</button></details>
-<div id="morningDashboard" class="card"><h3>Rückblick · letzte Session</h3><div id="morningBody" class="muted">Wird geladen …</div><button id="reloadMorning" class="secondary wide" type="button">Rückblick aktualisieren</button></div><div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Trading-Session starten</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, einen Leader festlegen und Kontrakte je Konto einstellen. Bei einer bereits offenen Session bitte zuerst diese abschließen.</p><div id="sessionAccountList"></div><p id="sessionSetupFeedback" role="status" class="notice">Wähle mindestens ein Konto und stelle genau einen Leader ein.</p><button id="confirmSession" class="wide">Session starten und zum Trade</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
+<div id="topFiveDashboard" class="card"><div class="row"><h3>Meine Top 5</h3><button type="button" class="secondary" id="reloadTopFive">↻</button></div><div id="topFiveBody" class="muted">Wird geladen …</div></div><div id="openReviewsPanel" class="card"><div class="row"><h3>Offene Reviews</h3><button type="button" class="secondary" id="reloadOpenReviews">↻</button></div><div id="openReviewsBody" class="muted">Wird geladen …</div></div><div id="morningDashboard" class="card"><h3>Rückblick · letzte Session</h3><div id="morningBody" class="muted">Wird geladen …</div><button id="reloadMorning" class="secondary wide" type="button">Rückblick aktualisieren</button></div><div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Trading-Session starten</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, einen Leader festlegen und Kontrakte je Konto einstellen. Bei einer bereits offenen Session bitte zuerst diese abschließen.</p><div id="sessionAccountList"></div><p id="sessionSetupFeedback" role="status" class="notice">Wähle mindestens ein Konto und stelle genau einen Leader ein.</p><button id="confirmSession" class="wide">Session starten und zum Trade</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
 <div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><div class="card emotion-section"><h3>Mentale Verfassung · Session</h3><p class="muted">Einmal pro Session. Kein Handelsverbot.</p><div class="emotion-options" id="sessionMoodOptions" data-emotion-group="sessionMood"><button type="button" data-value="focused">Ruhig / fokussiert</button><button type="button" data-value="stressed">Gestresst</button><button type="button" data-value="tired">Müde</button><button type="button" data-value="euphoric">Euphorisch</button></div><label>Drang, unbedingt zu traden<select id="sessionUrge"><option value="">Nicht bewertet</option><option value="low">Niedrig</option><option value="medium">Mittel</option><option value="high">Hoch</option></select></label><div id="sessionEmotionStatus" class="muted" role="status">Mit dem Session-Kontext speichern.</div></div><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><div class="session-checks"><h3>Session-Vorbereitung · Pflichtcheck</h3>
 <label><input type="checkbox" class="htf-check" data-check="structure"> HTF-Struktur und Extrempunkte geprüft</label>
 <label><input type="checkbox" class="htf-check" data-check="levels"> Relevante Liquidität und Volumenlevels geprüft</label>
@@ -60,8 +60,8 @@ button{touch-action:manipulation;}
 <div id="sessionTrades" class="card hidden"><div class="row"><h3>Trades dieser Session</h3><button id="reloadTrades" class="secondary" type="button">Aktualisieren</button></div><div id="sessionTradeList" class="muted">Lade Trades …</div><div id="tradeDetails" class="hidden" aria-live="polite"></div></div>
 </section>
 <section id="accountsView" class="hidden"><h2>Trading-Konten</h2><p class="muted">Konten sind Journal-Einträge. Keine Verbindung zum Broker.</p><div id="accountList"></div><div id="accountEditor" class="account hidden"><h3>Bestehendes Konto bearbeiten</h3><label>Kontoname<input id="editAccountName"></label><label>Kontotyp<select id="editAccountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter<input id="editBroker"></label><div class="grid"><label>Standardinstrument<select id="editInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="editQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="saveAccountEdit" class="wide">Änderungen speichern</button><button id="cancelAccountEdit" class="ghost wide">Abbrechen</button><button id="deactivateAccount" class="danger wide">Konto deaktivieren</button><small>Deaktivieren blendet das Konto aus der aktiven Auswahl aus. Bestehende Trades bleiben erhalten.</small></div><details><summary><strong>+ Neues Konto hinzufügen</strong></summary><label>Kontoname<input id="accountName" placeholder="z. B. AMP Privat"></label><label>Kontotyp<select id="accountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter (optional)<input id="broker" placeholder="z. B. AMP Futures"></label><div class="grid"><label>Standardinstrument<select id="defaultInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="defaultQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="addAccount" class="wide">Konto speichern</button></details></section>
-<section id="decisionView" class="hidden"><h2>Neue Trading-Entscheidung</h2><p class="muted">Eine Entscheidung kann mehrere Konten umfassen. Sie zählt erst beim dokumentierten Entry.</p><div id="decisionSession" class="notice">Bitte zuerst eine Session starten.</div><div class="setup-select-head"><strong>Setup wählen</strong></div><div id="setupCards" class="setup-cards" role="group" aria-label="Setup-Auswahl"></div><input id="setup" type="hidden" value=""><p id="setupSelectionStatus" class="muted" role="status">Bitte ein Setup auswählen.</p><div class="card emotion-section"><h3>Emotionaler Entry-Check</h3><p class="muted">Ein Klick. Bei FOMO, Revenge oder Impulsivität warnen wir – ohne zu blockieren.</p><div class="emotion-options" id="entryEmotionOptions" data-emotion-group="entryEmotion"><button type="button" data-value="plan">Nach Plan</button><button type="button" data-value="fomo">FOMO</button><button type="button" data-value="revenge">Revenge</button><button type="button" data-value="impulsive">Impulsiv</button></div><p id="entryEmotionWarning" class="emotion-warning hidden" role="alert"></p></div><label>Richtung<select id="direction"><option value="long">Long</option><option value="short">Short</option></select></label><label>Leitinstrument<select id="instrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><h3>Kontozuordnung</h3><div id="allocationList"></div><div class="notice">Das Speichern dokumentiert einen Entry im Journal, führt aber keine Order aus. Maximal 5 Entscheidungen pro Session sind eine Warnschwelle, keine technische Handelssperre.</div><button id="recordEntry" class="wide">Entry dokumentieren</button></section>
-<section id="settingsView" class="hidden"><h2>⚙ Einstellungen</h2><p class="muted">Verwaltung außerhalb des Trading-Ablaufs. Hier kannst du Setups und ihre Beispielbilder pflegen, ohne den schnellen Entry zu unterbrechen.</p><div id="setupManager" class="account"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p></div></section><section><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
+<section id="decisionView" class="hidden"><h2>Neue Trading-Entscheidung</h2><p class="muted">Eine Entscheidung kann mehrere Konten umfassen. Sie zählt erst beim dokumentierten Entry.</p><div id="decisionSession" class="notice">Bitte zuerst eine Session starten.</div><div class="setup-select-head"><strong>Setup wählen</strong></div><div id="setupCards" class="setup-cards" role="group" aria-label="Setup-Auswahl"></div><input id="setup" type="hidden" value=""><p id="setupSelectionStatus" class="muted" role="status">Bitte ein Setup auswählen.</p><div class="card emotion-section"><h3>Emotionaler Entry-Check</h3><div class="emotion-options" id="entryEmotionOptions" data-emotion-group="entryEmotion"><button type="button" data-value="plan">Nach Plan</button><button type="button" data-value="fomo">FOMO</button><button type="button" data-value="revenge">Revenge</button><button type="button" data-value="impulsive">Impulsiv</button></div><p id="entryEmotionWarning" class="emotion-warning hidden" role="alert"></p></div><label>Richtung<select id="direction"><option value="long">Long</option><option value="short">Short</option></select></label><label>Leitinstrument<select id="instrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><h3>Kontozuordnung</h3><div id="allocationList"></div><div class="notice">Das Speichern dokumentiert einen Entry im Journal, führt aber keine Order aus. Maximal 5 Entscheidungen pro Session sind eine Warnschwelle, keine technische Handelssperre.</div><button id="recordEntry" class="wide">Entry dokumentieren</button></section>
+<section id="analyticsView" class="hidden"><h2>▥ Analyse</h2><div class="card"><label>Kontofilter<select id="analyticsAccount"><option value="all">Alle Konten · Entscheidungen</option></select></label><button type="button" id="reloadAnalytics" class="secondary wide">Analyse aktualisieren</button><div id="analyticsSummary" class="muted">Wird geladen …</div></div><div class="card"><h3>Best Practices · vollständig</h3><div id="analyticsGood"></div></div><div class="card"><h3>Fehler · vollständig</h3><div id="analyticsBad"></div></div><div id="analyticsDrilldown" class="card hidden"></div></section><section id="trainingView" class="hidden"><h2>◎ Training</h2><p class="muted">Deine dokumentierten Fehler, Gegenmaßnahmen und Entwicklung. Keine Unterbrechung während des Tradings.</p><div class="card"><div class="row"><h3>Fehler-Prioritäten</h3><button id="reloadTraining" type="button" class="secondary">Aktualisieren</button></div><div id="trainingList" aria-live="polite">Wird geladen …</div></div><div id="trainingDetail" class="card hidden" aria-live="polite"></div></section><section id="settingsView" class="hidden"><h2>⚙ Einstellungen</h2><p class="muted">Verwaltung außerhalb des Trading-Ablaufs. Hier kannst du Setups und ihre Beispielbilder pflegen, ohne den schnellen Entry zu unterbrechen.</p><div id="setupManager" class="account"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p></div></section><section><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
 </div></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -78,8 +78,8 @@ const message=(s,err=false)=>{$('message').textContent=s;$('message').className=
 const localDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function showView(view){
- if(['live','decision','accounts','settings'].includes(view))try{localStorage.setItem('tt7_active_view',view)}catch(_){};for(const v of ['live','decision','accounts','settings'])$(v+'View').classList.toggle('hidden',v!==view);document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));}
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{showView(b.dataset.view);if(b.dataset.view==='settings')renderSetupManager();window.scrollTo({top:0,behavior:'smooth'});});
+ if(['live','decision','accounts','analytics','training','settings'].includes(view))try{localStorage.setItem('tt7_active_view',view)}catch(_){};for(const v of ['live','decision','accounts','analytics','training','settings'])$(v+'View').classList.toggle('hidden',v!==view);document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{showView(b.dataset.view);if(b.dataset.view==='settings')renderSetupManager();if(b.dataset.view==='training')loadTraining();if(b.dataset.view==='analytics')loadAnalytics();window.scrollTo({top:0,behavior:'smooth'});});
 document.addEventListener('click',e=>{if(e.target?.id==='goAccounts')showView('accounts');});
 function goToTradeEntry(){if(!currentSession){message('Bitte zuerst eine Session starten.',true);return;}renderDecision();showView('decision');$('decisionView').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('setupCards').querySelector('button')?.focus({preventScroll:true}),150);}
 $('goToTradeEntry').addEventListener('click',goToTradeEntry);
@@ -99,7 +99,7 @@ $('magic').onclick=async()=>{
   finally{btn.disabled=false}
 };
 $('logout').onclick=async()=>{const {error}=await client.auth.signOut();if(error)message(error.message,true);else {currentUser=null;currentSession=null;accounts=[];await authStatus();}};
-async function refresh(){await loadSetupCatalog();await loadAccounts();await loadSession();renderDecision();await Promise.all([loadMorningDashboard(),loadProgressAndPlaybook()]);{let v='live';try{v=localStorage.getItem('tt7_active_view')||'live'}catch(_){}showView(v);}}
+async function refresh(){await loadSetupCatalog();await loadAccounts();await loadSession();renderDecision();await Promise.all([loadMorningDashboard(),loadProgressAndPlaybook(),loadTraining(),loadAnalytics(),loadOpenReviews()]);{let v='live';try{v=localStorage.getItem('tt7_active_view')||'live'}catch(_){}showView(v);}}
 async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();}
 function renderSession(){$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionState').textContent=currentSession?'Offen':'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';setEmotion($('sessionMoodOptions'),currentSession?.htf_context?.mental_check?.mood||'');$('sessionUrge').value=currentSession?.htf_context?.mental_check?.urge||'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
 document.querySelectorAll('.htf-check').forEach(el=>{el.checked=!!checks[el.dataset.check]});
@@ -122,7 +122,7 @@ async function loadSessionTrades(){
   $('sessionSummary').classList.remove('hidden');
   list.textContent='Lade Trades …';
   const {data,error}=await client.from('trades')
-    .select('id,setup_type,instrument,direction,entry_at,exit_at,realized_pnl_usd,exit_reason,initial_risk_usd,rule_deviation,execution_grade,observations,deviation_reason')
+    .select('id,setup_type,instrument,direction,entry_at,exit_at,entry_emotion,exit_emotion,realized_pnl_usd,exit_reason,initial_risk_usd,rule_deviation,execution_grade,observations,deviation_reason')
     .eq('session_id',currentSession.id).order('entry_at',{ascending:false}).limit(100);
   if(error){list.textContent='Trades konnten nicht geladen werden: '+error.message;$('sessionSummaryBody').textContent='Auswertung nicht verfügbar – Trades konnten nicht geladen werden.';return}
   sessionTrades=data||[];
@@ -348,8 +348,8 @@ async function openTradeDetails(trade){
     const feesTotal=existingResults.reduce((sum,r)=>sum+Number(r.fees_usd||0),0);
     const exitSection=trade.exit_at?
       `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe brutto: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
-      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Während des Trades oder danach markieren. Ungeprüft ist nicht automatisch negativ.</p>
+      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<h4>Emotion beim Exit · Pflicht</h4><div class="emotion-options" data-emotion-group="exitCommitEmotion"><button type="button" data-value="disciplined">Nach Plan</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button><button type="button" data-value="stress">Stress</button></div><p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<div class="account intratrade-emotion"><h3>Emotion während des Trades · optional</h3><div class="emotion-options" data-emotion-group="duringTradeEmotion"><button type="button" data-value="calm">Ruhig</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="uncertain">Unsicherheit</button></div><button type="button" class="secondary wide save-during-emotion">Emotion speichern</button><div class="during-feedback muted" role="status"></div></div><div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Während des Trades oder danach markieren. Ungeprüft ist nicht automatisch negativ.</p>
 <div class="analysis-grid">
 <label><input type="checkbox" data-analysis="structure"> Struktur / Bruch</label>
 <label><input type="checkbox" data-analysis="volume"> Volumen Preis/Zeit</label>
@@ -360,7 +360,7 @@ async function openTradeDetails(trade){
 </div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide">Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><div class="image-dropzone" tabindex="0" role="group" aria-label="LTF-Bilder ablegen oder mit Strg+V einfügen"><strong>Bilder hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bilder auswählen · max. 10 gleichzeitig</span><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><span class="image-pick-status" role="status">Noch keine neuen Bilder ausgewählt.</span></div><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
 <h3>Trade-Review · unabhängig vom P&L</h3>
 <p class="muted">Auch nach dem Exit ergänzbar. A+ bedeutet gute Ausführung, nicht zwingend Gewinn.</p>
-<h4>Emotion nach dem Exit</h4><div class="emotion-options" data-emotion-group="exitEmotion"><button type="button" data-value="disciplined">Diszipliniert</button><button type="button" data-value="fear">Angst / zu früh</button><button type="button" data-value="greed">Gier / zu lange</button><button type="button" data-value="stress">Stress / Druck</button></div><p class="muted">Optional. Zusammen mit dem Review speichern.</p><label>Ausführungsqualität<select class="review-grade"><option value="">Noch nicht bewertet</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>unrated</option></select></label>
+<h4>Emotion beim Exit · gespeichert</h4><div class="emotion-options" data-emotion-group="exitEmotion"><button type="button" data-value="disciplined">Diszipliniert</button><button type="button" data-value="fear">Angst / zu früh</button><button type="button" data-value="greed">Gier / zu lange</button><button type="button" data-value="stress">Stress / Druck</button></div><p class="muted">Die beim Abschluss gespeicherte Emotion wird im Review nur angezeigt.</p><label>Ausführungsqualität<select class="review-grade"><option value="">Noch nicht bewertet</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>unrated</option></select></label>
 <label>Regelprüfung<select class="review-compliance"><option value="unknown">Noch nicht geprüft</option><option value="clean">Geprüft · kein Regelbruch</option><option value="breach">Regelbruch dokumentieren</option></select></label>
 <label>Fehlerart<select class="review-error"><option value="">Kein Fehler ausgewählt</option><option value="fomo">FOMO</option><option value="overtrading">Overtrading</option><option value="poor_entry">Schlechter Entry</option><option value="stop_management">SL-Verhalten</option><option value="early_exit">Zu früher Exit</option><option value="plan_violation">Planabweichung</option><option value="other">Sonstiges</option></select></label>
 <label>Gegenmaßnahme (Wenn–Dann-Regel)<select class="review-reuse"><option value="">Neue Maßnahme schreiben</option></select><textarea class="review-action" rows="2" placeholder="Wenn …, dann …"></textarea></label>
@@ -393,12 +393,13 @@ async function openTradeDetails(trade){
       review.querySelector('.review-error').value=obs.review_error||'';
       review.querySelector('.review-action').value=obs.countermeasure||'';
       review.querySelector('.review-note').value=obs.review_note||'';
-      review.querySelector('.review-playbook').checked=!!obs.playbook;setEmotion(review.querySelector('[data-emotion-group="exitEmotion"]'),obs.exit_emotion||'');
-      const measures=[...new Set(sessionTrades.map(t=>t.observations?.countermeasure).filter(Boolean))].slice(0,15);
+      review.querySelector('.review-playbook').checked=!!obs.playbook;setEmotion(review.querySelector('[data-emotion-group="exitEmotion"]'),trade.exit_emotion||obs.exit_emotion||'');review.querySelectorAll('[data-emotion-group="exitEmotion"] button').forEach(b=>b.disabled=true);
+      const measures=[...new Set([...trainingMeasures.map(m=>m.rule_text),...sessionTrades.map(t=>t.observations?.countermeasure)].filter(Boolean))].slice(0,30);
       const reuse=review.querySelector('.review-reuse');
       for(const measure of measures){const option=document.createElement('option');option.value=measure;option.textContent=measure.length>65?measure.slice(0,65)+'…':measure;reuse.appendChild(option);}
       reuse.addEventListener('change',()=>{if(reuse.value)review.querySelector('.review-action').value=reuse.value;});
     }
+    setEmotion(panel.querySelector('[data-emotion-group="duringTradeEmotion"]'),trade.observations?.during_trade_emotion||'');
     const recoverable=draftRead(trade.id);
     if(recoverable&&trade.exit_at)recoverable.exit=null;
     if(recoverable&&(recoverable.exit||recoverable.analysis||recoverable.review)){
@@ -446,6 +447,21 @@ $('tradeDetails').addEventListener('click',async e=>{
  finally{busy=false;btn.disabled=false;}
 });
 $('tradeDetails').addEventListener('click',async e=>{
+ const btn=e.target.closest('.save-during-emotion');if(!btn||busy)return;
+ const panel=$('tradeDetails'),trade=sessionTrades.find(t=>t.id===panel.dataset.tradeId);if(!trade)return;
+ const emotion=selectedEmotion(panel.querySelector('[data-emotion-group="duringTradeEmotion"]'));
+ const feedback=panel.querySelector('.during-feedback');
+ if(!emotion){feedback.textContent='Bitte zuerst eine Emotion auswählen.';return;}
+ busy=true;btn.disabled=true;
+ try{
+  const observations={...(trade.observations||{}),during_trade_emotion:emotion,during_trade_emotion_at:new Date().toISOString()};
+  const {data,error}=await conditionalTradeUpdate(trade.id,{observations},trade.observations,'observations');
+  if(error)throw error;if(!data){tradeConflictFeedback(feedback);return;}
+  trade.observations=data.observations;feedback.textContent='Emotion mit Zeitstempel gespeichert.';
+ }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
+ finally{busy=false;btn.disabled=false;}
+});
+$('tradeDetails').addEventListener('click',async e=>{
  const btn=e.target.closest('.review-save');if(!btn||busy)return;
  const form=btn.closest('.review-editor');
  const trade=sessionTrades.find(t=>t.id===form.dataset.tradeId);if(!trade)return;
@@ -458,7 +474,7 @@ $('tradeDetails').addEventListener('click',async e=>{
  if(errorType&&!action){feedback.textContent='Für dokumentierte Fehler ist eine Wenn–Dann-Gegenmaßnahme erforderlich.';return;}
  if(action.length>1000||note.length>1500){feedback.textContent='Text zu lang.';return;}
  const observations={...(trade.observations||{}),compliance_reviewed:compliance!=='unknown',
- review_error:errorType,exit_emotion:selectedEmotion(form.querySelector('[data-emotion-group="exitEmotion"]')),countermeasure:action,review_note:note,playbook:form.querySelector('.review-playbook').checked};
+ review_error:errorType,countermeasure:action,review_note:note,playbook:form.querySelector('.review-playbook').checked};
  const patch={execution_grade:form.querySelector('.review-grade').value||null,
  rule_deviation:compliance==='breach',deviation_reason:compliance==='breach'?errorType:null,observations};
  busy=true;btn.disabled=true;feedback.textContent='Review wird gespeichert …';
@@ -469,7 +485,7 @@ $('tradeDetails').addEventListener('click',async e=>{
    Object.assign(trade,data);
    feedback.textContent='Review in Supabase gespeichert.';
    draftMarkSaved(trade.id,'review');
-   try{await renderSessionSummary(sessionTrades);await loadProgressAndPlaybook();}
+   try{await renderSessionSummary(sessionTrades);await loadProgressAndPlaybook();await loadTraining();await loadAnalytics();await loadOpenReviews();}
    catch(refreshError){feedback.textContent='Review gespeichert. Anzeigeaktualisierung fehlgeschlagen: '+refreshError.message;}
  }catch(err){feedback.textContent='Review nicht gespeichert: '+err.message;}
  finally{busy=false;btn.disabled=false;}
@@ -719,11 +735,255 @@ $('tradeDetails').addEventListener('click',async e=>{
  }catch(err){feedback.textContent=uploaded+' Bild(er) gespeichert, danach Fehler: '+err.message;}
  finally{busy=false;btn.disabled=false;}
 });
+
+let trainingRows=[],trainingLoadVersion=0;
+const trainingKey=t=>String(t.observations?.review_error||'').trim();
+function trainingBar(count,denom){
+ const bar=document.createElement('div');bar.className='training-bar';
+ const fill=document.createElement('div');fill.className='training-bar-fill';fill.style.width=(denom?Math.min(100,100*count/denom):0)+'%';bar.append(fill);return bar;
+}
+async function loadTraining(){
+ if(!currentUser)return;
+ const seq=++trainingLoadVersion;
+ $('trainingList').textContent='Training wird geladen …';
+ const {data,error}=await client.from('trades').select('id,session_id,setup_type,direction,instrument,entry_at,exit_at,entry_emotion,exit_emotion,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd').not('exit_at','is',null).order('exit_at',{ascending:false}).limit(50);
+ if(seq!==trainingLoadVersion)return;
+ if(error){$('trainingList').textContent='Ladefehler: '+error.message;return;}
+ trainingRows=data||[];
+ const {data:rules,error:ruleError}=await client.from('training_countermeasures').select('id,owner_id,error_key,rule_text,activated_at');
+ trainingMeasures=ruleError?[]:(rules||[]);
+ const counts=new Map();
+ for(const t of trainingRows){for(const m of METRICS.filter(m=>!m.good)){if(m.has(t))counts.set(m.key,(counts.get(m.key)||0)+1);}}
+ const sorted=[...counts].sort((a,b)=>b[1]-a[1]);
+ const list=$('trainingList');list.replaceChildren();
+ if(!sorted.length){list.textContent=trainingRows.length?'Noch keine Fehler in den letzten '+trainingRows.length+' abgeschlossenen Trades dokumentiert.':'Noch keine abgeschlossenen Trades vorhanden.';return;}
+ const info=document.createElement('p');info.className='muted';info.textContent='Letzte '+trainingRows.length+' abgeschlossene Entscheidungen · Fehler je Trade gezählt · kein Leader/Follower-Doppelzählen';list.append(info);
+ for(const [key,count] of sorted){
+  const btn=document.createElement('button');btn.type='button';btn.className='training-priority';
+  const top=document.createElement('div');top.className='row';
+  const label=document.createElement('strong');label.textContent=METRICS.find(m=>m.key===key)?.label||REVIEW_LABELS[key]||key;
+  const num=document.createElement('span');num.textContent=count+' / '+trainingRows.length;
+  top.append(label,num);btn.append(top,trainingBar(count,trainingRows.length));
+  btn.addEventListener('click',()=>openTrainingDetail(key));
+  list.append(btn);
+ }
+}
+function openTrainingDetail(key){
+ const metric=METRICS.find(m=>m.key===key);const rows=trainingRows.filter(t=>metric?metric.has(t):trainingKey(t)===key);
+ const detail=$('trainingDetail');detail.replaceChildren();detail.classList.remove('hidden');
+ const h=document.createElement('h3');h.textContent='Training: '+(metric?.label||REVIEW_LABELS[key]||key);detail.append(h);
+ const now=trainingRows.slice(0,25),old=trainingRows.slice(25,50);
+ const count=arr=>arr.filter(t=>metric?metric.has(t):trainingKey(t)===key).length;
+ const comparison=document.createElement('p');comparison.className='muted';
+ comparison.textContent='Neueste '+now.length+': '+count(now)+' Fehler · vorherige '+old.length+': '+count(old)+' Fehler. Nur dokumentierte Fälle; kein Wirksamkeitsnachweis.';
+ detail.append(comparison);
+ const measures=[...new Set(rows.map(t=>t.observations?.countermeasure).filter(Boolean))];
+ const mh=document.createElement('h4');mh.textContent='Hinterlegte Gegenmaßnahmen';detail.append(mh);
+ if(!measures.length){const p=document.createElement('p');p.className='muted';p.textContent='Noch keine Gegenmaßnahme hinterlegt. Öffne einen Trade und ergänze sie im Review.';detail.append(p);}
+ for(const m of measures){const p=document.createElement('p');p.className='training-measure';p.textContent=m;detail.append(p);}
+ const saved=trainingMeasures.find(m=>m.error_key===key);
+ const editTitle=document.createElement('h4');editTitle.textContent='Aktive Wenn-Dann-Gegenmaßnahme';detail.append(editTitle);
+ const input=document.createElement('textarea');input.rows=3;input.maxLength=1000;input.value=saved?.rule_text||measures[0]||'';input.placeholder='Wenn …, dann …';input.setAttribute('aria-label','Gegenmaßnahme bearbeiten');detail.append(input);
+ const save=document.createElement('button');save.type='button';save.textContent='Gegenmaßnahme speichern';detail.append(save);
+ const feedback=document.createElement('p');feedback.className='muted';detail.append(feedback);
+ save.addEventListener('click',async()=>{
+  const value=input.value.trim();if(value.length<5){feedback.textContent='Bitte eine konkrete Wenn-Dann-Regel mit mindestens 5 Zeichen eintragen.';return;}
+  save.disabled=true;feedback.textContent='Speichert …';
+  try{
+   const {data,error}=await client.from('training_countermeasures').upsert({owner_id:currentUser.id,error_key:key,rule_text:value,activated_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:'owner_id,error_key'}).select('id,owner_id,error_key,rule_text,activated_at').single();
+   if(error)throw error;
+   trainingMeasures=trainingMeasures.filter(x=>x.error_key!==key).concat(data);
+   feedback.textContent='Gespeichert. Ab diesem Zeitpunkt wird die weitere Fehlerentwicklung beobachtet.';
+  }catch(e){feedback.textContent='Speichern fehlgeschlagen: '+e.message;}
+  finally{save.disabled=false;}
+ });
+ if(saved){
+  const activated=new Date(saved.activated_at);
+  const before=trainingRows.filter(t=>new Date(t.exit_at)<activated);
+  const after=trainingRows.filter(t=>new Date(t.exit_at)>=activated);
+  const countError=arr=>arr.filter(t=>metric?metric.has(t):trainingKey(t)===key).length;
+  const progress=document.createElement('p');progress.className='muted';
+  progress.textContent='Seit Aktivierung: '+countError(after)+' / '+after.length+' Trades · davor: '+countError(before)+' / '+before.length+' Trades. Vergleich nur bei ausreichend Daten sinnvoll; kein Kausalitätsnachweis.';
+  detail.append(progress);
+ }
+ const th=document.createElement('h4');th.textContent='Betroffene Trades ('+rows.length+')';detail.append(th);
+ for(const t of rows){
+  const btn=document.createElement('button');btn.type='button';btn.className='training-trade';
+  btn.textContent=berlinTime(t.entry_at)+' · '+t.setup_type+' · '+t.direction+' '+t.instrument+' · '+(t.execution_grade||'unbewertet');
+  btn.addEventListener('click',()=>openTrainingTrade(t));detail.append(btn);
+ }
+ detail.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function openTrainingTrade(t){
+ const detail=$('trainingDetail');let panel=$('trainingTradeDetail');
+ if(!panel){panel=document.createElement('div');panel.id='trainingTradeDetail';detail.append(panel);}
+ panel.replaceChildren();
+ const title=document.createElement('h4');title.textContent='Trade · '+t.setup_type;panel.append(title);
+ const obs=t.observations||{};
+ const p=document.createElement('p');
+ p.textContent=berlinTime(t.entry_at)+' · '+t.direction+' '+t.instrument+' · P&L: '+usd(t.realized_pnl_usd||0)+' USD · Entry: '+(obs.entry_emotion||'nicht erfasst')+' · Exit: '+(obs.exit_emotion||'nicht erfasst');
+ panel.append(p);
+ const note=document.createElement('p');note.textContent='Review: '+(obs.review_note||'Keine Notiz');panel.append(note);
+ const action=document.createElement('p');action.textContent='Gegenmaßnahme: '+(obs.countermeasure||'Nicht hinterlegt');panel.append(action);
+ const open=document.createElement('button');open.type='button';open.textContent='Trade vollständig öffnen / Review bearbeiten';
+ open.addEventListener('click',async()=>{
+  const existing=sessionTrades.find(x=>x.id===t.id);
+  if(!existing)sessionTrades.push(t);
+  showView('live');
+  await openTradeDetails(t);
+  $('tradeDetails').scrollIntoView({behavior:'smooth',block:'start'});
+ });
+ panel.append(open);
+ const shots=document.createElement('div');shots.className='training-shots';panel.append(shots);
+ try{
+  const prefix=chartPath('trade',t.id,'');
+  const {data,error}=await client.storage.from(CHART_BUCKET).list(prefix,{limit:30});
+  if(error)throw error;
+  for(const file of data||[]){
+   if(!file.name||file.name.endsWith('/'))continue;
+   const path=prefix+file.name;
+   const {data:signed,error:signError}=await client.storage.from(CHART_BUCKET).createSignedUrl(path,120);
+   if(signError||!signed?.signedUrl)continue;
+   const link=document.createElement('a');link.href=signed.signedUrl;link.target='_blank';link.rel='noopener noreferrer';
+   const img=document.createElement('img');img.src=signed.signedUrl;img.alt='Trade-Screenshot';img.loading='lazy';link.append(img);shots.append(link);
+  }
+ }catch(e){const warn=document.createElement('p');warn.className='muted';warn.textContent='Screenshots konnten nicht geladen werden: '+e.message;panel.append(warn);}
+ panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('reloadTraining').addEventListener('click',loadTraining);
+
+
+let analyticsRows=[],analyticsAccountRows=[],analyticsResults=[],trainingMeasures=[];
+const METRICS=[
+ {key:'clean_entry',label:'Entry nach Plan',good:true,has:t=>t.entry_emotion==='plan'||t.observations?.entry_emotion==='plan'},
+ {key:'disciplined_exit',label:'Exit nach Plan',good:true,has:t=>t.exit_emotion==='disciplined'||t.observations?.exit_emotion==='disciplined'},
+ {key:'clean_rules',label:'Regeln eingehalten',good:true,has:t=>t.observations?.compliance_reviewed&&!t.rule_deviation},
+ {key:'a_plus',label:'A+ Ausführung',good:true,has:t=>t.execution_grade==='A+'},
+ {key:'fomo',label:'FOMO',good:false,has:t=>t.observations?.review_error==='fomo'||t.entry_emotion==='fomo'||t.observations?.entry_emotion==='fomo'},
+ {key:'revenge',label:'Revenge-Entry',good:false,has:t=>t.entry_emotion==='revenge'||t.observations?.entry_emotion==='revenge'},
+ {key:'impulsive',label:'Impulsiver Entry',good:false,has:t=>t.entry_emotion==='impulsive'||t.observations?.entry_emotion==='impulsive'},
+ {key:'overtrading',label:'Overtrading',good:false,has:t=>t.observations?.review_error==='overtrading'},
+ {key:'poor_entry',label:'Schlechter Entry',good:false,has:t=>t.observations?.review_error==='poor_entry'},
+ {key:'stop_management',label:'SL-Fehler',good:false,has:t=>t.observations?.review_error==='stop_management'},
+ {key:'early_exit',label:'Zu früher Exit',good:false,has:t=>t.observations?.review_error==='early_exit'},
+ {key:'plan_violation',label:'Planabweichung',good:false,has:t=>t.observations?.review_error==='plan_violation'},
+ {key:'fear_exit',label:'Exit aus Angst',good:false,has:t=>t.exit_emotion==='fear'||t.observations?.exit_emotion==='fear'},
+ {key:'greed_exit',label:'Exit aus Gier',good:false,has:t=>t.exit_emotion==='greed'||t.observations?.exit_emotion==='greed'},
+ {key:'frustration_exit',label:'Exit aus Frust',good:false,has:t=>t.exit_emotion==='frustration'||t.observations?.exit_emotion==='frustration'}
+];
+function metricRows(rows){return METRICS.map(m=>({...m,rows:rows.filter(m.has)})).filter(m=>m.rows.length).sort((a,b)=>b.rows.length-a.rows.length||a.label.localeCompare(b.label));}
+function renderMetricList(target,metrics,total,callback){
+ target.replaceChildren();
+ if(!metrics.length){target.textContent='Noch keine entsprechend dokumentierten Trades.';return;}
+ for(const metric of metrics){
+  const btn=document.createElement('button');btn.type='button';btn.className='training-priority';
+  const head=document.createElement('div');head.className='row';
+  const name=document.createElement('strong');name.textContent=metric.label;
+  const count=document.createElement('span');count.textContent=metric.rows.length+' / '+total;
+  head.append(name,count);btn.append(head);
+  const bar=trainingBar(metric.rows.length,total);bar.firstElementChild.style.background=metric.good?'#16a34a':'#dc2626';btn.append(bar);
+  btn.addEventListener('click',()=>callback(metric));target.append(btn);
+ }
+}
+async function loadAnalytics(){
+ if(!currentUser)return;
+ const {data,error}=await client.from('trades').select('id,session_id,setup_type,direction,instrument,entry_at,exit_at,entry_emotion,exit_emotion,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd').not('exit_at','is',null).order('exit_at',{ascending:false}).limit(50);
+ if(error){$('analyticsSummary').textContent='Analyse nicht geladen: '+error.message;return;}
+ analyticsRows=data||[];
+ const ids=analyticsRows.map(t=>t.id);
+ analyticsAccountRows=[];analyticsResults=[];
+ if(ids.length){
+  const {data:allocs,error:allocError}=await client.from('trade_account_allocations').select('id,trade_id,account_id,initial_risk_usd').in('trade_id',ids);
+  if(allocError){$('analyticsSummary').textContent='Kontozuordnungen nicht geladen: '+allocError.message;return;}
+  analyticsAccountRows=allocs||[];
+  if(analyticsAccountRows.length){
+   const {data:results,error:resultsError}=await client.from('account_trade_results').select('allocation_id,realized_pnl_usd,fees_usd').in('allocation_id',analyticsAccountRows.map(a=>a.id));
+   if(resultsError){$('analyticsSummary').textContent='Kontoergebnisse nicht geladen: '+resultsError.message;return;}
+   analyticsResults=results||[];
+  }
+ }
+ const filter=$('analyticsAccount'),prior=filter.value;filter.replaceChildren();
+ const all=document.createElement('option');all.value='all';all.textContent='Alle Konten · Entscheidungen';filter.append(all);
+ for(const a of allAccounts){const o=document.createElement('option');o.value=a.id;o.textContent=a.account_name;filter.append(o);}
+ for(const id of new Set(analyticsAccountRows.map(a=>a.account_id))){if(![...filter.options].some(o=>o.value===id)){const o=document.createElement('option');o.value=id;o.textContent='Historisches Konto · '+id.slice(0,8);filter.append(o);}}
+ filter.value=[...filter.options].some(o=>o.value===prior)?prior:'all';
+ renderAnalytics();renderTopFive();
+}
+function filteredAnalytics(){
+ const id=$('analyticsAccount').value;
+ if(id==='all')return analyticsRows;
+ const tradeIds=new Set(analyticsAccountRows.filter(x=>x.account_id===id).map(x=>x.trade_id));
+ return analyticsRows.filter(t=>tradeIds.has(t.id));
+}
+function renderAnalytics(){
+ const rows=filteredAnalytics(),total=rows.length;
+ const filter=$('analyticsAccount').value;
+ const sum=$('analyticsSummary');sum.replaceChildren();
+ const p=document.createElement('p');p.textContent=total+' Entscheidungen im aktuellen Fenster der letzten 50 abgeschlossenen Trades. Kopierte Ausführungen zählen nur einmal als Entscheidung.';sum.append(p);
+ if(filter==='all'){
+  const valid=rows.filter(t=>Number(t.initial_risk_usd)>0&&Number.isFinite(Number(t.realized_pnl_usd)));
+  const average=valid.length?valid.reduce((n,t)=>n+Number(t.realized_pnl_usd)/Number(t.initial_risk_usd),0)/valid.length:null;
+  const r=document.createElement('p');r.textContent='Ø R je Entscheidung: '+(average===null?'nicht berechenbar':average.toFixed(2)+' R')+' ('+valid.length+' gültige Risiken).';sum.append(r);
+ }else{
+  const allocations=analyticsAccountRows.filter(x=>x.account_id===filter&&rows.some(t=>t.id===x.trade_id));
+  const byAllocation=new Map(analyticsResults.map(x=>[x.allocation_id,x]));
+  const valid=allocations.filter(x=>Number(x.initial_risk_usd)>0&&byAllocation.has(x.id));
+  const avg=valid.length?valid.reduce((n,a)=>n+(Number(byAllocation.get(a.id).realized_pnl_usd)-Number(byAllocation.get(a.id).fees_usd||0))/Number(a.initial_risk_usd),0)/valid.length:null;
+  const p=document.createElement('p');p.textContent='Ø Netto-R je Kontoausführung: '+(avg===null?'nicht berechenbar':avg.toFixed(2)+' R')+' ('+valid.length+' Ausführungen).';sum.append(p);
+ }
+ const metrics=metricRows(rows);
+ renderMetricList($('analyticsGood'),metrics.filter(x=>x.good),total,openAnalyticsMetric);
+ renderMetricList($('analyticsBad'),metrics.filter(x=>!x.good),total,openAnalyticsMetric);
+}
+function openAnalyticsMetric(metric){
+ const panel=$('analyticsDrilldown');panel.replaceChildren();panel.classList.remove('hidden');
+ const title=document.createElement('h3');title.textContent=metric.label+' · '+metric.rows.length+' Trades';panel.append(title);
+ for(const trade of metric.rows){
+  const b=document.createElement('button');b.type='button';b.className='training-trade';
+  b.textContent=berlinTime(trade.entry_at)+' · '+trade.setup_type+' · '+trade.direction+' · '+(trade.execution_grade||'unbewertet');
+  b.addEventListener('click',()=>openAnalyticsTrade(trade));panel.append(b);
+ }
+ panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function openAnalyticsTrade(trade){
+ showView('training');
+ const detail=$('trainingDetail');detail.classList.remove('hidden');detail.replaceChildren();
+ const heading=document.createElement('h3');heading.textContent='Trade-Details · '+trade.setup_type;detail.append(heading);
+ await openTrainingTrade(trade);
+}
+function renderTopFive(){
+ const target=$('topFiveBody');
+ renderMetricList(target,metricRows(analyticsRows).slice(0,5),analyticsRows.length,openAnalyticsTradeMetric);
+}
+function openAnalyticsTradeMetric(metric){showView('analytics');openAnalyticsMetric(metric);}
+$('reloadTopFive').addEventListener('click',loadAnalytics);
+$('analyticsAccount').addEventListener('change',renderAnalytics);
+$('reloadAnalytics').addEventListener('click',loadAnalytics);
+
+
+async function loadOpenReviews(){
+ if(!currentUser)return;
+ const el=$('openReviewsBody');el.textContent='Wird geladen …';
+ const {data,error}=await client.from('trades').select('id,session_id,setup_type,direction,instrument,entry_at,exit_at,entry_emotion,exit_emotion,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd').not('exit_at','is',null).order('exit_at',{ascending:false}).limit(200);
+ if(error){el.textContent='Ladefehler: '+error.message;return;}
+ const open=(data||[]).filter(t=>!t.observations?.compliance_reviewed||!t.execution_grade||t.execution_grade==='unrated');
+ el.replaceChildren();
+ if(!open.length){el.textContent='Keine offenen Reviews unter den letzten '+(data||[]).length+' abgeschlossenen Trades.';return;}
+ const label=document.createElement('p');label.className='muted';label.textContent=open.length+' offene Reviews · letzte '+(data||[]).length+' abgeschlossene Trades';el.append(label);
+ for(const trade of open.slice(0,20)){
+  const btn=document.createElement('button');btn.type='button';btn.className='training-trade';
+  btn.textContent=berlinTime(trade.entry_at)+' · '+trade.setup_type+' · '+trade.direction;
+  btn.addEventListener('click',()=>openAnalyticsTrade(trade));el.append(btn);
+ }
+ if(open.length>20){const p=document.createElement('p');p.textContent='Es werden die ersten 20 angezeigt.';el.append(p);}
+}
+$('reloadOpenReviews').addEventListener('click',loadOpenReviews);
+
 async function loadProgressAndPlaybook(){
  const progress=$('progressPanel'),playbook=$('playbookPanel');
  progress.classList.remove('hidden');playbook.classList.remove('hidden');
  const {data:closed,error}=await client.from('trades')
- .select('id,setup_type,direction,instrument,entry_at,exit_at,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd')
+ .select('id,setup_type,direction,instrument,entry_at,exit_at,entry_emotion,exit_emotion,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd')
  .not('exit_at','is',null).order('exit_at',{ascending:false}).limit(50);
  if(error){$('progressBody').textContent='Ladefehler: '+error.message;$('playbookBody').textContent='Ladefehler: '+error.message;return;}
  const {data:all,error:bookError}=await client.from('trades')
@@ -753,7 +1013,7 @@ async function loadProgressAndPlaybook(){
  <p>A+: ${aplus}/${graded.length} bewertete Trades${graded.length?' ('+Math.round(aplus/graded.length*100)+' %)':''}</p>
  <p>Fehler: ${errors||'keine dokumentiert'}</p>
  <p>Fehlerquote neueste 25: ${errorRate(halves[0])} · vorherige 25: ${errorRate(halves[1])}. Nur dokumentierte Fehler; keine Kausalitätsaussage.</p>
- <details><summary>Gegenmaßnahmen (${measures.length})</summary>${measureHtml||'Noch keine Gegenmaßnahmen erfasst.'}</details>`;
+ `;
  if(bookError)return;
  const saved=(all||[]).filter(t=>t.observations?.playbook);
  $('playbookBody').innerHTML=saved.length?saved.map(t=>`<div class="account"><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction)} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${escapeHtml(t.execution_grade||'unbewertet')}</div><p>${escapeHtml(t.observations?.review_note||'Keine Notiz')}</p><button type="button" class="secondary playbook-open" data-trade-id="${t.id}">Trade öffnen</button></div>`).join(''):'Noch keine Setups übernommen.';
@@ -852,6 +1112,8 @@ $('tradeDetails').addEventListener('click',async e=>{
   feedback.textContent='';
   editor.querySelectorAll('input,select').forEach(el=>el.style.outline='');
   if(!reason){fail('Bitte Exit-Grund auswählen.',editor.querySelector('.exit-reason'));return;}
+  const exitEmotion=selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]'));
+  if(!exitEmotion){fail('Bitte die Emotion beim Exit auswählen.');return;}
   const results=[];
   for(const card of editor.querySelectorAll('.exit-account')){
     const result=exitResult(card);
@@ -868,7 +1130,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   busy=true;btn.disabled=true;btn.textContent='Wird abgeschlossen …';feedback.textContent='Abschluss wird gespeichert …';feedback.style.color='';
   try{
     const tradeId=$('tradeDetails').dataset.tradeId;
-    const {data,error}=await client.rpc('close_trade_with_account_results',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results});
+    const {data,error}=await client.rpc('close_trade_with_account_results_v7',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results,p_exit_emotion:exitEmotion});
     if(error)throw error;
     if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
     message('Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
@@ -1182,29 +1444,23 @@ $('recordEntry').onclick=async()=>{
   if(selected.filter(a=>a.role==='leader').length!==1){message('Genau ein ausgewähltes Konto muss Leader sein.',true);return}
   if(tradeCount>=5&&!confirm('Warnung: Bereits '+tradeCount+' Entscheidungen in dieser Session. Trotzdem dokumentieren?'))return;
   const entryEmotion=selectedEmotion($('entryEmotionOptions'));
-   if(entryEmotion&&entryEmotion!=='plan'&&!confirm('EMOTIONALE WARNUNG: '+$('entryEmotionWarning').textContent+'\n\nTrotzdem als Trade dokumentieren?'))return;
-   if(!confirm('Entry jetzt als ausgeführte Trading-Entscheidung dokumentieren? Keine Brokerorder.'))return;
+   // Emotionale Warnung bleibt sichtbar im Formular; keine zusätzlichen Bestätigungsdialoge.
   busy=true;
   $('recordEntry').disabled=true;
   try{
-    const {data,error}=await client.rpc('create_trade_with_allocations',{
+    const {data,error}=await client.rpc('create_trade_with_allocations_v7',{
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,
       p_direction:$('direction').value,
-      p_allocations:selected
+      p_allocations:selected,
+      p_entry_emotion:entryEmotion||'unreported'
     });
     if(error)throw error;
     if(!data)throw new Error('Keine Trade-ID von der Datenbank zurückgegeben. Bitte vor erneutem Speichern die Trade-Liste prüfen.');
-    let emotionSaveError=null;
-    if(entryEmotion){
-      const {error:emotionError}=await client.from('trades').update({observations:{entry_emotion:entryEmotion}}).eq('id',data);
-      if(emotionError)emotionSaveError=emotionError;
-    }
     await loadCount();
     await loadSessionTrades();
-    if(emotionSaveError)message('Entry wurde gespeichert, aber Emotion NICHT gespeichert: '+emotionSaveError.message,true);
-    else message('Entry atomar gespeichert: 1 Entscheidung, '+selected.length+' Kontozuordnung(en). Trade-ID: '+data);
+    message('Entry mit Emotion atomar gespeichert: '+selected.length+' Kontozuordnung(en).');
     setEmotion($('entryEmotionOptions'),'');updateEntryEmotionWarning();showView('live');
   }catch(e){
     message('Speichern nicht bestätigt: '+e.message+'\nBei Netzwerkfehlern vor einem erneuten Versuch bitte die Trades prüfen, um doppelte Entries zu vermeiden.',true);
