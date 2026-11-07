@@ -34,7 +34,7 @@ button{touch-action:manipulation;}
 .analysis-grid input,.session-checks input{display:inline-block;width:22px;height:22px;flex:0 0 22px;margin:0;accent-color:var(--accent)}
 .chart-thumb{padding:10px 0;border-bottom:1px solid var(--line)}
 @media(max-width:390px){.analysis-grid{grid-template-columns:1fr}}
-.image-dropzone{border:2px dashed #53758c;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:rgba(61,112,143,.09);margin:10px 0}.image-dropzone.drag-over,.image-dropzone:focus-visible{border-color:#11c8c4;background:rgba(17,200,196,.14);outline:2px solid #11c8c4;outline-offset:2px}.image-dropzone input[type=file]{max-width:100%}.image-pick-status{font-size:13px;color:#a9c5d7}.trade-cta{background:#079f9f;color:white;font-weight:750;font-size:17px;min-height:56px;margin:14px 0 5px}.trade-cta:focus-visible{outline:3px solid #fff;outline-offset:3px}#decisionView{scroll-margin-top:80px}</style>
+.image-dropzone{border:2px dashed #53758c;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:rgba(61,112,143,.09);margin:10px 0}.image-dropzone.drag-over,.image-dropzone:focus-visible{border-color:#11c8c4;background:rgba(17,200,196,.14);outline:2px solid #11c8c4;outline-offset:2px}.image-dropzone input[type=file]{max-width:100%}.image-pick-status{font-size:13px;color:#a9c5d7}.trade-cta{background:#079f9f;color:white;font-weight:750;font-size:17px;min-height:56px;margin:14px 0 5px}.trade-cta:focus-visible{outline:3px solid #fff;outline-offset:3px}#decisionView{scroll-margin-top:80px}.setup-select-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 10px}.setup-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.setup-card{border:2px solid #3c5a71;border-radius:12px;min-height:96px;padding:12px;text-align:left;background:#193149;color:#f1f8ff;display:flex;flex-direction:column;justify-content:center;gap:6px;white-space:normal}.setup-card.selected{border-color:#10c7c1;background:#14515a;box-shadow:0 0 0 2px rgba(16,199,193,.18)}.setup-card strong{font-size:15px}.setup-card small{font-size:12px;color:#b9d2e1}.setup-manager-row{border-top:1px solid #3c5a71;padding:12px 0}.setup-manager-row .row{gap:8px}.setup-manager-row input,.setup-manager-row textarea{margin-bottom:8px}@media(max-width:520px){.setup-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.setup-card{min-height:90px}.setup-select-head button{width:auto}}.setup-card-image{width:100%;height:100px;object-fit:cover;border-radius:7px;margin-bottom:4px}.setup-image-editor{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.setup-image-editor input{flex:1 1 200px}.setup-image-editor button{flex:1 1 130px}</style>
 </head>
 <body><main>
 <header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Sammeltest 66–73 · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
@@ -53,13 +53,13 @@ button{touch-action:manipulation;}
 <label><input type="checkbox" class="htf-check" data-check="events"> News-/Makrokalender geprüft</label>
 <label><input type="checkbox" class="htf-check" data-check="risk"> Tagesrisiko und Trade-Limit geprüft</label>
 <div id="sessionCheckStatus" class="muted" role="status"></div></div>
-<button id="goToTradeEntry" type="button" class="wide trade-cta">+ Neuen Trade dokumentieren</button><p class="muted">Öffnet direkt die Trade-Eingabe. Es wird keine Brokerorder ausgelöst.</p><button id="saveHtf" class="secondary wide">Session-Kontext und Checks speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
+<button id="saveHtf" class="secondary wide">Session-Kontext und Checks speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
 <div id="htfScreenshot" class="card hidden"><h3>HTF-Chart · ein Bild je Session</h3><div class="image-dropzone" id="htfDropzone" tabindex="0" role="group" aria-label="HTF-Bild hier ablegen oder mit Strg+V einfügen"><strong>Bild hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bild auswählen · PNG, JPG, WebP · max. 10 MB</span><input type="file" id="htfFile" accept="image/png,image/jpeg,image/webp"><span class="image-pick-status" role="status">Noch kein neues Bild ausgewählt.</span></div><button id="htfUpload" type="button" class="secondary wide">HTF-Bild speichern / ersetzen</button><div id="htfImagePreview" class="muted">Noch kein Bild geladen.</div></div>
-<div id="progressPanel" class="card hidden"><h3>Fortschritt · letzte 50 abgeschlossene Trades</h3><div id="progressBody">Noch nicht geladen.</div><button type="button" id="reloadProgress" class="secondary wide">Auswertung aktualisieren</button></div><div id="playbookPanel" class="card hidden"><h3>Playbook · gespeicherte Setups</h3><div id="playbookBody">Noch nicht geladen.</div></div><div id="sessionSummary" class="card hidden" aria-live="polite"><h3>Session-Auswertung</h3><div id="sessionSummaryBody" class="muted">Noch keine Daten.</div></div>
+<div id="tradeStartAfterHtf" class="card"><button id="goToTradeEntry" type="button" class="wide trade-cta">+ Neuen Trade dokumentieren</button><p class="muted">Öffnet direkt die Trade-Eingabe. Es wird keine Brokerorder ausgelöst.</p></div><div id="progressPanel" class="card hidden"><h3>Fortschritt · letzte 50 abgeschlossene Trades</h3><div id="progressBody">Noch nicht geladen.</div><button type="button" id="reloadProgress" class="secondary wide">Auswertung aktualisieren</button></div><div id="playbookPanel" class="card hidden"><h3>Playbook · gespeicherte Setups</h3><div id="playbookBody">Noch nicht geladen.</div></div><div id="sessionSummary" class="card hidden" aria-live="polite"><h3>Session-Auswertung</h3><div id="sessionSummaryBody" class="muted">Noch keine Daten.</div></div>
 <div id="sessionTrades" class="card hidden"><div class="row"><h3>Trades dieser Session</h3><button id="reloadTrades" class="secondary" type="button">Aktualisieren</button></div><div id="sessionTradeList" class="muted">Lade Trades …</div><div id="tradeDetails" class="hidden" aria-live="polite"></div></div>
 </section>
 <section id="accountsView" class="hidden"><h2>Trading-Konten</h2><p class="muted">Konten sind Journal-Einträge. Keine Verbindung zum Broker.</p><div id="accountList"></div><div id="accountEditor" class="account hidden"><h3>Bestehendes Konto bearbeiten</h3><label>Kontoname<input id="editAccountName"></label><label>Kontotyp<select id="editAccountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter<input id="editBroker"></label><div class="grid"><label>Standardinstrument<select id="editInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="editQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="saveAccountEdit" class="wide">Änderungen speichern</button><button id="cancelAccountEdit" class="ghost wide">Abbrechen</button><button id="deactivateAccount" class="danger wide">Konto deaktivieren</button><small>Deaktivieren blendet das Konto aus der aktiven Auswahl aus. Bestehende Trades bleiben erhalten.</small></div><details><summary><strong>+ Neues Konto hinzufügen</strong></summary><label>Kontoname<input id="accountName" placeholder="z. B. AMP Privat"></label><label>Kontotyp<select id="accountType"><option value="personal">Privat</option><option value="evaluation">Evaluation</option><option value="funded">Funded</option><option value="demo">Demo</option><option value="other">Sonstiges</option></select></label><label>Broker / Anbieter (optional)<input id="broker" placeholder="z. B. AMP Futures"></label><div class="grid"><label>Standardinstrument<select id="defaultInstrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><label>Standardkontrakte<input id="defaultQty" type="number" min="0.01" step="0.01" value="1"></label></div><button id="addAccount" class="wide">Konto speichern</button></details></section>
-<section id="decisionView" class="hidden"><h2>Neue Trading-Entscheidung</h2><p class="muted">Eine Entscheidung kann mehrere Konten umfassen. Sie zählt erst beim dokumentierten Entry.</p><div id="decisionSession" class="notice">Bitte zuerst eine Session starten.</div><label>Setup<select id="setup"><option value="">Setup wählen</option><option>Liquidity Play</option><option>Trendbruch</option><option>Momentum</option><option>Kampagne Long</option><option>Kampagne Short</option><option>Countertrade</option></select></label><label>Richtung<select id="direction"><option value="long">Long</option><option value="short">Short</option></select></label><label>Leitinstrument<select id="instrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><h3>Kontozuordnung</h3><div id="allocationList"></div><div class="notice">Das Speichern dokumentiert einen Entry im Journal, führt aber keine Order aus. Maximal 5 Entscheidungen pro Session sind eine Warnschwelle, keine technische Handelssperre.</div><button id="recordEntry" class="wide">Entry dokumentieren</button></section>
+<section id="decisionView" class="hidden"><h2>Neue Trading-Entscheidung</h2><p class="muted">Eine Entscheidung kann mehrere Konten umfassen. Sie zählt erst beim dokumentierten Entry.</p><div id="decisionSession" class="notice">Bitte zuerst eine Session starten.</div><div class="setup-select-head"><strong>Setup wählen</strong><button type="button" id="manageSetups" class="secondary">Setups bearbeiten</button></div><div id="setupCards" class="setup-cards" role="group" aria-label="Setup-Auswahl"></div><input id="setup" type="hidden" value=""><p id="setupSelectionStatus" class="muted" role="status">Bitte ein Setup auswählen.</p><div id="setupManager" class="account hidden"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p><button id="closeSetupManager" type="button" class="secondary wide">Fertig</button></div><label>Richtung<select id="direction"><option value="long">Long</option><option value="short">Short</option></select></label><label>Leitinstrument<select id="instrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><h3>Kontozuordnung</h3><div id="allocationList"></div><div class="notice">Das Speichern dokumentiert einen Entry im Journal, führt aber keine Order aus. Maximal 5 Entscheidungen pro Session sind eine Warnschwelle, keine technische Handelssperre.</div><button id="recordEntry" class="wide">Entry dokumentieren</button></section>
 <section><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
 </div></main>
 
@@ -94,7 +94,7 @@ $('magic').onclick=async()=>{
   finally{btn.disabled=false}
 };
 $('logout').onclick=async()=>{const {error}=await client.auth.signOut();if(error)message(error.message,true);else {currentUser=null;currentSession=null;accounts=[];await authStatus();}};
-async function refresh(){await loadAccounts();await loadSession();renderDecision();await Promise.all([loadMorningDashboard(),loadProgressAndPlaybook()]);{let v='live';try{v=localStorage.getItem('tt7_active_view')||'live'}catch(_){}showView(v);}}
+async function refresh(){await loadSetupCatalog();await loadAccounts();await loadSession();renderDecision();await Promise.all([loadMorningDashboard(),loadProgressAndPlaybook()]);{let v='live';try{v=localStorage.getItem('tt7_active_view')||'live'}catch(_){}showView(v);}}
 async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();}
 function renderSession(){$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionState').textContent=currentSession?'Offen':'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
 document.querySelectorAll('.htf-check').forEach(el=>{el.checked=!!checks[el.dataset.check]});
@@ -526,6 +526,7 @@ const CHART_BUCKET='trading-chart-screenshots';
 function chartPath(type,id,filename){return `${currentUser.id}/${type}/${id}/${filename}`;}
 function safeImage(file){
  if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Nur PNG, JPEG oder WebP erlaubt.');
+ if(file.size===0)throw Error('Leere Bilddatei.');
  if(file.size>10*1024*1024)throw Error('Maximal 10 MB pro Bild.');
 }
 async function uploadChart(file,path){
@@ -1024,12 +1025,143 @@ $('deactivateAccount').onclick=async()=>{
   finally{busy=false;$('deactivateAccount').disabled=false}
 };
 $('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isFinite(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();};
+
+const DEFAULT_SETUP_NAMES=['Liquidity Play','Trendbruch','Momentum','Kampagne Long','Kampagne Short','Countertrade'];
+let setupCatalog=[],setupCatalogReady=false,setupCatalogBusy=false;
+const setupNotice=(msg,error=false)=>{const el=$('setupManagerStatus');el.textContent=msg;el.className=error?'error':'ok';};
+async function loadSetupCatalog(){
+ if(!currentUser)return;
+ const {data,error}=await client.from('trading_setup_catalog').select('id,name,description,active,sort_order,image_path').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+ if(error){setupCatalogReady=false;$('setupCards').textContent='Setups konnten nicht geladen werden: '+error.message;return;}
+ setupCatalog=data||[];setupCatalogReady=true;
+ // Seed default setups once, only if this account has never had a catalog.
+ if(!setupCatalog.length){
+  const rows=DEFAULT_SETUP_NAMES.map((name,i)=>({owner_id:currentUser.id,name,sort_order:i}));
+  const {error:seedError}=await client.from('trading_setup_catalog').insert(rows);
+  if(seedError){setupNotice('Standard-Setups konnten nicht angelegt werden: '+seedError.message,true);}
+  else{
+   const {data:seeded,error:reloadError}=await client.from('trading_setup_catalog').select('id,name,description,active,sort_order,image_path').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+   if(!reloadError)setupCatalog=seeded||[];
+  }
+ }
+ renderSetupCards();renderSetupManager();
+}
+function renderSetupCards(){
+ const target=$('setupCards'),selected=$('setup').value;
+ target.replaceChildren();
+ const active=setupCatalog.filter(x=>x.active);
+ if(!active.length){target.textContent='Keine aktiven Setups. Über „Setups bearbeiten“ hinzufügen.';$('setup').value='';return;}
+ if(!active.some(x=>x.name===selected)){$('setup').value='';$('setupSelectionStatus').textContent='Bitte ein Setup auswählen.';}
+ for(const item of active){
+  const button=document.createElement('button');button.type='button';
+  button.className='setup-card'+(item.name===$('setup').value?' selected':'');
+  const title=document.createElement('strong');title.textContent=item.name;button.appendChild(title);
+  if(item.image_path){const image=document.createElement('img');image.className='setup-card-image';image.alt='Setup-Beispiel: '+item.name;button.prepend(image);signedChart(item.image_path).then(url=>{if(image.isConnected)image.src=url}).catch(()=>{if(image.isConnected)image.remove()});}
+  const desc=document.createElement('small');desc.textContent=item.description||'Setup auswählen';button.appendChild(desc);
+  button.addEventListener('click',()=>{
+   $('setup').value=item.name;
+   $('setupSelectionStatus').textContent='Ausgewählt: '+item.name;
+   renderSetupCards();
+  });
+  target.appendChild(button);
+ }
+}
+function renderSetupManager(){
+ const target=$('setupManagerList');target.replaceChildren();
+ for(const item of setupCatalog){
+  const box=document.createElement('div');box.className='setup-manager-row';
+  const name=document.createElement('input');name.value=item.name;name.maxLength=80;name.setAttribute('aria-label','Setup-Name');
+  const description=document.createElement('textarea');description.value=item.description||'';description.maxLength=1000;description.rows=2;description.setAttribute('aria-label','Setup-Beschreibung');
+  const imageRow=document.createElement('div');imageRow.className='setup-image-editor';
+  const imageInput=document.createElement('input');imageInput.type='file';imageInput.accept='image/png,image/jpeg,image/webp';imageInput.setAttribute('aria-label','Setup-Bild auswählen');
+  const imageSave=document.createElement('button');imageSave.type='button';imageSave.className='secondary';imageSave.textContent='Bild speichern / ersetzen';
+  const imageRemove=document.createElement('button');imageRemove.type='button';imageRemove.className='ghost';imageRemove.textContent='Bild entfernen';imageRemove.disabled=!item.image_path;
+  imageRow.append(imageInput,imageSave,imageRemove);
+  const row=document.createElement('div');row.className='row';
+  const save=document.createElement('button');save.type='button';save.className='secondary';save.textContent='Änderungen speichern';
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='ghost';toggle.textContent=item.active?'Aus Auswahl entfernen':'Wieder aktivieren';
+  const label=document.createElement('span');label.className='muted';label.textContent=item.active?'Aktiv':'Ausgeblendet';
+  row.append(save,toggle,label);box.append(name,description,imageRow,row);target.appendChild(box);
+  imageSave.addEventListener('click',async()=>{
+   const file=imageInput.files?.[0];
+   if(!file){setupNotice('Bitte zuerst ein Setup-Bild auswählen.',true);return;}
+   if(setupCatalogBusy)return;setupCatalogBusy=true;imageSave.disabled=true;
+   let uploaded=null;
+   try{
+    uploaded=chartPath('setup',item.id,crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_'));await uploadChart(file,uploaded);
+    const {error}=await client.from('trading_setup_catalog').update({image_path:uploaded,updated_at:new Date().toISOString()}).eq('id',item.id);
+    if(error)throw error;
+    const old=item.image_path;await loadSetupCatalog();
+    setupNotice('Setup-Bild gespeichert.');
+    if(old&&old!==uploaded){const {error:cleanupError}=await client.storage.from(CHART_BUCKET).remove([old]);if(cleanupError)setupNotice('Neues Bild gespeichert, altes Bild konnte nicht bereinigt werden: '+cleanupError.message,true);}
+   }catch(e){
+    if(uploaded){await client.storage.from(CHART_BUCKET).remove([uploaded]).catch(()=>{});}
+    setupNotice('Bild konnte nicht gespeichert werden: '+e.message,true);
+   }finally{setupCatalogBusy=false;imageSave.disabled=false;}
+  });
+  imageRemove.addEventListener('click',async()=>{
+   if(!item.image_path||setupCatalogBusy)return;
+   if(!confirm('Bild von Setup „'+item.name+'“ entfernen?'))return;
+   setupCatalogBusy=true;imageRemove.disabled=true;
+   try{
+    const {error}=await client.from('trading_setup_catalog').update({image_path:null,updated_at:new Date().toISOString()}).eq('id',item.id);
+    if(error)throw error;
+    const old=item.image_path;await loadSetupCatalog();
+    const {error:storageError}=await client.storage.from(CHART_BUCKET).remove([old]);
+    setupNotice(storageError?'Bildzuordnung entfernt; Dateibereinigung fehlgeschlagen: '+storageError.message:'Setup-Bild entfernt.',!!storageError);
+   }catch(e){setupNotice('Bild entfernen fehlgeschlagen: '+e.message,true);}
+   finally{setupCatalogBusy=false;imageRemove.disabled=false;}
+  });
+  save.addEventListener('click',async()=>{
+   const next=name.value.trim();
+   if(!next){setupNotice('Setup-Name darf nicht leer sein.',true);return;}
+   if(setupCatalogBusy)return;setupCatalogBusy=true;save.disabled=true;
+   try{
+    const {error}=await client.from('trading_setup_catalog').update({name:next,description:description.value.trim(),updated_at:new Date().toISOString()}).eq('id',item.id);
+    if(error)throw error;
+    const prior=item.name;await loadSetupCatalog();
+    if($('setup').value===prior){$('setup').value=next;renderSetupCards();}
+    setupNotice('Setup gespeichert. Alte Trades behalten ihre bisherige Setup-Bezeichnung.');
+   }catch(e){setupNotice('Speichern fehlgeschlagen: '+e.message,true);}
+   finally{setupCatalogBusy=false;save.disabled=false;}
+  });
+  toggle.addEventListener('click',async()=>{
+   if(setupCatalogBusy)return;
+   if(item.active&&!confirm('Setup „'+item.name+'“ für neue Trades ausblenden? Alte Trades bleiben erhalten.'))return;
+   setupCatalogBusy=true;toggle.disabled=true;
+   try{
+    const {error}=await client.from('trading_setup_catalog').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',item.id);
+    if(error)throw error;
+    if(item.active&&$('setup').value===item.name)$('setup').value='';
+    await loadSetupCatalog();setupNotice(item.active?'Setup ausgeblendet.':'Setup wieder aktiviert.');
+   }catch(e){setupNotice('Statusänderung fehlgeschlagen: '+e.message,true);}
+   finally{setupCatalogBusy=false;toggle.disabled=false;}
+  });
+ }
+}
+$('manageSetups').addEventListener('click',()=>{$('setupManager').classList.remove('hidden');renderSetupManager();$('setupManager').scrollIntoView({behavior:'smooth',block:'nearest'});});
+$('closeSetupManager').addEventListener('click',()=>{$('setupManager').classList.add('hidden');$('setupCards').scrollIntoView({behavior:'smooth',block:'nearest'});});
+$('createSetup').addEventListener('click',async()=>{
+ const name=$('newSetupName').value.trim(),description=$('newSetupDescription').value.trim();
+ if(!name){setupNotice('Bitte einen Namen eingeben.',true);return;}
+ if(setupCatalogBusy)return;setupCatalogBusy=true;$('createSetup').disabled=true;
+ try{
+  const {error}=await client.from('trading_setup_catalog').insert({owner_id:currentUser.id,name,description,sort_order:setupCatalog.length});
+  if(error)throw error;
+  $('newSetupName').value='';$('newSetupDescription').value='';
+  await loadSetupCatalog();setupNotice('Neues Setup hinzugefügt.');
+ }catch(e){setupNotice('Hinzufügen fehlgeschlagen: '+e.message,true);}
+ finally{setupCatalogBusy=false;$('createSetup').disabled=false;}
+});
+
 function renderDecision(){const chosen=currentSession?.htf_context?.selected_accounts||[];$('allocationList').innerHTML=chosen.length?chosen.map(v=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label><input style="display:inline;width:auto;margin-right:8px" type="checkbox" class="acct-check" data-id="${a.id}" checked>${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="acct-role" data-id="${a.id}"><option value="follower" ${v.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="acct-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===v.instrument?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="acct-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity)}"></label></div>`}).join(''):'<p class="notice">Wähle zuerst im Live-Cockpit die Konten für diese Session aus.</p>';}
 $('recordEntry').onclick=async()=>{
   if(busy)return;
   if(!currentSession){message('Bitte zuerst eine Session starten.',true);return}
   if(!(currentSession.htf_context?.selected_accounts||[]).length){message('Bitte zuerst die Konten für diese Session auswählen.',true);return}
   const setup=$('setup').value;
+  if(!setupCatalogReady){message('Setup-Katalog noch nicht geladen. Bitte aktualisieren.',true);return;}
+  if(!setupCatalog.some(x=>x.active&&x.name===setup)){message('Bitte ein aktives Setup auswählen.',true);return;}
   if(!setup){message('Bitte ein Setup auswählen.',true);return}
   const selected=[...document.querySelectorAll('.acct-check:checked')].map(c=>{
     const id=c.dataset.id;
