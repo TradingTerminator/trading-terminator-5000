@@ -19,6 +19,7 @@ input,select,textarea{font-size:16px}
 .stop-stepper button{font-size:25px;padding:8px}
 /* iOS Safari: rapid taps must increment ticks, not trigger double-tap zoom */
 button{touch-action:manipulation;}
+#tradeDetails{scroll-margin-top:88px}.measure{border-top:1px solid var(--line);padding:10px 0}.tabs{position:sticky;top:0}.tabs button{white-space:normal}
 .stop-stepper button,.stop-presets button,.stop-reason-buttons button{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .stop-stepper button{min-height:60px;min-width:0;overscroll-behavior:contain}
 .stop-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:9px 0 14px}
@@ -36,11 +37,15 @@ button{touch-action:manipulation;}
 </style>
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Journal · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Sammeltest 66–73 · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <nav id="tabs" class="tabs hidden"><div><button data-view="live" class="active">◉ Live</button><button data-view="decision">＋ Trade</button><button data-view="accounts">▤ Konten</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldelink per E-Mail senden</button><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Die GitHub-Pages-Adresse muss in Supabase als Redirect URL zugelassen sein.</small></section>
 <div id="app" class="hidden">
 <section id="liveView"><h2>Live-Cockpit</h2><div class="grid"><div class="stat"><small>Session</small><strong id="sessionState">Keine</strong></div><div class="stat"><small>Ausgeführte Entscheidungen</small><strong id="tradeCount">0 / 5</strong></div></div>
+<details class="card" id="qualityChecklist"><summary><strong>V7 Testmodus · 12 Prüfungen</strong></summary>
+<p class="muted">Diese Checkliste ist nur lokal auf diesem Gerät. Keine echten Brokerorders.</p>
+<div id="testChecklist"></div>
+<button type="button" id="resetTestChecklist" class="secondary wide">Testhaken zurücksetzen</button></details>
 <div id="morningDashboard" class="card"><h3>Rückblick · letzte Session</h3><div id="morningBody" class="muted">Wird geladen …</div><button id="reloadMorning" class="secondary wide" type="button">Rückblick aktualisieren</button></div><div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
 <div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><div class="session-checks"><h3>Session-Vorbereitung · Pflichtcheck</h3>
 <label><input type="checkbox" class="htf-check" data-check="structure"> HTF-Struktur und Extrempunkte geprüft</label>
@@ -67,7 +72,8 @@ let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0
 const message=(s,err=false)=>{$('message').textContent=s;$('message').className=err?'error':'ok'};
 const localDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function showView(view){for(const v of ['live','decision','accounts'])$(v+'View').classList.toggle('hidden',v!==view);document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));}
+function showView(view){
+ if(['live','decision','accounts'].includes(view))try{localStorage.setItem('tt7_active_view',view)}catch(_){};for(const v of ['live','decision','accounts'])$(v+'View').classList.toggle('hidden',v!==view);document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>showView(b.dataset.view));
 document.addEventListener('click',e=>{if(e.target?.id==='goAccounts')showView('accounts');});
 async function authStatus(){const {data,error}=await client.auth.getUser();currentUser=error?null:data.user;const signed=!!currentUser;$('loginView').classList.toggle('hidden',signed);$('app').classList.toggle('hidden',!signed);$('tabs').classList.toggle('hidden',!signed);$('logout').classList.toggle('hidden',!signed);if(signed){message('Angemeldet: '+currentUser.email);await refresh();}else message(error?'Anmeldestatus: '+error.message:'Bitte anmelden.',!!error);}
@@ -86,7 +92,7 @@ $('magic').onclick=async()=>{
   finally{btn.disabled=false}
 };
 $('logout').onclick=async()=>{const {error}=await client.auth.signOut();if(error)message(error.message,true);else {currentUser=null;currentSession=null;accounts=[];await authStatus();}};
-async function refresh(){await loadAccounts();await loadSession();renderDecision();await loadMorningDashboard();}
+async function refresh(){await loadAccounts();await loadSession();renderDecision();await Promise.all([loadMorningDashboard(),loadProgressAndPlaybook()]);{let v='live';try{v=localStorage.getItem('tt7_active_view')||'live'}catch(_){}showView(v);}}
 async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();}
 function renderSession(){$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionState').textContent=currentSession?'Offen':'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
 document.querySelectorAll('.htf-check').forEach(el=>{el.checked=!!checks[el.dataset.check]});
@@ -102,9 +108,10 @@ let sessionTrades=[];
 async function loadSessionTrades(){
   const wrap=$('sessionTrades'), list=$('sessionTradeList'), details=$('tradeDetails');
   wrap.classList.toggle('hidden',!currentSession);
-  details.classList.add('hidden');details.innerHTML='';
+  draftFlush();detailRequestSeq++;
+  details.classList.add('hidden');details.innerHTML='';details.dataset.tradeId='';
   sessionTrades=[];
-  if(!currentSession){$('sessionSummary').classList.add('hidden');$('progressPanel').classList.add('hidden');$('playbookPanel').classList.add('hidden');return;}
+  if(!currentSession){$('sessionSummary').classList.add('hidden');return;}
   $('sessionSummary').classList.remove('hidden');
   list.textContent='Lade Trades …';
   const {data,error}=await client.from('trades')
@@ -113,7 +120,6 @@ async function loadSessionTrades(){
   if(error){list.textContent='Trades konnten nicht geladen werden: '+error.message;$('sessionSummaryBody').textContent='Auswertung nicht verfügbar – Trades konnten nicht geladen werden.';return}
   sessionTrades=data||[];
   await renderSessionSummary(sessionTrades);
-  await loadProgressAndPlaybook();
   if(sessionTrades.length===100){$('sessionSummaryBody').insertAdjacentHTML('beforeend','<p class="notice">Achtung: Maximal 100 Trades geladen. Die Auswertung kann unvollständig sein.</p>');}
   list.innerHTML=sessionTrades.length?sessionTrades.map(t=>
     `<div class="account"><div class="row"><div><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction.toUpperCase())} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${t.exit_at?'Abgeschlossen':'Offen'}</div></div><button type="button" class="secondary open-trade" data-id="${t.id}">Öffnen</button></div></div>`
@@ -124,6 +130,7 @@ async function renderSessionSummary(trades){
  const closed=trades.filter(t=>t.exit_at),open=trades.length-closed.length;
  const total=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
  const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
+ const riskComplete=closed.length>0&&closed.every(t=>t.initial_risk_usd!=null&&Number(t.initial_risk_usd)>0);
  const reviewedTrades=trades.filter(t=>t.observations?.compliance_reviewed);
  const withoutMarkedDeviation=reviewedTrades.filter(t=>!t.rule_deviation).length;
  const graded=trades.filter(t=>t.execution_grade&&t.execution_grade!=='unrated');
@@ -150,7 +157,7 @@ async function renderSessionSummary(trades){
      }
    }
  }
- target.innerHTML=`<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Realisiert (USD)</small><strong>${usd(total)}</strong></div><div class="stat"><small>Realisiertes R</small><strong>${risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Geprüft ohne Regelbruch: ${withoutMarkedDeviation} / ${reviewedTrades.length} geprüfte Trades (${trades.length-reviewedTrades.length} ungeprüft). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Session-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L-Eingabe ist brutto vor Gebühren; Netto = Brutto minus Gebühren. Keine Broker-Synchronisation.</p>`;
+ target.innerHTML=`<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Realisiert (USD)</small><strong>${usd(total)}</strong></div><div class="stat"><small>Realisiertes R</small><strong>${closed.length&&riskComplete&&risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Geprüft ohne Regelbruch: ${withoutMarkedDeviation} / ${reviewedTrades.length} geprüfte Trades (${trades.length-reviewedTrades.length} ungeprüft). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Session-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L-Eingabe ist brutto vor Gebühren; Netto = Brutto minus Gebühren. Keine Broker-Synchronisation.</p>`;
 }
 $('reloadTrades').onclick=loadSessionTrades;
 const tickValues={NQ:5,MNQ:0.5,ES:12.5,MES:1.25};
@@ -204,6 +211,65 @@ function updateRiskCard(card){
   if(!manual.checked)field.value=amount===null?'':amount.toFixed(2);
   return amount;
 }
+
+const DRAFT_PREFIX='tt7_draft_v3';
+const draftKey=id=>currentUser&&id?`${DRAFT_PREFIX}:${currentUser.id}:${id}`:null;
+let draftTimer=null;
+function draftRead(id){
+ const key=draftKey(id);if(!key)return null;
+ try{const raw=localStorage.getItem(key);if(!raw)return null;
+ const item=JSON.parse(raw);
+ return item?.version===1&&item.tradeId===id&&Date.now()-item.savedAt<30*86400000?item:null;
+ }catch(_){return null;}
+}
+function draftCapture(){
+ const panel=$('tradeDetails'),id=panel.dataset.tradeId;
+ if(!id||panel.classList.contains('hidden'))return null;
+ const analysis=panel.querySelector('.ltf-analysis'),review=panel.querySelector('.review-editor');
+ return {version:1,tradeId:id,savedAt:Date.now(),exit:snapshotExitDraft(),
+ analysis:analysis?{checks:Object.fromEntries([...analysis.querySelectorAll('[data-analysis]')].map(el=>[el.dataset.analysis,el.checked])),note:analysis.querySelector('.analysis-note').value}:null,
+ review:review?{grade:review.querySelector('.review-grade').value,compliance:review.querySelector('.review-compliance').value,
+ error:review.querySelector('.review-error').value,action:review.querySelector('.review-action').value,
+ note:review.querySelector('.review-note').value,playbook:review.querySelector('.review-playbook').checked}:null};
+}
+function draftSave(){
+ const item=draftCapture(),key=item&&draftKey(item.tradeId);
+ if(!key)return;
+ try{localStorage.setItem(key,JSON.stringify(item));
+ const status=$('tradeDetails').querySelector('.draft-status');
+ if(status)status.textContent='Lokaler Entwurf gesichert · nicht synchronisiert';
+ }catch(err){const status=$('tradeDetails').querySelector('.draft-status');if(status)status.textContent='Lokale Sicherung nicht möglich: '+err.message;}
+}
+let draftDirty=false;
+function draftSchedule(){draftDirty=true;clearTimeout(draftTimer);draftTimer=setTimeout(()=>{draftSave();draftDirty=false;},350);}
+function draftFlush(){if(draftDirty){clearTimeout(draftTimer);draftSave();draftDirty=false;}}
+function draftRestore(item){
+ if(!item)return;
+ const panel=$('tradeDetails');
+ if(item.exit&&panel.querySelector('.exit-editor'))restoreExitDraft(item.exit);
+ const analysis=panel.querySelector('.ltf-analysis');
+ if(analysis&&item.analysis){
+ analysis.querySelectorAll('[data-analysis]').forEach(el=>el.checked=!!item.analysis.checks?.[el.dataset.analysis]);
+ analysis.querySelector('.analysis-note').value=item.analysis.note||'';
+ }
+ const review=panel.querySelector('.review-editor');
+ if(review&&item.review){
+ const v=item.review;
+ review.querySelector('.review-grade').value=v.grade||'';
+ review.querySelector('.review-compliance').value=v.compliance||'unknown';
+ review.querySelector('.review-error').value=v.error||'';
+ review.querySelector('.review-action').value=v.action||'';
+ review.querySelector('.review-note').value=v.note||'';
+ review.querySelector('.review-playbook').checked=!!v.playbook;
+ }
+ const status=panel.querySelector('.draft-status');
+ if(status)status.textContent='Lokalen Entwurf wiederhergestellt · bitte Eingaben prüfen';
+}
+$('tradeDetails').addEventListener('input',e=>{if(e.target.closest('.exit-editor,.ltf-analysis,.review-editor'))draftSchedule();});
+$('tradeDetails').addEventListener('change',e=>{if(e.target.closest('.exit-editor,.ltf-analysis,.review-editor'))draftSchedule();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){draftFlush();}});
+window.addEventListener('pagehide',()=>{draftFlush();});
+
 function snapshotExitDraft(){
   const editor=document.querySelector('#tradeDetails .exit-editor');
   if(!editor)return null;
@@ -230,7 +296,10 @@ function restoreExitDraft(draft){
 function rememberAccountPosition(node){const card=node?.closest('.risk-card');return {id:card?.dataset.id||null,top:card?.getBoundingClientRect().top??0,scrollY:window.scrollY};}
 function restoreAccountPosition(pos){requestAnimationFrame(()=>{const card=[...document.querySelectorAll('#tradeDetails .risk-card')].find(c=>c.dataset.id===pos.id);if(card)window.scrollBy({top:card.getBoundingClientRect().top-pos.top,behavior:'instant'});else window.scrollTo({top:pos.scrollY,behavior:'instant'});});}
 function jumpToAccount(id){const card=[...document.querySelectorAll('#tradeDetails .risk-card')].find(c=>c.dataset.id===id);if(card)card.scrollIntoView({behavior:'smooth',block:'start'});}
+let detailRequestSeq=0;
 async function openTradeDetails(trade){
+  draftFlush();
+  const requestSeq=++detailRequestSeq;
   const panel=$('tradeDetails');panel.dataset.tradeId=trade.id;panel.classList.remove('hidden');panel.textContent='Kontozuordnungen werden geladen …';
   try{
     const {data,error}=await client.from('trade_account_allocations')
@@ -255,14 +324,15 @@ async function openTradeDetails(trade){
       if(resultsError)throw resultsError;
       existingResults=results||[];
     }
+    if(requestSeq!==detailRequestSeq||panel.dataset.tradeId!==trade.id)return;
     const resultByAllocation=new Map(existingResults.map(r=>[r.allocation_id,r]));
     const initialRisk=(data||[]).reduce((sum,a)=>sum+Number(a.initial_risk_usd||0),0);
     const pnlTotal=existingResults.reduce((sum,r)=>sum+Number(r.realized_pnl_usd||0),0);
     const feesTotal=existingResults.reduce((sum,r)=>sum+Number(r.fees_usd||0),0);
     const exitSection=trade.exit_at?
-      `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
+      `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe brutto: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
       `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Während des Trades oder danach markieren. Ungeprüft ist nicht automatisch negativ.</p>
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Während des Trades oder danach markieren. Ungeprüft ist nicht automatisch negativ.</p>
 <div class="analysis-grid">
 <label><input type="checkbox" data-analysis="structure"> Struktur / Bruch</label>
 <label><input type="checkbox" data-analysis="volume"> Volumen Preis/Zeit</label>
@@ -291,7 +361,7 @@ async function openTradeDetails(trade){
     });
     panel.querySelectorAll('.exit-unit').forEach(sel=>{sel.value=preferredExitUnit();});
     const exitEditor=panel.querySelector('.exit-editor');if(exitEditor)updateExitPreview(exitEditor);
-    await renderTradeImages(trade.id);
+    try{await renderTradeImages(trade.id);}catch(imageError){const g=panel.querySelector('.ltf-gallery');if(g)g.textContent='Bildanzeige fehlgeschlagen: '+imageError.message;}
     const analysis=panel.querySelector('.ltf-analysis');
     if(analysis){
       const a=trade.observations?.ltf_analysis||{};
@@ -312,9 +382,21 @@ async function openTradeDetails(trade){
       for(const measure of measures){const option=document.createElement('option');option.value=measure;option.textContent=measure.length>65?measure.slice(0,65)+'…':measure;reuse.appendChild(option);}
       reuse.addEventListener('change',()=>{if(reuse.value)review.querySelector('.review-action').value=reuse.value;});
     }
+    const recoverable=draftRead(trade.id);
+    if(recoverable){
+      const status=panel.querySelector('.draft-status');
+      status.textContent='Lokaler Entwurf vorhanden. Nicht automatisch über Supabase-Daten gelegt.';
+      const restore=document.createElement('button');restore.type='button';restore.className='secondary';
+      restore.textContent='Lokalen Entwurf anzeigen / wiederherstellen';
+      restore.addEventListener('click',()=>{
+        if(!confirm('Lokale Eingaben über die aktuell angezeigten Felder legen? Bereits gespeicherte Werte könnten älter sein.'))return;
+        draftRestore(recoverable);draftSchedule();
+      });
+      status.appendChild(restore);
+    }
     const jump=panel.querySelector('#jumpAccount');if(jump)jump.addEventListener('change',()=>{if(jump.value)jumpToAccount(jump.value);});
-    $('closeTradeDetails').onclick=()=>{panel.classList.add('hidden');panel.innerHTML=''};
-  }catch(err){panel.textContent='Trade-Details konnten nicht geladen werden: '+err.message}
+    $('closeTradeDetails').onclick=()=>{draftFlush();detailRequestSeq++;panel.classList.add('hidden');panel.innerHTML='';panel.dataset.tradeId=''};
+  }catch(err){if(requestSeq===detailRequestSeq)panel.textContent='Trade-Details konnten nicht geladen werden: '+err.message}
 }
 $('tradeDetails').addEventListener('click',async e=>{
  const btn=e.target.closest('.analysis-save');if(!btn||busy)return;
@@ -330,6 +412,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   const {data,error}=await client.from('trades').update({observations}).eq('id',trade.id).select('observations').single();
   if(error)throw error;
   trade.observations=data.observations;feedback.textContent='Analyse gespeichert.';
+  draftFlush();
  }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
  finally{busy=false;btn.disabled=false;}
 });
@@ -355,9 +438,10 @@ $('tradeDetails').addEventListener('click',async e=>{
      .select('id,execution_grade,rule_deviation,deviation_reason,observations').single();
    if(error)throw error;
    Object.assign(trade,data);
-   feedback.textContent='Review gespeichert.';
-   await renderSessionSummary(sessionTrades);
-   await loadProgressAndPlaybook();
+   feedback.textContent='Review in Supabase gespeichert.';
+   draftFlush();
+   try{await renderSessionSummary(sessionTrades);await loadProgressAndPlaybook();}
+   catch(refreshError){feedback.textContent='Review gespeichert. Anzeigeaktualisierung fehlgeschlagen: '+refreshError.message;}
  }catch(err){feedback.textContent='Review nicht gespeichert: '+err.message;}
  finally{busy=false;btn.disabled=false;}
 });
@@ -377,6 +461,7 @@ async function loadMorningDashboard(){
  const all=trades||[],closed=all.filter(t=>t.exit_at);
  const pnl=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
  const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
+ const riskComplete=closed.length>0&&closed.every(t=>t.initial_risk_usd!=null&&Number(t.initial_risk_usd)>0);
  const checked=all.filter(t=>t.observations?.compliance_reviewed);
  const clean=checked.filter(t=>!t.rule_deviation).length;
  const aplus=all.filter(t=>t.execution_grade==='A+').length;
@@ -385,7 +470,7 @@ async function loadMorningDashboard(){
  const limit=all.length===100?'<p class="notice">100-Trades-Limit: möglicherweise unvollständig.</p>':'';
  target.innerHTML=`<p><strong>${escapeHtml(latest.session_date)}</strong> · ${latest.status==='closed'?'Abgeschlossen':'Noch offen'}</p>
  <div class="grid"><div class="stat"><small>Brutto-P&L</small><strong>${usd(pnl)} USD</strong></div>
- <div class="stat"><small>R (Brutto)</small><strong>${risk>0?(pnl/risk).toFixed(2):'–'}</strong></div>
+ <div class="stat"><small>R (Brutto)</small><strong>${closed.length&&riskComplete&&risk>0?(pnl/risk).toFixed(2):'–'}</strong></div>
  <div class="stat"><small>Trades</small><strong>${all.length}</strong></div>
  <div class="stat"><small>A+ bewertet</small><strong>${aplus}</strong></div></div>
  <p>Regelkonform: ${clean}/${checked.length} geprüfte Trades · ${all.length-checked.length} ungeprüft</p>
@@ -394,6 +479,25 @@ async function loadMorningDashboard(){
  }catch(err){target.textContent='Rückblick nicht verfügbar: '+err.message;}
 }
 $('reloadMorning').addEventListener('click',loadMorningDashboard);
+const TEST_ITEMS=[
+'Anmelden und abmelden','Session starten und Konten auswählen','HTF-Checks speichern und nach Reload prüfen',
+'HTF-Bild hochladen, ansehen, ersetzen','Trade eröffnen mit Leader/Follower',
+'Initialrisiko je Konto speichern','SL verschieben und Verlauf prüfen',
+'LTF-Checks speichern und Bilder hochladen','Exit-Einheit Ticks/USD umstellen',
+'P&L und Gebühren plausibilisieren','Trade abschließen und erneut öffnen',
+'Review/Playbook/50-Trade-Auswertung prüfen'];
+function renderTestChecklist(){
+ const target=$('testChecklist');target.replaceChildren();
+ let saved={};try{saved=JSON.parse(localStorage.getItem('tt7_test_checklist')||'{}');}catch(_){}
+ TEST_ITEMS.forEach((label,i)=>{
+  const row=document.createElement('label');row.style.cssText='display:flex;gap:10px;align-items:center;padding:7px 0';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!saved[i];cb.style.cssText='width:22px;height:22px;flex-shrink:0';
+  cb.addEventListener('change',()=>{saved[i]=cb.checked;try{localStorage.setItem('tt7_test_checklist',JSON.stringify(saved));}catch(_){}});
+  const span=document.createElement('span');span.textContent=(i+1)+'. '+label;row.append(cb,span);target.appendChild(row);
+ });
+}
+$('resetTestChecklist').addEventListener('click',()=>{localStorage.removeItem('tt7_test_checklist');renderTestChecklist();});
+renderTestChecklist();
 const CHART_BUCKET='trading-chart-screenshots';
 function chartPath(type,id,filename){return `${currentUser.id}/${type}/${id}/${filename}`;}
 function safeImage(file){
@@ -465,6 +569,7 @@ async function renderTradeImages(tradeId){
  if(error){gallery.textContent='Bilder konnten nicht geladen werden: '+error.message;return;}
  if(!data?.length){gallery.textContent='Noch keine LTF-Bilder.';return;}
  for(const f of data){
+  if(panel.dataset.tradeId!==tradeId)return;
   if(!f.name||!f.id)continue;
   const path=prefix+f.name;
   try{const url=await signedChart(path);
@@ -499,27 +604,52 @@ $('tradeDetails').addEventListener('click',async e=>{
 async function loadProgressAndPlaybook(){
  const progress=$('progressPanel'),playbook=$('playbookPanel');
  progress.classList.remove('hidden');playbook.classList.remove('hidden');
- const {data,error}=await client.from('trades')
+ const {data:closed,error}=await client.from('trades')
  .select('id,setup_type,direction,instrument,entry_at,exit_at,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd')
- .order('entry_at',{ascending:false}).limit(1000);
+ .not('exit_at','is',null).order('exit_at',{ascending:false}).limit(50);
  if(error){$('progressBody').textContent='Ladefehler: '+error.message;$('playbookBody').textContent='Ladefehler: '+error.message;return;}
- const all=data||[],closed=all.filter(t=>t.exit_at).slice(0,50);
- const reviewed=closed.filter(t=>t.observations?.compliance_reviewed);
+ const {data:all,error:bookError}=await client.from('trades')
+ .select('id,setup_type,direction,instrument,entry_at,exit_at,execution_grade,rule_deviation,observations')
+ .order('entry_at',{ascending:false}).limit(1000);
+ if(bookError){$('playbookBody').textContent='Playbook-Ladefehler: '+bookError.message;}
+ const recent=closed||[];
+ const reviewed=recent.filter(t=>t.observations?.compliance_reviewed);
  const clean=reviewed.filter(t=>!t.rule_deviation).length;
- const graded=closed.filter(t=>t.execution_grade&&t.execution_grade!=='unrated');
+ const graded=recent.filter(t=>t.execution_grade&&t.execution_grade!=='unrated');
  const aplus=graded.filter(t=>t.execution_grade==='A+').length;
- const pnl=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
- const risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
- const counts={};for(const t of closed){const key=t.observations?.review_error;if(key)counts[key]=(counts[key]||0)+1;}
+ const pnl=recent.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
+ const risk=recent.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
+ const riskComplete=recent.length>0&&recent.every(t=>t.initial_risk_usd!=null&&Number(t.initial_risk_usd)>0);
+ const counts={};for(const t of recent){const key=t.observations?.review_error;if(key)counts[key]=(counts[key]||0)+1;}
+ const halves=[recent.slice(0,25),recent.slice(25,50)];
+ const errorRate=part=>part.length?Math.round(100*part.filter(t=>t.observations?.review_error).length/part.length)+' % ('+part.length+' Trades)':'–';
+ const measures=[...new Set(recent.map(t=>t.observations?.countermeasure).filter(Boolean))];
+ const measureHtml=measures.slice(0,8).map(m=>{
+  const relevant=recent.filter(t=>t.observations?.countermeasure===m);
+  const hits=relevant.filter(t=>t.observations?.review_error).length;
+  return `<div class="measure"><strong>${escapeHtml(m)}</strong><div class="muted">${relevant.length} dokumentierte Zuordnungen · ${hits} mit Fehlerkennzeichnung. Keine Aussage über Wirksamkeit ohne Folgetrade-Verknüpfung.</div></div>`;
+ }).join('');
  const errors=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>escapeHtml(REVIEW_LABELS[k]||k)+': '+v).join(' · ');
- $('progressBody').innerHTML=`<p><strong>${closed.length}/50</strong> abgeschlossene Trades · <strong>${usd(pnl)} USD</strong> Brutto · <strong>${risk>0?(pnl/risk).toFixed(2):'–'} R</strong></p>
- <p>Regelprüfung: ${reviewed.length}/${closed.length} dokumentiert · ${reviewed.length?Math.round(clean/reviewed.length*100)+' % ohne Regelbruch':'noch keine Quote'}</p>
+ $('progressBody').innerHTML=`<p><strong>${recent.length}/50</strong> abgeschlossene Trades · <strong>${usd(pnl)} USD</strong> Brutto · <strong>${riskComplete&&risk>0?(pnl/risk).toFixed(2):'–'} R</strong></p>
+ <p>Regelprüfung: ${reviewed.length}/${recent.length} dokumentiert · ${reviewed.length?Math.round(clean/reviewed.length*100)+' % ohne Regelbruch':'noch keine Quote'}</p>
  <p>A+: ${aplus}/${graded.length} bewertete Trades${graded.length?' ('+Math.round(aplus/graded.length*100)+' %)':''}</p>
- <p>Fehler: ${errors||'keine dokumentiert'}</p>${all.length===1000?'<p class="notice">Nur die neuesten 1000 Trades durchsucht. Ältere Playbook-Einträge fehlen möglicherweise.</p>':''}`;
- const saved=all.filter(t=>t.observations?.playbook);
- $('playbookBody').innerHTML=saved.length?saved.map(t=>`<div class="account"><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction)} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${escapeHtml(t.execution_grade||'unbewertet')}</div><p>${escapeHtml(t.observations?.review_note||'Keine Notiz')}</p></div>`).join(''):'Noch keine Setups übernommen.';
+ <p>Fehler: ${errors||'keine dokumentiert'}</p>
+ <p>Fehlerquote neueste 25: ${errorRate(halves[0])} · vorherige 25: ${errorRate(halves[1])}. Nur dokumentierte Fehler; keine Kausalitätsaussage.</p>
+ <details><summary>Gegenmaßnahmen (${measures.length})</summary>${measureHtml||'Noch keine Gegenmaßnahmen erfasst.'}</details>`;
+ if(bookError)return;
+ const saved=(all||[]).filter(t=>t.observations?.playbook);
+ $('playbookBody').innerHTML=saved.length?saved.map(t=>`<div class="account"><strong>${escapeHtml(t.setup_type)} · ${escapeHtml(t.direction)} ${escapeHtml(t.instrument)}</strong><div class="muted">${escapeHtml(berlinTime(t.entry_at))} · ${escapeHtml(t.execution_grade||'unbewertet')}</div><p>${escapeHtml(t.observations?.review_note||'Keine Notiz')}</p><button type="button" class="secondary playbook-open" data-trade-id="${t.id}">Trade öffnen</button></div>`).join(''):'Noch keine Setups übernommen.';
+ if((all||[]).length===1000)$('playbookBody').insertAdjacentHTML('beforeend','<p class="notice">Playbook: maximal 1000 neueste Trades geprüft.</p>');
 }
 $('reloadProgress').addEventListener('click',loadProgressAndPlaybook);
+$('playbookBody').addEventListener('click',async e=>{
+ const btn=e.target.closest('.playbook-open');if(!btn)return;
+ const trade=sessionTrades.find(t=>t.id===btn.dataset.tradeId);
+ if(!trade){message('Dieser Playbook-Trade liegt außerhalb der aktiven Session. Historische Detailnavigation folgt in einem späteren Schritt.',true);return;}
+ await openTradeDetails(trade);
+ $('tradeDetails').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
 $('sessionTradeList').addEventListener('click',async e=>{
   const btn=e.target.closest('.open-trade');if(!btn)return;
   const trade=sessionTrades.find(t=>t.id===btn.dataset.id);if(!trade)return;
@@ -624,6 +754,9 @@ $('tradeDetails').addEventListener('click',async e=>{
     if(error)throw error;
     if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
     message('Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
+    {const old=draftRead(tradeId);if(old){old.exit=null;try{localStorage.setItem(draftKey(tradeId),JSON.stringify(old));}catch(_){}}}
+    editor.remove(); // The committed exit form must not be saved again.
+    draftDirty=false;clearTimeout(draftTimer);
     try{
       await loadSessionTrades();
       const closed=sessionTrades.find(t=>t.id===tradeId);
