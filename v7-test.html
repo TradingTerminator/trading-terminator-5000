@@ -216,7 +216,7 @@ async function openTradeDetails(trade){
     const feesTotal=existingResults.reduce((sum,r)=>sum+Number(r.fees_usd||0),0);
     const exitSection=trade.exit_at?
       `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Gebühren separat: ${usd(feesTotal)} USD. P&L wird als eingegebener Betrag summiert; Gebühren werden nicht automatisch abgezogen.</small></p></div>`:
-      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto den tatsächlich realisierten P&L-Betrag eingeben (mit Minus bei Verlust). Ein Abschluss speichert alle Konten gemeinsam. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Dokumentierter TP (Ticks, optional)<input class="exit-tp" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="z. B. 100" autocomplete="off"></label><div class="muted exit-tp-preview">TP: –</div><label>Realisierter P&L (USD)<input class="exit-pnl" type="text" inputmode="decimal" placeholder="z. B. 125 oder -75" autocomplete="off"></label><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
+      `<div class="account exit-editor"><h3>Trade abschließen</h3><p class="muted">Für jedes Konto den tatsächlich realisierten P&L-Betrag eingeben (mit Minus bei Verlust). Ein Abschluss speichert alle Konten gemeinsam. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Dokumentierter TP (Ticks, optional)<input class="exit-tp" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="z. B. 100" autocomplete="off"></label><div class="muted exit-tp-preview">TP: –</div><label>Realisierter P&L (USD)<input class="exit-pnl" type="text" inputmode="decimal" placeholder="z. B. 125 oder -75" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen des P&L wechseln">+/− P&L</button><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
     panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exit-Ergebnisse werden je Konto separat erfasst.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
     panel.querySelectorAll('.risk-card').forEach(card=>{
       const field=card.querySelector('.risk-usd');
@@ -248,32 +248,52 @@ function updateExitPreview(editor){
     card.querySelector('.exit-r').textContent=pnl!==null&&initial>0?'R: '+(pnl/initial).toFixed(2):'R: –';
     const tpRaw=card.querySelector('.exit-tp').value.trim();
     const tpOk=/^[1-9]\d*$/.test(tpRaw)&&Number.isSafeInteger(Number(tpRaw));
-    const instrument=card.querySelector('strong').textContent.match(/\b(MNQ|MES|NQ|ES)\b/)?.[1];
-    const quantity=Number(card.querySelector('strong').textContent.match(/×\s*([\d.]+)/)?.[1]);
+    const instrument=card.dataset.instrument;
+    const quantity=Number(card.dataset.quantity);
     const tickValue={NQ:5,MNQ:.5,ES:12.5,MES:1.25}[instrument];
     card.querySelector('.exit-tp-preview').textContent=tpRaw===''?'TP: nicht erfasst':tpOk&&tickValue&&quantity>0?'TP: '+(Number(tpRaw)*.25).toFixed(2)+' Punkte · theoretisch '+usd(Number(tpRaw)*tickValue*quantity)+' USD brutto':'TP: ungültige Tickzahl';
   });
   editor.querySelector('.exit-preview').textContent=complete?'Gesamtergebnis: '+usd(total)+' USD · '+(total/risk).toFixed(2)+' R':'Gesamtergebnis: bitte alle Konten ausfüllen';
 }
-$('tradeDetails').addEventListener('input',e=>{const editor=e.target.closest('.exit-editor');if(editor)updateExitPreview(editor);});
+$('tradeDetails').addEventListener('input',e=>{
+  const editor=e.target.closest('.exit-editor');
+  if(editor){e.target.style.outline='';const feedback=editor.querySelector('.exit-feedback');if(feedback)feedback.textContent='';updateExitPreview(editor);}
+});
+$('tradeDetails').addEventListener('click',e=>{
+  const b=e.target.closest('.exit-negate');if(!b)return;
+  const field=b.closest('.exit-account').querySelector('.exit-pnl');
+  field.value=field.value.trim().startsWith('-')?field.value.trim().slice(1):'-'+field.value.trim();
+  field.dispatchEvent(new Event('input',{bubbles:true}));
+});
 $('tradeDetails').addEventListener('click',async e=>{
   const btn=e.target.closest('.close-trade-action');if(!btn||busy)return;
   const editor=btn.closest('.exit-editor'),reason=editor.querySelector('.exit-reason').value;
-  if(!reason){message('Bitte Exit-Grund auswählen.',true);return;}
+  const feedback=editor.querySelector('.exit-feedback');
+  const fail=(msg,field)=>{
+    feedback.textContent=msg;feedback.style.color='#ffb4ad';
+    if(field){field.style.outline='2px solid #ffb4ad';field.scrollIntoView({behavior:'smooth',block:'center'});field.focus({preventScroll:true});}
+    else feedback.scrollIntoView({behavior:'smooth',block:'center'});
+    message(msg,true);
+  };
+  feedback.textContent='';
+  editor.querySelectorAll('input,select').forEach(el=>el.style.outline='');
+  if(!reason){fail('Bitte Exit-Grund auswählen.',editor.querySelector('.exit-reason'));return;}
   const results=[];
   for(const card of editor.querySelectorAll('.exit-account')){
     const pnl=parseMoney(card.querySelector('.exit-pnl').value);
     const feesRaw=card.querySelector('.exit-fees').value;
     const fees=feesRaw.trim()===''?0:parseMoney(feesRaw);
-    if(pnl===null||fees===null||fees<0||!card.dataset.risk||Number(card.dataset.risk)<=0){message('Bitte für jedes Konto gültigen P&L, Gebühren und Initialrisiko prüfen.',true);return;}
+    if(pnl===null){fail('Realisierter P&L fehlt oder ist ungültig. Auch bei 0 USD bitte 0 eingeben.',card.querySelector('.exit-pnl'));return;}
+    if(fees===null||fees<0){fail('Gebühren dürfen nicht negativ oder ungültig sein.',card.querySelector('.exit-fees'));return;}
+    if(!card.dataset.risk||Number(card.dataset.risk)<=0){fail('Für dieses Konto fehlt das ursprüngliche Risiko. Bitte zuerst speichern.');return;}
     const tpRaw=card.querySelector('.exit-tp').value.trim();
     const tp=tpRaw===''?null:Number(tpRaw);
-    if(tpRaw!==''&&(!/^[1-9]\d*$/.test(tpRaw)||!Number.isSafeInteger(tp)||tp>2147483647)){message('TP-Ticks müssen eine positive ganze Zahl sein.',true);return;}
+    if(tpRaw!==''&&(!/^[1-9]\d*$/.test(tpRaw)||!Number.isSafeInteger(tp)||tp>2147483647)){fail('TP-Ticks müssen eine positive ganze Zahl sein.',card.querySelector('.exit-tp'));return;}
     results.push({allocation_id:card.dataset.id,realized_pnl_usd:pnl,fees_usd:fees,tp_ticks:tp});
   }
   const total=results.reduce((s,r)=>s+r.realized_pnl_usd,0);
   if(!confirm('Trade mit '+results.length+' Kontoergebnissen und '+usd(total)+' USD Gesamt-P&L endgültig abschließen? Keine Brokerorder.'))return;
-  busy=true;btn.disabled=true;
+  busy=true;btn.disabled=true;btn.textContent='Wird abgeschlossen …';feedback.textContent='Abschluss wird gespeichert …';feedback.style.color='';
   try{
     const tradeId=$('tradeDetails').dataset.tradeId;
     const {data,error}=await client.rpc('close_trade_with_account_results',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results});
@@ -283,8 +303,8 @@ $('tradeDetails').addEventListener('click',async e=>{
     const closed=sessionTrades.find(t=>t.id===tradeId);
     if(closed)await openTradeDetails(closed);
     message('Trade abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
-  }catch(err){message('Trade-Abschluss nicht bestätigt: '+err.message+'\nVor einem erneuten Versuch die Trade-Liste aktualisieren.',true);}
-  finally{busy=false;btn.disabled=false;}
+  }catch(err){fail('Trade-Abschluss nicht bestätigt: '+err.message+' — vor einem erneuten Versuch die Trade-Liste aktualisieren.');}
+  finally{busy=false;btn.disabled=false;btn.textContent='Trade endgültig abschließen';}
 });
 $('tradeDetails').addEventListener('click',e=>{
   const btn=e.target.closest('.stop-minus,.stop-plus,.stop-preset,.stop-reason-choice');
