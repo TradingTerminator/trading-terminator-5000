@@ -398,6 +398,16 @@ async function openTradeDetails(trade){
     $('closeTradeDetails').onclick=()=>{draftFlush();detailRequestSeq++;panel.classList.add('hidden');panel.innerHTML='';panel.dataset.tradeId=''};
   }catch(err){if(requestSeq===detailRequestSeq)panel.textContent='Trade-Details konnten nicht geladen werden: '+err.message}
 }
+// Optimistic concurrency: reject writes if another device changed observations after load.
+// This is a compare-and-swap at the PostgREST UPDATE statement, not a pre-read.
+function conditionalTradeUpdate(id,patch,previousObservations,columns){
+ let q=client.from('trades').update(patch).eq('id',id);
+ q=previousObservations==null?q.is('observations',null):q.filter('observations','eq',JSON.stringify(previousObservations));
+ return q.select(columns).maybeSingle();
+}
+function tradeConflictFeedback(feedback){
+ feedback.textContent='Speicherkonflikt: Dieser Trade wurde auf einem anderen Gerät geändert. Deine Eingaben bleiben hier erhalten. Bitte erst den Trade neu laden und die Änderungen abgleichen.';
+}
 $('tradeDetails').addEventListener('click',async e=>{
  const btn=e.target.closest('.analysis-save');if(!btn||busy)return;
  const panel=$('tradeDetails'),trade=sessionTrades.find(t=>t.id===panel.dataset.tradeId);
@@ -409,8 +419,9 @@ $('tradeDetails').addEventListener('click',async e=>{
  const observations={...(trade.observations||{}),ltf_analysis:checks,entry_thesis:entryThesis};
  busy=true;btn.disabled=true;feedback.textContent='Analyse wird gespeichert …';
  try{
-  const {data,error}=await client.from('trades').update({observations}).eq('id',trade.id).select('observations').single();
+  const {data,error}=await conditionalTradeUpdate(trade.id,{observations},trade.observations,'observations');
   if(error)throw error;
+  if(!data){draftFlush();tradeConflictFeedback(feedback);return;}
   trade.observations=data.observations;feedback.textContent='Analyse gespeichert.';
   draftFlush();
  }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
@@ -434,9 +445,9 @@ $('tradeDetails').addEventListener('click',async e=>{
  rule_deviation:compliance==='breach',deviation_reason:compliance==='breach'?errorType:null,observations};
  busy=true;btn.disabled=true;feedback.textContent='Review wird gespeichert …';
  try{
-   const {data,error}=await client.from('trades').update(patch).eq('id',trade.id)
-     .select('id,execution_grade,rule_deviation,deviation_reason,observations').single();
+   const {data,error}=await conditionalTradeUpdate(trade.id,patch,trade.observations,'id,execution_grade,rule_deviation,deviation_reason,observations');
    if(error)throw error;
+   if(!data){draftFlush();tradeConflictFeedback(feedback);return;}
    Object.assign(trade,data);
    feedback.textContent='Review in Supabase gespeichert.';
    draftFlush();
