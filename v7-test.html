@@ -243,6 +243,16 @@ function draftSave(){
 let draftDirty=false;
 function draftSchedule(){draftDirty=true;clearTimeout(draftTimer);draftTimer=setTimeout(()=>{draftSave();draftDirty=false;},350);}
 function draftFlush(){if(draftDirty){clearTimeout(draftTimer);draftSave();draftDirty=false;}}
+function draftMarkSaved(id,section){
+ draftFlush();
+ const key=draftKey(id);if(!key)return;
+ try{const item=draftRead(id);if(!item)return;
+ item[section]=null;
+ if(!item.exit&&!item.analysis&&!item.review)localStorage.removeItem(key);
+ else localStorage.setItem(key,JSON.stringify(item));
+ }catch(_){}
+}
+
 function draftRestore(item){
  if(!item)return;
  const panel=$('tradeDetails');
@@ -383,7 +393,8 @@ async function openTradeDetails(trade){
       reuse.addEventListener('change',()=>{if(reuse.value)review.querySelector('.review-action').value=reuse.value;});
     }
     const recoverable=draftRead(trade.id);
-    if(recoverable){
+    if(recoverable&&trade.exit_at)recoverable.exit=null;
+    if(recoverable&&(recoverable.exit||recoverable.analysis||recoverable.review)){
       const status=panel.querySelector('.draft-status');
       status.textContent='Lokaler Entwurf vorhanden. Nicht automatisch über Supabase-Daten gelegt.';
       const restore=document.createElement('button');restore.type='button';restore.className='secondary';
@@ -423,7 +434,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   if(error)throw error;
   if(!data){draftFlush();tradeConflictFeedback(feedback);return;}
   trade.observations=data.observations;feedback.textContent='Analyse gespeichert.';
-  draftFlush();
+  draftMarkSaved(trade.id,'analysis');
  }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
  finally{busy=false;btn.disabled=false;}
 });
@@ -450,7 +461,7 @@ $('tradeDetails').addEventListener('click',async e=>{
    if(!data){draftFlush();tradeConflictFeedback(feedback);return;}
    Object.assign(trade,data);
    feedback.textContent='Review in Supabase gespeichert.';
-   draftFlush();
+   draftMarkSaved(trade.id,'review');
    try{await renderSessionSummary(sessionTrades);await loadProgressAndPlaybook();}
    catch(refreshError){feedback.textContent='Review gespeichert. Anzeigeaktualisierung fehlgeschlagen: '+refreshError.message;}
  }catch(err){feedback.textContent='Review nicht gespeichert: '+err.message;}
@@ -753,7 +764,7 @@ $('tradeDetails').addEventListener('click',async e=>{
     if(!result){fail('Bitte gültiges Ergebnis eingeben: Ticks als ganze Zahl oder USD mit maximal zwei Nachkommastellen.',card.querySelector('.exit-amount'));return;}
     if(fees===null||fees<0){fail('Gebühren dürfen nicht negativ oder ungültig sein.',card.querySelector('.exit-fees'));return;}
     if(!card.dataset.risk||Number(card.dataset.risk)<=0){fail('Für dieses Konto fehlt das ursprüngliche Risiko. Bitte zuerst speichern.');return;}
-    results.push({allocation_id:card.dataset.id,realized_pnl_usd:result.dollars,fees_usd:fees,tp_ticks:null});
+    results.push({allocation_id:card.dataset.id,realized_pnl_usd:result.dollars,fees_usd:fees,tp_ticks:(['TP','extended_tp'].includes(reason)&&result.unit==='ticks'&&result.ticks>0)?result.ticks:null});
   }
   const total=results.reduce((s,r)=>s+r.realized_pnl_usd,0);
   const totalFees=results.reduce((s,r)=>s+r.fees_usd,0);
@@ -765,7 +776,7 @@ $('tradeDetails').addEventListener('click',async e=>{
     if(error)throw error;
     if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
     message('Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
-    {const old=draftRead(tradeId);if(old){old.exit=null;try{localStorage.setItem(draftKey(tradeId),JSON.stringify(old));}catch(_){}}}
+    draftMarkSaved(tradeId,'exit');
     editor.remove(); // The committed exit form must not be saved again.
     draftDirty=false;clearTimeout(draftTimer);
     try{
