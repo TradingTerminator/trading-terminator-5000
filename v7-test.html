@@ -34,7 +34,7 @@ button{touch-action:manipulation;}
 .analysis-grid input,.session-checks input{display:inline-block;width:22px;height:22px;flex:0 0 22px;margin:0;accent-color:var(--accent)}
 .chart-thumb{padding:10px 0;border-bottom:1px solid var(--line)}
 @media(max-width:390px){.analysis-grid{grid-template-columns:1fr}}
-</style>
+.image-dropzone{border:2px dashed #53758c;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:rgba(61,112,143,.09);margin:10px 0}.image-dropzone.drag-over,.image-dropzone:focus-visible{border-color:#11c8c4;background:rgba(17,200,196,.14);outline:2px solid #11c8c4;outline-offset:2px}.image-dropzone input[type=file]{max-width:100%}.image-pick-status{font-size:13px;color:#a9c5d7}</style>
 </head>
 <body><main>
 <header><div><h1>⚡ Trading Terminator 5000</h1><small>V7 · Sammeltest 66–73 · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
@@ -46,7 +46,7 @@ button{touch-action:manipulation;}
 <p class="muted">Diese Checkliste ist nur lokal auf diesem Gerät. Keine echten Brokerorders.</p>
 <div id="testChecklist"></div>
 <button type="button" id="resetTestChecklist" class="secondary wide">Testhaken zurücksetzen</button></details>
-<div id="morningDashboard" class="card"><h3>Rückblick · letzte Session</h3><div id="morningBody" class="muted">Wird geladen …</div><button id="reloadMorning" class="secondary wide" type="button">Rückblick aktualisieren</button></div><div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Session konfigurieren</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, genau einen Leader bestimmen und Kontrakte je Konto einstellen.</p><div id="sessionAccountList"></div><button id="confirmSession" class="wide">Auswahl bestätigen und Session starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
+<div id="morningDashboard" class="card"><h3>Rückblick · letzte Session</h3><div id="morningBody" class="muted">Wird geladen …</div><button id="reloadMorning" class="secondary wide" type="button">Rückblick aktualisieren</button></div><div id="noSession"><p class="muted">Wähle für jede neue Session die Konten neu aus. Es wird keine frühere Auswahl übernommen.</p><button id="startSession" class="wide">Neue Trading-Session starten</button></div><div id="sessionSetup" class="hidden"><h3>Konten für diese Session</h3><p class="muted">Konten auswählen, einen Leader festlegen und Kontrakte je Konto einstellen. Bei einer bereits offenen Session bitte zuerst diese abschließen.</p><div id="sessionAccountList"></div><p id="sessionSetupFeedback" role="status" class="notice">Wähle mindestens ein Konto und stelle genau einen Leader ein.</p><button id="confirmSession" class="wide">Session mit ausgewählten Konten starten</button><button id="cancelSession" class="ghost wide">Abbrechen</button></div>
 <div id="activeSession" class="hidden"><p id="sessionInfo" class="muted"></p><label>HTF-Kontext / wichtige Zonen<textarea id="htf" rows="3" placeholder="Marktstruktur, Levels, Liquidität, Makro …"></textarea></label><div class="session-checks"><h3>Session-Vorbereitung · Pflichtcheck</h3>
 <label><input type="checkbox" class="htf-check" data-check="structure"> HTF-Struktur und Extrempunkte geprüft</label>
 <label><input type="checkbox" class="htf-check" data-check="levels"> Relevante Liquidität und Volumenlevels geprüft</label>
@@ -54,7 +54,7 @@ button{touch-action:manipulation;}
 <label><input type="checkbox" class="htf-check" data-check="risk"> Tagesrisiko und Trade-Limit geprüft</label>
 <div id="sessionCheckStatus" class="muted" role="status"></div></div>
 <button id="saveHtf" class="secondary wide">Session-Kontext und Checks speichern</button><div id="sessionAccountsSummary" class="notice"></div><button id="changeSessionAccounts" class="secondary wide">Konten für nächste Trades ändern</button><button id="closeSession" class="ghost wide">Session schließen</button></div>
-<div id="htfScreenshot" class="card hidden"><h3>HTF-Chart · ein Bild je Session</h3><input type="file" id="htfFile" accept="image/png,image/jpeg,image/webp"><button id="htfUpload" type="button" class="secondary wide">HTF-Bild speichern / ersetzen</button><div id="htfImagePreview" class="muted">Noch kein Bild geladen.</div></div>
+<div id="htfScreenshot" class="card hidden"><h3>HTF-Chart · ein Bild je Session</h3><div class="image-dropzone" id="htfDropzone" tabindex="0" role="group" aria-label="HTF-Bild hier ablegen oder mit Strg+V einfügen"><strong>Bild hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bild auswählen · PNG, JPG, WebP · max. 10 MB</span><input type="file" id="htfFile" accept="image/png,image/jpeg,image/webp"><span class="image-pick-status" role="status">Noch kein neues Bild ausgewählt.</span></div><button id="htfUpload" type="button" class="secondary wide">HTF-Bild speichern / ersetzen</button><div id="htfImagePreview" class="muted">Noch kein Bild geladen.</div></div>
 <div id="progressPanel" class="card hidden"><h3>Fortschritt · letzte 50 abgeschlossene Trades</h3><div id="progressBody">Noch nicht geladen.</div><button type="button" id="reloadProgress" class="secondary wide">Auswertung aktualisieren</button></div><div id="playbookPanel" class="card hidden"><h3>Playbook · gespeicherte Setups</h3><div id="playbookBody">Noch nicht geladen.</div></div><div id="sessionSummary" class="card hidden" aria-live="polite"><h3>Session-Auswertung</h3><div id="sessionSummaryBody" class="muted">Noch keine Daten.</div></div>
 <div id="sessionTrades" class="card hidden"><div class="row"><h3>Trades dieser Session</h3><button id="reloadTrades" class="secondary" type="button">Aktualisieren</button></div><div id="sessionTradeList" class="muted">Lade Trades …</div><div id="tradeDetails" class="hidden" aria-live="polite"></div></div>
 </section>
@@ -350,7 +350,7 @@ async function openTradeDetails(trade){
 <label><input type="checkbox" data-analysis="delta"> Delta</label>
 <label><input type="checkbox" data-analysis="tape"> Tape / DOM</label>
 <label><input type="checkbox" data-analysis="liquidity"> Liquidität / Absorption</label>
-</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide">Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
+</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide">Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><div class="image-dropzone" tabindex="0" role="group" aria-label="LTF-Bilder ablegen oder mit Strg+V einfügen"><strong>Bilder hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bilder auswählen · max. 10 gleichzeitig</span><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><span class="image-pick-status" role="status">Noch keine neuen Bilder ausgewählt.</span></div><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
 <h3>Trade-Review · unabhängig vom P&L</h3>
 <p class="muted">Auch nach dem Exit ergänzbar. A+ bedeutet gute Ausführung, nicht zwingend Gewinn.</p>
 <label>Ausführungsqualität<select class="review-grade"><option value="">Noch nicht bewertet</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>unrated</option></select></label>
@@ -557,9 +557,61 @@ async function renderHtfImage(){
  try{makeChartPreview(target,path,await signedChart(path));}
  catch(err){target.textContent='Bild konnte nicht geladen werden: '+err.message;}
 }
+
+// Shared clipboard/drop selection; actual uploads happen ONLY on explicit save.
+const pendingImages=new WeakMap();
+function chosenImages(zone){
+ const input=zone.querySelector('input[type=file]');
+ return pendingImages.get(zone)||[...input?.files||[]];
+}
+function setChosenImages(zone,files,append=false){
+ if(!zone)return;
+ const input=zone.querySelector('input[type=file]');
+ const valid=files.filter(f=>f&&['image/png','image/jpeg','image/webp'].includes(f.type)&&f.size>0&&f.size<=10*1024*1024);
+ const invalid=files.length-valid.length;
+ const merged=append?[...chosenImages(zone),...valid]:valid;
+ const limit=input?.multiple?10:1;
+ const selected=merged.slice(0,limit);
+ pendingImages.set(zone,selected);
+ const status=zone.querySelector('.image-pick-status');
+ if(status)status.textContent=selected.length?selected.length+' Bild(er) bereit zum Speichern'+(invalid?' · '+invalid+' ungültig/zu groß':'')+(merged.length>limit?' · Limit '+limit:''):'Kein gültiges Bild (PNG/JPG/WebP bis 10 MB).';
+}
+document.addEventListener('change',e=>{
+ if(e.target.matches('.image-dropzone input[type=file]')){
+  const zone=e.target.closest('.image-dropzone');
+  setChosenImages(zone,[...e.target.files]);
+ }
+});
+document.addEventListener('dragover',e=>{
+ const zone=e.target.closest?.('.image-dropzone');
+ if(!zone)return;
+ e.preventDefault();e.dataTransfer.dropEffect='copy';zone.classList.add('drag-over');
+});
+document.addEventListener('dragleave',e=>{
+ const zone=e.target.closest?.('.image-dropzone');
+ if(zone&&!zone.contains(e.relatedTarget))zone.classList.remove('drag-over');
+});
+document.addEventListener('drop',e=>{
+ const zone=e.target.closest?.('.image-dropzone');if(!zone)return;
+ e.preventDefault();zone.classList.remove('drag-over');
+ setChosenImages(zone,[...e.dataTransfer.files],!!zone.querySelector('input[multiple]'));
+ zone.focus();
+});
+document.addEventListener('paste',e=>{
+ const target=e.target;
+ if(target.closest?.('input,textarea,[contenteditable=true]'))return;
+ const zone=target.closest?.('.image-dropzone')||
+  (!$('tradeDetails').classList.contains('hidden')?$('tradeDetails').querySelector('.trade-images .image-dropzone'):null)||
+  (!$('htfScreenshot').classList.contains('hidden')?$('htfDropzone'):null);
+ if(!zone)return;
+ const images=[...e.clipboardData?.items||[]].filter(item=>item.kind==='file'&&item.type.startsWith('image/')).map(item=>item.getAsFile()).filter(Boolean);
+ if(!images.length)return;
+ e.preventDefault();setChosenImages(zone,images,!!zone.querySelector('input[multiple]'));
+});
+
 $('htfUpload').addEventListener('click',async()=>{
  if(busy||!currentSession)return;
- const file=$('htfFile').files?.[0];if(!file){message('Bitte zuerst ein HTF-Bild auswählen.',true);return;}
+ const file=chosenImages($('htfDropzone'))[0];if(!file){message('Bitte zuerst ein HTF-Bild auswählen.',true);return;}
  busy=true;$('htfUpload').disabled=true;
  let path;
  try{
@@ -570,7 +622,7 @@ $('htfUpload').addEventListener('click',async()=>{
    const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();
    if(error)throw error;
    currentSession.htf_context=data.htf_context;
-   $('htfFile').value='';
+   $('htfFile').value='';pendingImages.delete($('htfDropzone'));$('htfDropzone').querySelector('.image-pick-status').textContent='Bild gespeichert.';
    try{await renderHtfImage();}catch(e){message('Bild gespeichert, Vorschaufehler: '+e.message,true);}
    message('HTF-Bild gespeichert.'); 
    if(old&&old!==path){
@@ -609,7 +661,7 @@ $('tradeDetails').addEventListener('click',async e=>{
  const tradeId=$('tradeDetails').dataset.tradeId;
  const input=btn.closest('.trade-images').querySelector('.ltf-file');
  const feedback=btn.closest('.trade-images').querySelector('.ltf-feedback');
- const files=[...input.files||[]];if(!files.length){feedback.textContent='Bitte Bilder auswählen.';return;}
+ const zone=input.closest('.image-dropzone');const files=chosenImages(zone);if(!files.length){feedback.textContent='Bitte Bilder auswählen.';return;}
  if(files.length>10){feedback.textContent='Bitte höchstens 10 Bilder auf einmal auswählen.';return;}
  busy=true;btn.disabled=true;
  let uploaded=0;
@@ -619,7 +671,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   await uploadChart(file,chartPath('trade',tradeId,crypto.randomUUID()+'.'+ext));uploaded++;
  }
  feedback.textContent=uploaded+' Bild(er) gespeichert.';
- input.value='';await renderTradeImages(tradeId);
+ input.value='';pendingImages.delete(zone);zone.querySelector('.image-pick-status').textContent='Bilder gespeichert.';await renderTradeImages(tradeId);
  }catch(err){feedback.textContent=uploaded+' Bild(er) gespeichert, danach Fehler: '+err.message;}
  finally{busy=false;btn.disabled=false;}
 });
@@ -866,11 +918,12 @@ $('tradeDetails').addEventListener('click',async e=>{
 async function loadCount(){if(!currentSession){tradeCount=0;$('tradeCount').textContent='0 / 5';return}const {count,error}=await client.from('trades').select('id',{count:'exact',head:true}).eq('session_id',currentSession.id);if(error){message('Trade-Zähler: '+error.message,true);return}tradeCount=count??0;$('tradeCount').textContent=tradeCount+' / 5';}
 function openSessionSetup(mode){sessionDraftMode=mode;renderSessionAccounts();$('sessionSetup').classList.remove('hidden');$('noSession').classList.add('hidden');$('activeSession').classList.toggle('hidden',mode==='start');}
 function renderSessionAccounts(){const selected=sessionDraftMode==='change'?(currentSession?.htf_context?.selected_accounts||[]):[];$('sessionAccountList').innerHTML=accounts.length?accounts.map(a=>{const v=selected.find(x=>x.account_id===a.id);return `<div class="account"><label><input class="sess-check" data-id="${a.id}" type="checkbox" style="display:inline;width:auto" ${v?'checked':''}> ${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="sess-role" data-id="${a.id}"><option value="follower" ${v?.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v?.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v?.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="sess-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v?.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="sess-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v?.planned_quantity||a.default_quantity)}"></label></div>`}).join(''):'<p class="notice">Noch keine Konten vorhanden. Lege zuerst unter „Konten“ ein Konto an.</p><button type="button" class="secondary wide" id="goAccounts">Kontenverwaltung öffnen</button>';}
+function sessionFeedback(text){$('sessionSetupFeedback').textContent=text;message(text,true)}
 function getSessionSelection(){return [...document.querySelectorAll('.sess-check:checked')].map(c=>{const id=c.dataset.id;return {account_id:id,role:document.querySelector(`.sess-role[data-id="${id}"]`).value,instrument:document.querySelector(`.sess-instrument[data-id="${id}"]`).value,planned_quantity:Number(document.querySelector(`.sess-qty[data-id="${id}"]`).value)};});}
-$('startSession').onclick=()=>{if(currentSession)return;openSessionSetup('start');};
+$('startSession').onclick=()=>{if(currentSession){message('Es ist bereits eine Session offen. Schließe sie zuerst ab; offene Trades müssen zuvor dokumentiert werden.',true);return;}openSessionSetup('start');};
 $('changeSessionAccounts').onclick=()=>openSessionSetup('change');
 $('cancelSession').onclick=()=>{renderSession();};
-$('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){message('Wähle mindestens ein Konto.',true);return}if(selection.filter(x=>x.role==='leader').length!==1){message('Genau ein Leader ist erforderlich.',true);return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){message('Ungültige Kontraktzahl.',true);return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();await renderHtfImage();}catch(e){message('Kontenauswahl: '+e.message,true)}finally{busy=false;$('confirmSession').disabled=false}};
+$('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){sessionFeedback('Bitte mindestens ein Konto links mit dem Häkchen auswählen.');$('sessionAccountList').scrollIntoView({behavior:'smooth',block:'center'});return}if(selection.filter(x=>x.role==='leader').length!==1){sessionFeedback('Bitte bei genau einem ausgewählten Konto die Rolle Leader einstellen. Aktuell: '+selection.filter(x=>x.role==='leader').length+'.');$('sessionAccountList').scrollIntoView({behavior:'smooth',block:'center'});return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){sessionFeedback('Kontraktzahl muss für jedes ausgewählte Konto größer als null sein.');return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){if(currentSession)throw new Error('Es ist bereits eine Session offen. Bitte zuerst abschließen.');const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();await renderHtfImage();}catch(e){sessionFeedback('Session konnte nicht gespeichert werden: '+e.message)}finally{busy=false;$('confirmSession').disabled=false}};
 $('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:$('htf').value,preflight_checks:Object.fromEntries([...document.querySelectorAll('.htf-check')].map(el=>[el.dataset.check,el.checked]))};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;message('HTF-Kontext gespeichert.')}};
 $('closeSession').onclick=async()=>{if(!currentSession)return;const {count,error:openError}=await client.from('trades').select('id',{count:'exact',head:true}).eq('session_id',currentSession.id).is('exit_at',null);if(openError){message('Offene Trades prüfen: '+openError.message,true);return;}if(count>0){message('Session kann nicht geschlossen werden: '+count+' Trade(s) sind noch offen. Bitte zuerst dokumentieren und abschließen.',true);return;}if(!confirm('Session wirklich schließen?'))return;const {error}=await client.from('trading_sessions').update({status:'closed',closed_at:new Date().toISOString()}).eq('id',currentSession.id);if(error)message('Session schließen: '+error.message,true);else{currentSession=null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();message('Session geschlossen.')}};
 async function loadAccounts(){
