@@ -182,6 +182,29 @@ function updateRiskCard(card){
   if(!manual.checked)field.value=amount===null?'':amount.toFixed(2);
   return amount;
 }
+function snapshotExitDraft(){
+  const editor=document.querySelector('#tradeDetails .exit-editor');
+  if(!editor)return null;
+  return {reason:editor.querySelector('.exit-reason')?.value||'',
+    accounts:[...editor.querySelectorAll('.exit-account')].map(c=>({
+      id:c.dataset.id,tp:c.querySelector('.exit-tp')?.value||'',
+      pnl:c.querySelector('.exit-pnl')?.value||'',fees:c.querySelector('.exit-fees')?.value||''
+    }))};
+}
+function restoreExitDraft(draft){
+  if(!draft)return;
+  const editor=document.querySelector('#tradeDetails .exit-editor');
+  if(!editor)return;
+  editor.querySelector('.exit-reason').value=draft.reason;
+  for(const item of draft.accounts){
+    const c=[...editor.querySelectorAll('.exit-account')].find(el=>el.dataset.id===item.id);
+    if(!c)continue;
+    c.querySelector('.exit-tp').value=item.tp;
+    c.querySelector('.exit-pnl').value=item.pnl;
+    c.querySelector('.exit-fees').value=item.fees;
+  }
+  updateExitPreview(editor);
+}
 function rememberAccountPosition(node){const card=node?.closest('.risk-card');return {id:card?.dataset.id||null,top:card?.getBoundingClientRect().top??0,scrollY:window.scrollY};}
 function restoreAccountPosition(pos){requestAnimationFrame(()=>{const card=[...document.querySelectorAll('#tradeDetails .risk-card')].find(c=>c.dataset.id===pos.id);if(card)window.scrollBy({top:card.getBoundingClientRect().top-pos.top,behavior:'instant'});else window.scrollTo({top:pos.scrollY,behavior:'instant'});});}
 function jumpToAccount(id){const card=[...document.querySelectorAll('#tradeDetails .risk-card')].find(c=>c.dataset.id===id);if(card)card.scrollIntoView({behavior:'smooth',block:'start'});}
@@ -255,6 +278,14 @@ function updateExitPreview(editor){
   });
   editor.querySelector('.exit-preview').textContent=complete?'Gesamtergebnis: '+usd(total)+' USD · '+(total/risk).toFixed(2)+' R':'Gesamtergebnis: bitte alle Konten ausfüllen';
 }
+$('tradeDetails').addEventListener('change',e=>{
+  if(e.target.matches('.exit-reason')){
+    const editor=e.target.closest('.exit-editor');
+    const feedback=editor?.querySelector('.exit-feedback');
+    if(feedback)feedback.textContent='';
+    e.target.style.outline='';
+  }
+});
 $('tradeDetails').addEventListener('input',e=>{
   const editor=e.target.closest('.exit-editor');
   if(editor){e.target.style.outline='';const feedback=editor.querySelector('.exit-feedback');if(feedback)feedback.textContent='';updateExitPreview(editor);}
@@ -262,7 +293,8 @@ $('tradeDetails').addEventListener('input',e=>{
 $('tradeDetails').addEventListener('click',e=>{
   const b=e.target.closest('.exit-negate');if(!b)return;
   const field=b.closest('.exit-account').querySelector('.exit-pnl');
-  field.value=field.value.trim().startsWith('-')?field.value.trim().slice(1):'-'+field.value.trim();
+  const raw=field.value.trim();
+  field.value=raw===''?'-1':raw.startsWith('-')?raw.slice(1):'-'+raw;
   field.dispatchEvent(new Event('input',{bubbles:true}));
 });
 $('tradeDetails').addEventListener('click',async e=>{
@@ -345,9 +377,10 @@ $('tradeDetails').addEventListener('click',async e=>{
     });
     if(error)throw error;
     if(!data)throw new Error('Keine Bestätigung der Datenbank. Vor einem erneuten Versuch den Verlauf aktualisieren.');
+    const draft=snapshotExitDraft();
     const position=rememberAccountPosition(btn);
     const activeTrade=sessionTrades.find(t=>t.id===$('tradeDetails').dataset.tradeId);
-    if(activeTrade){await openTradeDetails(activeTrade);restoreAccountPosition(position);}
+    if(activeTrade){await openTradeDetails(activeTrade);restoreExitDraft(draft);restoreAccountPosition(position);}
     message('SL-Verschiebung gespeichert: '+previous+' → '+next+' Ticks. Initialrisiko unverändert.');
   }catch(err){message('SL-Verschiebung nicht bestätigt: '+err.message+'\nVor erneutem Versuch den Verlauf kontrollieren.',true);}
   finally{busy=false;btn.disabled=false;}
@@ -372,9 +405,10 @@ $('tradeDetails').addEventListener('click',async e=>{
     if(!data)throw new Error('Keine Änderung bestätigt.');
     message('Initialrisiko gespeichert: '+usd(payload.initial_risk_usd)+' USD.');
     // Details neu laden, damit die angezeigten Werte dem Datenbankstand entsprechen.
+    const draft=snapshotExitDraft();
     const position=rememberAccountPosition(btn);
     const activeTrade=sessionTrades.find(t=>t.id===$('tradeDetails').dataset.tradeId);
-    if(activeTrade){await openTradeDetails(activeTrade);restoreAccountPosition(position);}
+    if(activeTrade){await openTradeDetails(activeTrade);restoreExitDraft(draft);restoreAccountPosition(position);}
   }catch(err){message('Risiko konnte nicht gespeichert werden: '+err.message,true)}
   finally{busy=false;btn.disabled=false}
 });
