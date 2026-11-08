@@ -319,6 +319,7 @@ function restoreAccountPosition(pos){requestAnimationFrame(()=>{const card=[...d
 function jumpToAccount(id){const card=[...document.querySelectorAll('#tradeDetails .risk-card')].find(c=>c.dataset.id===id);if(card)card.scrollIntoView({behavior:'smooth',block:'start'});}
 let detailRequestSeq=0;
 async function openTradeDetails(trade){
+ if(ltfAutosaveTimer){clearTimeout(ltfAutosaveTimer);ltfAutosaveTimer=null;await flushLtfAutosave();}
   draftFlush();
   const requestSeq=++detailRequestSeq;
   const panel=$('tradeDetails');panel.dataset.tradeId=trade.id;panel.classList.remove('hidden');panel.textContent='Kontozuordnungen werden geladen …';
@@ -353,7 +354,7 @@ async function openTradeDetails(trade){
     const exitSection=trade.exit_at?
       `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe brutto: ${usd(pnlTotal)} USD · ${initialRisk?(pnlTotal/initialRisk).toFixed(2)+' R':'R offen'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
       `<div class="account exit-editor"><h3>Trade abschließen · alle Konten gemeinsam</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><div class="muted">Initialrisiko: ${a.initial_risk_usd==null?'nicht erfasst':usd(a.initial_risk_usd)+' USD'}</div><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<h4>Emotion beim Exit · Pflicht</h4><div class="emotion-options" data-emotion-group="exitCommitEmotion"><button type="button" data-value="disciplined">Nach Plan</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button><button type="button" data-value="stress">Stress</button></div><p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<div class="account intratrade-emotion"><h3>Emotion während des Trades · optional</h3><div class="emotion-options" data-emotion-group="duringTradeEmotion"><button type="button" data-value="calm">Ruhig</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="uncertain">Unsicherheit</button></div><div class="during-feedback muted" role="status"></div></div>${exitSection}<div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Während des Trades oder danach markieren. Ungeprüft ist nicht automatisch negativ.</p>
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><div class="account ltf-analysis"><h3>Trade-Analyse · LTF</h3><p class="muted">Haken werden sofort gespeichert, Text nach kurzer Pause. Ungeprüft ist nicht negativ.</p>
 <div class="analysis-grid">
 <label><input type="checkbox" data-analysis="structure"> Struktur / Bruch</label>
 <label><input type="checkbox" data-analysis="volume"> Volumen Preis/Zeit</label>
@@ -361,8 +362,8 @@ async function openTradeDetails(trade){
 <label><input type="checkbox" data-analysis="delta"> Delta</label>
 <label><input type="checkbox" data-analysis="tape"> Tape / DOM</label>
 <label><input type="checkbox" data-analysis="liquidity"> Liquidität / Absorption</label>
-</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide">Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><div class="image-dropzone" tabindex="0" role="group" aria-label="LTF-Bilder ablegen oder mit Strg+V einfügen"><strong>Bilder hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bilder auswählen · max. 10 gleichzeitig</span><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><span class="image-pick-status" role="status">Noch keine neuen Bilder ausgewählt.</span></div><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
-<h3>Trade-Review · unabhängig vom P&L</h3>
+</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide" hidden>Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><div class="image-dropzone" tabindex="0" role="group" aria-label="LTF-Bilder ablegen oder mit Strg+V einfügen"><strong>Bilder hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bilder auswählen · max. 10 gleichzeitig</span><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><span class="image-pick-status" role="status">Noch keine neuen Bilder ausgewählt.</span></div><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><h3>Ursprünglicher Stop-Loss / Risiko je Konto</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}<div class="account intratrade-emotion"><h3>Emotion während des Trades · optional</h3><div class="emotion-options" data-emotion-group="duringTradeEmotion"><button type="button" data-value="calm">Ruhig</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="uncertain">Unsicherheit</button></div><div class="during-feedback muted" role="status"></div></div>${exitSection}<details class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
+<summary><strong>Review nach dem Trade · optional öffnen</strong></summary><h3>Trade-Review · unabhängig vom P&L</h3>
 <p class="muted">Auch nach dem Exit ergänzbar. A+ bedeutet gute Ausführung, nicht zwingend Gewinn.</p>
 <h4>Emotion beim Exit · gespeichert</h4><div class="emotion-options" data-emotion-group="exitEmotion"><button type="button" data-value="disciplined">Diszipliniert</button><button type="button" data-value="fear">Angst / zu früh</button><button type="button" data-value="greed">Gier / zu lange</button><button type="button" data-value="stress">Stress / Druck</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button></div><p class="muted">Die beim Abschluss gespeicherte Emotion wird im Review nur angezeigt.</p><label>Ausführungsqualität<select class="review-grade"><option value="">Noch nicht bewertet</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>unrated</option></select></label>
 <label>Regelprüfung<select class="review-compliance"><option value="unknown">Noch nicht geprüft</option><option value="clean">Geprüft · kein Regelbruch</option><option value="breach">Regelbruch dokumentieren</option></select></label>
@@ -371,7 +372,7 @@ async function openTradeDetails(trade){
 <label>Wichtigste Erkenntnis<textarea class="review-note" rows="2" placeholder="Was wiederholen oder ändern?"></textarea></label>
 <label><input class="review-playbook" type="checkbox" style="display:inline;width:auto"> Ins Playbook übernehmen</label>
 <button type="button" class="review-save wide secondary">Review speichern</button><div class="review-feedback muted" role="status"></div>
-</div><p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exit-Ergebnisse werden je Konto separat erfasst.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
+</details><p class="muted">Eingabe in ganzen Ticks (1 Tick = 0,25 Punkte). In der Datenbank wird der SL-Abstand weiterhin in Punkten gespeichert. Berechnung ohne Gebühren und Slippage. Exit-Ergebnisse werden je Konto separat erfasst.</p><button type="button" class="ghost wide" id="closeTradeDetails">Details schließen</button></div>`;
     panel.querySelectorAll('.stop-toggle').forEach(toggle=>{
       toggle.addEventListener('change',()=>{
         const fields=toggle.closest('.stop-panel').querySelector('.stop-fields');
@@ -437,6 +438,43 @@ function conditionalTradeUpdate(id,patch,previousObservations,columns){
 function tradeConflictFeedback(feedback){
  feedback.textContent='Speicherkonflikt: Dieser Trade wurde auf einem anderen Gerät geändert. Deine Eingaben bleiben hier erhalten. Bitte erst den Trade neu laden und die Änderungen abgleichen.';
 }
+// LTF Autosave: each checkbox immediately, text after typing pause; serialized with retries.
+let ltfAutosaveTimer=null,ltfAutosaveInFlight=false,ltfAutosavePending=false;
+function scheduleLtfAutosave(delay=0){
+ clearTimeout(ltfAutosaveTimer);
+ ltfAutosaveTimer=setTimeout(()=>{ltfAutosaveTimer=null;void flushLtfAutosave();},delay);
+}
+async function flushLtfAutosave(){
+ const panel=$('tradeDetails'),editor=panel.querySelector('.ltf-analysis');
+ const trade=sessionTrades.find(t=>t.id===panel.dataset.tradeId);
+ if(!editor||!trade)return;
+ if(ltfAutosaveInFlight){ltfAutosavePending=true;return;}
+ const note=editor.querySelector('.analysis-note').value.trim();
+ const feedback=editor.querySelector('.analysis-feedback');
+ if(note.length>2000){feedback.textContent='Maximal 2000 Zeichen – nicht gespeichert.';return;}
+ const checks=Object.fromEntries([...editor.querySelectorAll('[data-analysis]')].map(el=>[el.dataset.analysis,el.checked]));
+ const next={...(trade.observations||{}),ltf_analysis:checks,entry_thesis:note};
+ if(JSON.stringify(next)===JSON.stringify(trade.observations||{}))return;
+ ltfAutosaveInFlight=true;feedback.textContent='Speichert …';
+ try{
+  const {data,error}=await conditionalTradeUpdate(trade.id,{observations:next},trade.observations,'observations');
+  if(error)throw error;
+  if(!data){feedback.textContent='Konflikt mit anderer Änderung. Eingaben bleiben erhalten. Bitte Trade neu öffnen.';return;}
+  trade.observations=data.observations;
+  feedback.textContent='✓ Automatisch gespeichert';
+  draftMarkSaved(trade.id,'analysis');
+ }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
+ finally{
+  ltfAutosaveInFlight=false;
+  if(ltfAutosavePending){ltfAutosavePending=false;scheduleLtfAutosave(50);}
+ }
+}
+$('tradeDetails').addEventListener('change',e=>{
+ if(e.target.matches('.ltf-analysis [data-analysis]'))scheduleLtfAutosave(0);
+});
+$('tradeDetails').addEventListener('input',e=>{
+ if(e.target.matches('.ltf-analysis .analysis-note'))scheduleLtfAutosave(650);
+});
 $('tradeDetails').addEventListener('click',async e=>{
  const btn=e.target.closest('.analysis-save');if(!btn||busy)return;
  const panel=$('tradeDetails'),trade=sessionTrades.find(t=>t.id===panel.dataset.tradeId);
@@ -726,6 +764,11 @@ async function renderTradeImages(tradeId){
   }catch(err){const p=document.createElement('p');p.textContent='Bild nicht verfügbar: '+err.message;gallery.appendChild(p);}
  }
 }
+$('tradeDetails').addEventListener('change',e=>{
+ if(!e.target.matches('.ltf-file'))return;
+ const button=e.target.closest('.trade-images').querySelector('.ltf-upload');
+ if(button)button.click();
+});
 $('tradeDetails').addEventListener('click',async e=>{
  const btn=e.target.closest('.ltf-upload');if(!btn||busy)return;
  const tradeId=$('tradeDetails').dataset.tradeId;
