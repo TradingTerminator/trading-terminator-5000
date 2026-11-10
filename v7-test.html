@@ -2,7 +2,13 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V7</title>
+<title>Trading Terminator 5000 · V7.30</title>
+<meta name="theme-color" content="#08111d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trading Terminator">
+<meta name="application-name" content="Trading Terminator 5000">
+<meta name="format-detection" content="telephone=no">
 <style>
 :root{color-scheme:dark;--bg:#09111c;--panel:#142538;--panel2:#1b3045;--line:#344d63;--text:#e8f2fa;--muted:#a9bfcd;--accent:#08a5a4;--warn:#e9a749}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:720px;margin:auto;padding:18px 16px 110px}header{display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:22px;margin:6px 0}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0 0 10px}p{line-height:1.45}small,.muted{color:var(--muted)}section,.card{background:var(--panel);padding:17px;border-radius:15px;margin:15px 0;border:1px solid #263c51}input,select,textarea,button{font:inherit;color:var(--text)}input,select,textarea{display:block;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px;margin:6px 0 13px}input:focus,select:focus,textarea:focus{outline:2px solid var(--accent)}label{display:block;font-weight:600;font-size:14px}button{border:0;background:var(--accent);padding:14px;border-radius:11px;font-weight:700;cursor:pointer;min-height:48px}button.secondary{background:#2c465b}button.ghost{background:transparent;border:1px solid var(--line)}button.danger{background:#7c3944}button:disabled{opacity:.5;cursor:not-allowed}.wide{width:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.pill{display:inline-block;border:1px solid var(--line);padding:5px 9px;border-radius:999px;color:var(--muted);font-size:12px}.notice{padding:12px;border-left:3px solid var(--warn);background:#342b22;border-radius:8px}.ok{color:#77d8b5}.error{color:#ff9c9c}.hidden{display:none!important}.account{border:0;border-top:1px solid var(--line);padding:13px 0 6px;border-radius:0;margin:10px 0}.account .grid{margin-top:10px}.account label{font-size:12px}.tabs{position:sticky;top:0;background:#102032;border:1px solid var(--line);border-radius:12px;display:flex;justify-content:center;padding:7px;margin:14px 0;z-index:10}.tabs>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:min(720px,100%)}.tabs button{padding:9px 3px;min-height:54px;background:#21374b;font-size:13px}.tabs button.active{background:#087f80}#message{white-space:pre-wrap;overflow-wrap:anywhere}.stat{background:var(--panel2);padding:14px;border-radius:11px}.stat strong{font-size:24px;display:block;margin-top:5px}details summary{cursor:pointer;padding:8px 0}button+button{margin-top:8px}#logout{padding:8px 10px;min-height:36px;font-size:13px}
@@ -346,7 +352,7 @@ body[data-tt-theme] .session-end-button:disabled{background:#503b42!important;co
 @media(max-width:420px){.session-finish-trade{flex-direction:column;align-items:stretch}.session-finish-trade button{width:100%}}
 </style><style id="tt716-login-ux">.tt-remember{display:flex;align-items:center;gap:12px;padding:12px 0;font-weight:700}.tt-remember input{width:24px;height:24px;flex:0 0 auto}#otpCode{font-size:26px;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums}#rememberHint{margin:0 0 12px}#otpPanel{margin:14px 0}</style><style id="tt717-clarity">body[data-tt-theme] .tt-old-session-banner{background:#713527!important;border:3px solid #ffae71!important;color:#fff5e8!important;box-shadow:0 0 0 2px #d86841!important}body[data-tt-theme] .tt-old-session-banner button{background:#f7b267!important;color:#251408!important;font-weight:850!important;min-height:54px!important}body[data-tt-theme] .session-end-button:focus-visible{outline:4px solid #ffdd6a!important;outline-offset:4px}</style></head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.21 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.30 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live">⌂ Dashboard</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="analytics">▥ Analyse</button><button data-view="settings">⚙ Settings</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>6-stelliger Anmeldecode<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="123456"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bei sechs Ziffern wird die Anmeldung automatisch geprüft. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Supabase-Vorlage „Magic Link“: Betreff <code>{{ .Token }} – Trading Terminator Anmeldecode</code> und denselben Code im Nachrichtentext. iOS-Codevorschläge sind vom Gerät und Mail-Anbieter abhängig.</small></section>
@@ -373,7 +379,14 @@ body[data-tt-theme] .session-end-button:disabled{background:#503b42!important;co
 <section id="decisionView" class="hidden"><div class="subnav"><button type="button" class="subnav-active" id="tradeNewTab">＋ Neuer Trade</button><button type="button" id="tradeOpenTab">◉ Trades dieser Session</button></div><div id="entrySessionMount"><div id="entrySessionBar" class="entry-session-bar"><div><strong id="entrySessionTitle">Session vorbereiten</strong><small id="entrySessionSub">HTF für alle Trades</small></div><button type="button" id="toggleEntrySession" class="secondary">Session verwalten</button></div></div><div class="page-intro"><h2>Neuer Trade</h2></div><div class="entry-steps hidden"><span class="current">1 · Entry</span><span>2 · Trade begleiten</span><span>3 · Exit</span></div><div id="decisionSession" class="notice hidden">Bitte zuerst eine Session starten.</div><div class="setup-select-head"><strong>1 · Setup wählen</strong></div><div id="setupCards" class="setup-cards" role="group" aria-label="Setup-Auswahl"></div><input id="setup" type="hidden" value=""><p id="setupSelectionStatus" class="muted" role="status">Bitte ein Setup auswählen.</p><div class="card emotion-section"><h3>2 · Emotion vor dem Entry</h3><div class="emotion-options" id="entryEmotionOptions" data-emotion-group="entryEmotion"><button type="button" data-value="plan">Nach Plan</button><button type="button" data-value="fomo">FOMO</button><button type="button" data-value="revenge">Revenge</button><button type="button" data-value="impulsive">Impulsiv</button></div><p id="entryEmotionWarning" class="emotion-warning hidden" role="alert"></p></div><div class="direction-field"><strong>3 · Richtung</strong><div class="direction-buttons" role="group" aria-label="Richtung wählen"><button type="button" class="direction-choice selected" data-direction="long" aria-pressed="true">▲ LONG</button><button type="button" class="direction-choice" data-direction="short" aria-pressed="false">▼ SHORT</button></div><select id="direction" class="visually-hidden" aria-label="Richtung"><option value="long">Long</option><option value="short">Short</option></select></div><label>Leitinstrument<select id="instrument"><option>NQ</option><option>MNQ</option><option>ES</option><option>MES</option></select></label><details id="entryAccounts" class="entry-accounts"><summary><strong>Konten & Kontrakte</strong><span class="muted"> · Session-Vorgabe prüfen / ändern</span></summary><div id="allocationList"></div></details><p class="tiny-note">Nur Journaleintrag · keine Brokerorder · 5 Trades = Warnschwelle</p><button id="recordEntry" class="wide trade-cta">✓ Entry dokumentieren → zurück zu ATAS</button></section>
 <section id="analyticsView" class="hidden"><div class="subnav"><button class="subnav-active" type="button">Auswertung</button><button id="analysisTrainingTab" type="button">Training & Learnings</button><button id="analysisPlaybookTab" type="button">Playbook</button><button id="analysisAccountsTab" type="button">Konten</button></div><h2>Analyse</h2><p class="muted">Zuerst deine 5 wichtigsten Muster; Details bei Bedarf.</p><details class="card financial-secondary"><summary>Kontofilter & zusätzliche Auswertung</summary><label>Kontofilter<select id="analyticsAccount"><option value="all">Alle Konten · Entscheidungen</option></select></label><button type="button" id="reloadAnalytics" class="secondary wide">Analyse aktualisieren</button><div id="analyticsSummary" class="muted">Wird geladen …</div></details><div class="card"><h3>Best Practices · vollständig</h3><div id="analyticsGood"></div></div><div class="card"><h3>Fehler · vollständig</h3><div id="analyticsBad"></div></div><div id="analyticsDrilldown" class="card hidden"></div></section><section id="trainingView" class="hidden"><div class="subnav"><button id="trainingAnalysisTab" type="button">Auswertung</button><button class="subnav-active" type="button">Training & Learnings</button><button id="trainingPlaybookTab" type="button">Playbook</button><button id="trainingAccountsTab" type="button">Konten</button></div><h2>◎ Training</h2><div id="trainingFocus" class="card"><h3>Dein nächster Trainingsfokus</h3><div id="trainingFocusBody" class="muted">Wird aus dokumentierten Entscheidungen ermittelt …</div></div><div class="card" id="trainingPractice"><h3>Deine nächste Trainingsaufgabe</h3><p class="muted">Eine konkrete Wenn–Dann-Regel, die du in der nächsten Session bewusst übst. Keine automatische Erfolgsbehauptung.</p><label>Trainingsziel<textarea id="trainingGoal" rows="2" maxlength="500" placeholder="Wenn ich einen Verlust hatte, dann prüfe ich vor dem nächsten Entry erneut meine Setup-Kriterien."></textarea></label><div class="grid"><button type="button" class="secondary" id="saveTrainingGoal">Ziel speichern</button><button type="button" class="secondary" id="completeTrainingGoal">Als geübt markieren</button></div><p id="trainingGoalStatus" class="muted"></p><details><summary>Trainingshistorie · synchronisiert</summary><div id="trainingGoalHistory" class="muted"></div></details></div><p class="muted">Deine dokumentierten Fehler, Gegenmaßnahmen und Entwicklung. Keine Unterbrechung während des Tradings.</p><div class="card"><div class="row"><h3>Fehler-Prioritäten</h3><button id="reloadTraining" type="button" class="secondary">Aktualisieren</button></div><div id="trainingList" aria-live="polite">Wird geladen …</div></div><div id="trainingDetail" class="card hidden" aria-live="polite"></div></section><section id="playbookView" class="hidden"><div class="subnav"><button id="playbookAnalysisTab" type="button">Auswertung</button><button id="playbookTrainingTab" type="button">Training</button><button class="subnav-active" type="button">Playbook</button><button id="playbookAccountsTab" type="button">Konten</button></div><h2>Playbook · Setup-Lexikon</h2><p class="muted">Deine Setups als Nachschlagewerk: Kriterien, Gegenbeispiele und dokumentierte Trades. Gewinn ist kein Aufnahmekriterium.</p><div class="card"><h3>Setup-Lexikon</h3><p class="muted">Beschreibungen pflegst du unter Settings → Setups. Hier erscheinen sie als Nachschlagewerk.</p><div id="playbookLexicon"></div><button id="refreshPlaybookLexicon" type="button" class="secondary wide">Lexikon aktualisieren</button></div></section><section id="settingsView" class="hidden"><h2>⚙ Einstellungen</h2><details class="card"><summary><strong>Supabase E-Mail-Code-Vorlage (Administrator)</strong></summary><p class="muted">Einmalig im Supabase-Dashboard unter Authentication → Email Templates → Magic Link eintragen. Das HTML kann diese Servervorlage nicht selbst ändern.</p><label>Betreff<input id="ttOtpSubject" readonly value="{{ .Token }} – Trading Terminator Anmeldecode"></label><button type="button" id="ttCopyOtpSubject" class="secondary">Betreff kopieren</button><label>Nachrichtentext<textarea id="ttOtpBody" rows="4" readonly>Dein Trading Terminator Anmeldecode: {{ .Token }}
 
-Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</textarea></label><button type="button" id="ttCopyOtpBody" class="secondary">Nachrichtentext kopieren</button></details><details class="card"><summary><strong>App-Diagnose & Datenschutz</strong></summary><p class="muted">Lokale Diagnose ohne Übertragung deiner Tradingdaten. Ein erfolgreicher Check ersetzt keinen Supabase-End-to-End-Test.</p><button type="button" id="ttRunDiagnostics" class="secondary wide">Lokale Funktionsprüfung starten</button><div id="ttDiagnosticsResult" role="status" aria-live="polite" class="muted"></div><p class="muted">Trade-Entwürfe werden bei „Angemeldet bleiben“ lokal gespeichert, sonst nur für diese Browser-Sitzung. Beim Abmelden werden lokale Trade-Entwürfe gelöscht.</p></details><details class="card" open><summary><strong>Darstellung</strong></summary><label>Farbschema<select id="ttThemeSelect"><option value="original">Petrol (Standard)</option><option value="graphite">Graphit</option><option value="contrast">Kontrast</option></select></label><label>Layout<select id="ttLayoutSelect"><option value="comfortable">Komfortabel</option><option value="compact">Kompakt</option></select></label><small>Darstellung wird lokal auf diesem Gerät gespeichert.</small></details><p class="muted">Verwaltung außerhalb des Trading-Ablaufs. Hier kannst du Setups und ihre Beispielbilder pflegen, ohne den schnellen Entry zu unterbrechen.</p><details class="card"><summary><strong>Emotionen verwalten</strong></summary><div class="account" id="emotionManager"><h3>Emotionen verwalten</h3><p class="muted">Bezeichnungen für vor, während und nach dem Trade ändern. Die gespeicherten Auswertungs-Codes bleiben unverändert. Synchronisierung über dein Benutzerprofil.</p><div id="emotionManagerFields"></div><button type="button" id="saveEmotionLabels" class="wide secondary">Emotionen speichern</button><p id="emotionManagerStatus" class="muted" role="status"></p></div></details><details class="card"><summary><strong>Setups & Playbook-Kriterien</strong></summary><div id="setupManager" class="account"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p></div></details></section><section><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
+Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</textarea></label><button type="button" id="ttCopyOtpBody" class="secondary">Nachrichtentext kopieren</button></details><details class="card"><summary><strong>App-Diagnose & Datenschutz</strong></summary><p class="muted">Lokale Diagnose ohne Übertragung deiner Tradingdaten. Ein erfolgreicher Check ersetzt keinen Supabase-End-to-End-Test.</p><button type="button" id="ttRunDiagnostics" class="secondary wide">Lokale Funktionsprüfung starten</button><div id="ttDiagnosticsResult" role="status" aria-live="polite" class="muted"></div><p class="muted">Trade-Entwürfe werden bei „Angemeldet bleiben“ lokal gespeichert, sonst nur für diese Browser-Sitzung. Beim Abmelden werden lokale Trade-Entwürfe gelöscht.</p></details><details class="card" id="ttDataTools"><summary><strong>Datensicherung & Live-Systemprüfung</strong></summary>
+<p class="muted">Sicherung deiner Supabase-Journaldaten direkt auf dein Gerät. Der Export verändert keine Daten. Bilder werden als Dateiverweise erfasst, nicht als Bilddateien heruntergeladen. Auch ungespeicherte lokale Trade-Entwürfe werden mitgesichert. Die JSON-Datei enthält persönliche Tradingdaten: sicher aufbewahren und nicht öffentlich hochladen.</p>
+<button type="button" id="ttBackupJson" class="secondary wide">Gesamtes Journal als JSON sichern</button>
+<button type="button" id="ttExportCsv" class="secondary wide">Trades als CSV exportieren</button>
+<button type="button" id="ttServerHealth" class="secondary wide">Supabase-Verbindung und Daten prüfen</button>
+<button type="button" id="ttVersionCheck" class="secondary wide">GitHub-Version prüfen (ohne Update)</button>
+<p id="ttDataToolsStatus" class="muted" role="status" aria-live="polite">Noch keine Prüfung durchgeführt.</p>
+</details><details class="card" open><summary><strong>Darstellung</strong></summary><label>Farbschema<select id="ttThemeSelect"><option value="original">Petrol (Standard)</option><option value="graphite">Graphit</option><option value="contrast">Kontrast</option></select></label><label>Layout<select id="ttLayoutSelect"><option value="comfortable">Komfortabel</option><option value="compact">Kompakt</option></select></label><small>Darstellung wird lokal auf diesem Gerät gespeichert.</small></details><p class="muted">Verwaltung außerhalb des Trading-Ablaufs. Hier kannst du Setups und ihre Beispielbilder pflegen, ohne den schnellen Entry zu unterbrechen.</p><details class="card"><summary><strong>Emotionen verwalten</strong></summary><div class="account" id="emotionManager"><h3>Emotionen verwalten</h3><p class="muted">Bezeichnungen für vor, während und nach dem Trade ändern. Die gespeicherten Auswertungs-Codes bleiben unverändert. Synchronisierung über dein Benutzerprofil.</p><div id="emotionManagerFields"></div><button type="button" id="saveEmotionLabels" class="wide secondary">Emotionen speichern</button><p id="emotionManagerStatus" class="muted" role="status"></p></div></details><details class="card"><summary><strong>Setups & Playbook-Kriterien</strong></summary><div id="setupManager" class="account"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p></div></details></section><section><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
 </div></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -470,10 +483,11 @@ $('rememberLogin').checked=ttRemember;
 $('ttCopyOtpSubject')?.addEventListener('click',()=>navigator.clipboard?.writeText($('ttOtpSubject').value).then(()=>message('Betreff kopiert.')).catch(()=>message('Bitte Betreff manuell kopieren.',true)));
 $('ttCopyOtpBody')?.addEventListener('click',()=>navigator.clipboard?.writeText($('ttOtpBody').value).then(()=>message('Nachrichtentext kopiert.')).catch(()=>message('Bitte Nachrichtentext manuell kopieren.',true)));
 $('rememberLogin').addEventListener('change',e=>{
+ draftFlush();
  ttSetRemember(e.target.checked);
  $('rememberHint').textContent=ttRemember?'Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.':'Nur in diesem App-Fenster angemeldet bleiben. Nach dem vollständigen Beenden kann eine erneute Anmeldung nötig sein.';
 });
-let ttOtpSubmitting=false;
+let ttOtpSubmitting=false;let ttOtpEmail='';
 $('otpCode').addEventListener('input',()=>{
  const input=$('otpCode');input.value=input.value.replace(/\D/g,'').slice(0,6);
  if(input.value.length===6&&!ttOtpSubmitting){$('verifyOtp').click();}
@@ -489,10 +503,11 @@ $('login').onclick=async()=>{
 $('magic').onclick=async()=>{
  const email=$('email').value.trim(),btn=$('magic'),notice=$('emailNotice');
  if(!email||!$('email').checkValidity()){notice.classList.remove('hidden');notice.textContent='Bitte zuerst eine gültige E-Mail-Adresse eingeben.';return;}
- btn.disabled=true;notice.classList.add('hidden');$('otpCode').value='';$('otpPanel').classList.add('hidden');
+ btn.disabled=true;ttOtpEmail='';notice.classList.add('hidden');$('otpCode').value='';$('otpPanel').classList.add('hidden');
  try{
-  const {error}=await client.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
+  const {error}=await client.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
   if(error)throw error;
+  ttOtpEmail=email;
   $('otpPanel').classList.remove('hidden');
   $('otpCode').focus();
   notice.textContent='E-Mail angefordert. Wenn iOS den Code erkennt, erscheint er über der Tastatur. Sonst bitte manuell eingeben. Die Supabase-E-Mail-Vorlage muss {{ .Token }} enthalten.';
@@ -503,17 +518,17 @@ $('magic').onclick=async()=>{
 $('verifyOtp').onclick=async()=>{
  if(ttOtpSubmitting)return;
  const email=$('email').value.trim(),token=$('otpCode').value.trim(),btn=$('verifyOtp'),notice=$('emailNotice');
- if(!email||!$('email').checkValidity()||!/^[0-9]{6}$/.test(token)){notice.textContent='Bitte E-Mail und sechsstelligen Code eingeben.';notice.classList.remove('hidden');return;}
+ if(!email||email!==ttOtpEmail||!$('email').checkValidity()||!/^[0-9]{6}$/.test(token)){notice.textContent='Bitte den Code für die angeforderte E-Mail-Adresse eingeben. Bei geänderter Adresse neuen Code anfordern.';notice.classList.remove('hidden');return;}
  ttOtpSubmitting=true;btn.disabled=true;
  try{
   const {error}=await client.auth.verifyOtp({email,token,type:'email'});
   if(error)throw error;
-  $('otpCode').value='';$('otpPanel').classList.add('hidden');notice.classList.add('hidden');
+  $('otpCode').value='';ttOtpEmail='';$('otpPanel').classList.add('hidden');notice.classList.add('hidden');
   await authStatus();
  }catch(error){notice.textContent='Code-Anmeldung fehlgeschlagen: '+(error?.message||'Netzwerkfehler');notice.classList.remove('hidden');message(notice.textContent,true)}
  finally{btn.disabled=false;ttOtpSubmitting=false}
 };
-$('logout').onclick=async()=>{draftFlush();const loggingOutUser=currentUser?.id;const {error}=await client.auth.signOut();if(error)message(error.message,true);else {draftPurgeUser(loggingOutUser);currentUser=null;currentSession=null;accounts=[];$('password').value='';$('otpCode').value='';$('otpPanel').classList.add('hidden');$('tradeDetails').innerHTML='';$('tradeDetails').dataset.tradeId='';try{sessionStorage.removeItem('tt7_active_trade_id');sessionStorage.removeItem('tt7_active_view');sessionStorage.removeItem('tt7_scroll_y');}catch(_){}await authStatus();}};
+$('logout').onclick=async()=>{draftFlush();const loggingOutUser=currentUser?.id;const {error}=await client.auth.signOut();if(error)message(error.message,true);else {draftPurgeUser(loggingOutUser);currentUser=null;currentSession=null;accounts=[];$('password').value='';$('otpCode').value='';ttOtpEmail='';$('otpPanel').classList.add('hidden');$('tradeDetails').innerHTML='';$('tradeDetails').dataset.tradeId='';try{sessionStorage.removeItem('tt7_active_trade_id');sessionStorage.removeItem('tt7_active_view');sessionStorage.removeItem('tt7_scroll_y');}catch(_){}await authStatus();}};
 async function refresh(){
   let savedView='live',savedTrade='',savedScroll=0;
   try{savedView=sessionStorage.getItem('tt7_active_view')||localStorage.getItem('tt7_active_view')||'live';savedTrade=sessionStorage.getItem('tt7_active_trade_id')||'';savedScroll=Number(sessionStorage.getItem('tt7_scroll_y')||0)}catch(_){}
@@ -680,7 +695,17 @@ function draftMoveUser(userId,remember){
  try{for(let i=from.length-1;i>=0;i--){
    const key=from.key(i);if(!key?.startsWith(prefix))continue;
    const value=from.getItem(key);
-   if(value!==null){to.setItem(key,value);from.removeItem(key);}
+   if(value!==null){
+     // Vorhandene neuere Entwürfe niemals durch ältere Entwürfe überschreiben.
+     const target=to.getItem(key);
+     let shouldCopy=target===null;
+     if(target!==null){
+       try{shouldCopy=(JSON.parse(value)?.savedAt||0)>(JSON.parse(target)?.savedAt||0)}
+       catch(_){shouldCopy=false}
+     }
+     if(shouldCopy)to.setItem(key,value);
+     if(to.getItem(key)!==null)from.removeItem(key);
+   }
  }}catch(_){}
 }
 let draftTimer=null;let draftOwnerId=null;
@@ -1866,7 +1891,26 @@ $('closeSession').onclick=async()=>{
   if(data?.status!=='closed'||String(data?.session_id)!==String(sessionId))throw new Error('Server hat den Abschluss nicht bestätigt.');
   currentSession=null;renderSession();report('Session erfolgreich abgeschlossen. Du kannst jetzt eine neue Session starten.');showSessionHub();
   await Promise.allSettled([loadCount(),loadSessionTrades(),renderHtfImage()]);
- }catch(err){report('Session konnte nicht abgeschlossen werden: '+err.message,true);}
+ }catch(err){
+  const id=currentSession?.id;
+  if(id){
+   try{
+    const {data:serverSession,error:verifyError}=await client.from('trading_sessions')
+      .select('id,status').eq('id',id).maybeSingle();
+    if(!verifyError&&serverSession?.status==='closed'){
+     currentSession=null;renderSession();showSessionHub();
+     report('Session ist laut Server abgeschlossen. Die Abschlussbestätigung war unterbrochen.');
+     await Promise.allSettled([loadCount(),loadSessionTrades(),renderHtfImage()]);
+     return;
+    }
+    if(!verifyError&&serverSession?.status==='open'){
+     report('Session ist laut Server noch offen: '+(err?.message||'Verbindungsfehler')+' · Bitte erneut prüfen.',true);
+     return;
+    }
+   }catch(_){/* Status bleibt ungeklärt */}
+  }
+  report('Session-Status nicht bestätigt: '+(err?.message||'Verbindungsfehler')+'. Bitte Verbindung prüfen und Session aktualisieren, bevor du erneut abschließt.',true);
+ }
  finally{busy=false;if(currentSession)await refreshSessionFinishChecklist();}
 };
 async function loadAccounts(){
@@ -2263,6 +2307,145 @@ authStatus();
    const fail=lines.filter(x=>x.startsWith('✗')).length;
    $('ttDiagnosticsResult').textContent=lines.join('\n')+'\n'+(fail?fail+' lokale Prüfpunkte fehlgeschlagen.':'Alle lokalen Prüfpunkte bestanden. Keine Aussage zur Serververbindung oder Anmeldung.');
  });
+})();
+</script>
+
+<script id="tt-data-tools-module">
+(function(){
+'use strict';
+const byId=id=>document.getElementById(id);
+const status=byId('ttDataToolsStatus');
+let running=false;
+const tables=[
+ 'trading_sessions','trade_ideas','trades','stop_adjustments','trade_events',
+ 'screenshots','corrective_actions','trade_errors','trade_reviews','playbook_entries',
+ 'trading_accounts','account_groups','account_group_members','trade_account_allocations',
+ 'account_fills','account_trade_results','allocation_change_log','trading_setup_catalog',
+ 'training_countermeasures','training_goals_v7'
+];
+function inform(text,bad=false){status.textContent=text;status.style.color=bad?'#ffb4ad':'';}
+function download(name,blob){
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);
+ try{a.click()}finally{a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+}
+function csvCell(value){
+ let s=value==null?'':typeof value==='object'?JSON.stringify(value):String(value);
+ // CSV-Formelinjektion verhindern, auch wenn nach Leerzeichen oder Tabs eine Formel beginnt.
+ if(typeof value==='string'&&/^[\s]*[=+\-@]/.test(s))s="'"+s;
+ return '"'+s.replace(/"/g,'""')+'"';
+}
+function fileStamp(){
+ const d=new Date(),p=new Intl.DateTimeFormat('en-GB',{
+  timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+ }).formatToParts(d);
+ const v=k=>p.find(x=>x.type===k)?.value||'00';
+ return `${v('year')}-${v('month')}-${v('day')}_${v('hour')}${v('minute')}`;
+}
+async function ensureUser(){
+ const {data,error}=await client.auth.getUser();
+ if(error||!data?.user)throw new Error('Nicht angemeldet. Bitte erneut anmelden.');
+ return data.user;
+}
+async function allRows(table){
+ const size=500,limit=50000,all=[];
+ for(let offset=0;offset<limit;offset+=size){
+  const {data,error}=await client.from(table).select('*').range(offset,offset+size-1);
+  if(error)throw new Error(`${table}: ${error.message}`);
+  if(!Array.isArray(data))throw new Error(`${table}: ungültige Serverantwort`);
+  all.push(...data);
+  if(data.length<size)return all;
+ }
+ // Bei exakt 50.000 Zeilen muss zusätzlich geprüft werden, ob weitere existieren.
+ const {data,error}=await client.from(table).select('id').range(limit,limit);
+ if(error)throw new Error(`${table}: Vollständigkeit nicht prüfbar: ${error.message}`);
+ if(data?.length)throw new Error(`${table}: mehr als ${limit} Datensätze. Kein unvollständiger Export erstellt.`);
+ return all;
+}
+function collectLocalDrafts(ownerId){
+ const prefix=`tt7_draft_v3:${ownerId}:`,latest=new Map();
+ for(const storage of [localStorage,sessionStorage]){
+  try{
+   for(let i=0;i<storage.length;i++){
+    const key=storage.key(i);
+    if(!key?.startsWith(prefix))continue;
+    try{
+     const draft=JSON.parse(storage.getItem(key));
+     if(draft?.version!==1||!draft.tradeId)continue;
+     const old=latest.get(key);
+     if(!old||(Number(draft.savedAt)||0)>(Number(old.savedAt)||0))latest.set(key,draft);
+    }catch(_){}
+   }
+  }catch(_){}
+ }
+ return [...latest.values()];
+}
+async function run(label,callback){
+ if(running)return;
+ running=true;
+ const buttons=[byId('ttBackupJson'),byId('ttExportCsv'),byId('ttServerHealth'),byId('ttVersionCheck')];
+ buttons.forEach(b=>b.disabled=true);
+ try{await callback()}
+ catch(e){inform(`${label} fehlgeschlagen: ${e?.message||'Unbekannter Fehler'}. Es wurde nichts an Supabase geändert.`,true)}
+ finally{running=false;buttons.forEach(b=>b.disabled=false)}
+}
+byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',async()=>{
+ if(location.protocol!=='https:'&&location.hostname!=='localhost')throw new Error('Nur auf der veröffentlichten HTTPS-Seite verfügbar');
+ inform('Prüfe die veröffentlichte GitHub-Datei …');
+ const response=await fetch(location.pathname+'?tt_version_check='+Date.now(),{cache:'no-store',credentials:'same-origin'});
+ if(!response.ok)throw new Error('HTTP '+response.status);
+ const html=await response.text();
+ const match=html.match(/Version\s+(7\.\d+)\s*·\s*Trading\s*&\s*Training/);
+ if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
+ inform(match[1]==='7.30'?'GitHub liefert Version 7.30. Die lokale App ist auf demselben Stand.':
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 7.30. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+}));
+byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
+ const user=await ensureUser(),contents={};
+ for(let i=0;i<tables.length;i++){
+  inform(`Sichere Tabelle ${i+1}/${tables.length}: ${tables[i]} …`);
+  contents[tables[i]]=await allRows(tables[i]);
+ }
+ const {data,error}=await client.auth.getUser();
+ if(error||data?.user?.id!==user.id)throw new Error('Benutzer hat sich während des Exports geändert');
+ if(typeof draftFlush==='function')draftFlush();
+ const drafts=collectLocalDrafts(user.id);
+ const backup={
+  format:'trading-terminator-backup',format_version:1,app_version:'7.30',
+  created_at:new Date().toISOString(),owner_id:user.id,
+  notes:'Read-only Export; Bilddateien selbst nicht enthalten. Lokale Entwürfe sind nur Backup-Daten, keine automatische Importfunktion.',
+  tables:contents,local_drafts:drafts
+ };
+ const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'});
+ download(`trading-terminator-backup_${fileStamp()}.json`,blob);
+ inform(`JSON-Sicherung vorbereitet: ${tables.length} Tabellen, ${Object.values(contents).reduce((n,a)=>n+a.length,0)} Datensätze und ${drafts.length} lokale Trade-Entwürfe. Datei bitte sicher aufbewahren.`);
+}));
+byId('ttExportCsv')?.addEventListener('click',()=>run('CSV-Export',async()=>{
+ const user=await ensureUser();inform('Lade sämtliche Trades …');
+ const rows=await allRows('trades');
+ if((await ensureUser()).id!==user.id)throw new Error('Benutzer während des Exports gewechselt');
+ const columns=['id','session_id','setup_type','instrument','direction','entry_at','exit_at',
+ 'entry_emotion','exit_emotion','exit_reason','realized_pnl_usd','initial_risk_usd',
+ 'execution_grade','rule_deviation','deviation_reason'];
+ const csv='\ufeff'+[columns.map(csvCell).join(';'),...rows.map(row=>columns.map(c=>csvCell(row[c])).join(';'))].join('\r\n');
+ download(`trading-terminator-trades_${fileStamp()}.csv`,new Blob([csv],{type:'text/csv;charset=utf-8'}));
+ inform(`CSV-Datei vorbereitet: ${rows.length} Trades. Kontoergebnisse und Bilder sind nicht Teil dieser Übersicht.`);
+}));
+byId('ttServerHealth')?.addEventListener('click',()=>run('Live-Systemprüfung',async()=>{
+ const user=await ensureUser(),counts={};
+ for(const name of ['trading_sessions','trades','trading_accounts','trade_account_allocations','account_trade_results']){
+  inform(`Prüfe ${name} …`);
+  const {count,error}=await client.from(name).select('*',{count:'exact',head:true});
+  if(error)throw new Error(`${name}: ${error.message}`);
+  counts[name]=count;
+ }
+ const {data:open,error}=await client.from('trading_sessions').select('id,session_date').eq('status','open').limit(10);
+ if(error)throw error;
+ const same=(await client.auth.getUser()).data?.user?.id===user.id;
+ if(!same)throw new Error('Benutzer während der Prüfung gewechselt');
+ inform('Supabase erreichbar · '+Object.entries(counts).map(([k,v])=>`${k}: ${v}`).join(' · ')+
+  ` · Offene Sessions: ${open.length}${open.length>1?' (Achtung: mehr als eine!)':''}. Read-only; kein Beweis für vollständige RLS-Sicherheit.`);
+}));
 })();
 </script>
 </body></html>
