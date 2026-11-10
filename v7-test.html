@@ -344,12 +344,12 @@ body[data-tt-theme] .session-end-button:disabled{background:#503b42!important;co
 .session-finish-warning{color:#ffc078;font-weight:800}
 .session-finish-ready{color:#9df1c8;font-weight:800}
 @media(max-width:420px){.session-finish-trade{flex-direction:column;align-items:stretch}.session-finish-trade button{width:100%}}
-</style><style id="tt716-login-ux">.tt-remember{display:flex;align-items:center;gap:12px;padding:12px 0;font-weight:700}.tt-remember input{width:24px;height:24px;flex:0 0 auto}#otpCode{font-size:26px;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums}#rememberHint{margin:0 0 12px}#otpPanel{margin:14px 0}</style></head>
+</style><style id="tt716-login-ux">.tt-remember{display:flex;align-items:center;gap:12px;padding:12px 0;font-weight:700}.tt-remember input{width:24px;height:24px;flex:0 0 auto}#otpCode{font-size:26px;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums}#rememberHint{margin:0 0 12px}#otpPanel{margin:14px 0}</style><style id="tt717-clarity">body[data-tt-theme] .tt-old-session-banner{background:#713527!important;border:3px solid #ffae71!important;color:#fff5e8!important;box-shadow:0 0 0 2px #d86841!important}body[data-tt-theme] .tt-old-session-banner button{background:#f7b267!important;color:#251408!important;font-weight:850!important;min-height:54px!important}body[data-tt-theme] .session-end-button:focus-visible{outline:4px solid #ffdd6a!important;outline-offset:4px}</style></head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.16 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.18 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live">⌂ Dashboard</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="analytics">▥ Analyse</button><button data-view="settings">⚙ Settings</button></div></nav>
-<section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Auf diesem Gerät angemeldet bleiben, auch nach dem Schließen der App.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>6-stelliger Anmeldecode<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="123456"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bei sechs Ziffern wird die Anmeldung automatisch geprüft. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Supabase-Vorlage „Magic Link“: Betreff <code>{{ .Token }} – Trading Terminator Anmeldecode</code> und denselben Code im Nachrichtentext. iOS-Codevorschläge sind vom Gerät und Mail-Anbieter abhängig.</small></section>
+<section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>6-stelliger Anmeldecode<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="123456"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bei sechs Ziffern wird die Anmeldung automatisch geprüft. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Supabase-Vorlage „Magic Link“: Betreff <code>{{ .Token }} – Trading Terminator Anmeldecode</code> und denselben Code im Nachrichtentext. iOS-Codevorschläge sind vom Gerät und Mail-Anbieter abhängig.</small></section>
 <div id="ttToast" role="status" aria-live="polite"></div><div id="ttConnection" class="tt-connection" role="status" aria-live="polite" hidden></div><div id="app" class="hidden">
 <section id="liveView"><div class="page-intro"><h2>Dein Trading-Cockpit</h2><p>Aktuelle Session · offene Trades · nächster Trainingsfokus</p></div><div id="sessionHub" class="session-hub"><div class="session-hub-heading"><span class="eyebrow">01 · VORBEREITUNG</span><h2>Session & HTF</h2><p>Eine Session ist dein HTF-Kontext für mehrere Trades. Erst Session starten und analysieren, danach beliebig viele Handelsentscheidungen dieser Session zuordnen.</p><div id="sessionHubState" class="notice">Session-Status wird geladen …</div></div></div><div class="dashboard-quick"><button type="button" id="quickEntry" class="quick-entry">＋ Trade starten <span>›</span></button><button type="button" id="quickTrades" class="quick-secondary">● Offene Trades <span id="openTradeBadge"></span></button></div><div class="grid"><div class="stat"><small>Session</small><strong id="sessionState">Keine</strong></div><div class="stat"><small>Ausgeführte Entscheidungen</small><strong id="tradeCount">0 / 5</strong></div></div>
 <details class="card dev-checklist" id="qualityChecklist"><summary><strong>V7 Testmodus · 12 Prüfungen</strong></summary>
@@ -380,7 +380,7 @@ Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</tex
 <script>
 'use strict';
 // Auth-Persistenz: lokal bei „Angemeldet bleiben“, sonst nur für den aktuellen Browser-/PWA-Kontext.
-const TT_REMEMBER_KEY='tt7_remember_login_v716';
+const TT_REMEMBER_KEY='tt7_remember_login_v716'; // Präferenz bleibt bei Updates erhalten
 const TT_AUTH_KEY='sb-hogrdcqblpcrqgdtsvjv-auth-token';
 function ttRememberPref(){try{return localStorage.getItem(TT_REMEMBER_KEY)!=='false';}catch(_){return true;}}
 let ttRemember=ttRememberPref();
@@ -433,7 +433,7 @@ document.addEventListener('click',e=>{const btn=e.target.closest('.direction-cho
 function syncDirectionButtons(){document.querySelectorAll('.direction-choice').forEach(b=>{const active=b.dataset.direction===$('direction').value;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{showView(b.dataset.view);if(b.dataset.view==='decision'){entrySessionExpanded=false;syncEntrySession();}if(b.dataset.view==='settings'){renderSetupManager();renderEmotionManager();}if(b.dataset.view==='training')loadTraining();if(b.dataset.view==='analytics')loadAnalytics();window.scrollTo({top:0,behavior:'smooth'});});
 document.addEventListener('click',e=>{if(e.target?.id==='goAccounts')showView('accounts');});
-function goToTradeEntry(){renderDecision();syncDirectionButtons();showView('decision');entrySessionExpanded=false;syncEntrySession();$('decisionView').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('setupCards').querySelector('button')?.focus({preventScroll:true}),150);}
+function goToTradeEntry(){if(currentSession&&currentSession.session_date!==localDate()){showSessionHub();message('Alte Session zuerst abschließen. Neue Trades sind hier gesperrt.',true);return;}renderDecision();syncDirectionButtons();showView('decision');entrySessionExpanded=false;syncEntrySession();$('decisionView').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('setupCards').querySelector('button')?.focus({preventScroll:true}),150);}
 $('tradeOpenTab').addEventListener('click',()=>{showView('journal');$('sessionTrades').scrollIntoView({behavior:'smooth',block:'start'});});
 $('journalEntryTab').addEventListener('click',goToTradeEntry);
 $('tradeNewTab').addEventListener('click',goToTradeEntry);
@@ -446,11 +446,11 @@ $('journalWorkspace').appendChild($('sessionTrades'));
 const qc=$('qualityChecklist');if(qc)$('settingsView').appendChild(qc);
 
 // Session is a first-class workspace, not hidden below the dashboard analytics.
-['noSession','sessionSetup','activeSession','htfScreenshot','tradeStartAfterHtf','sessionFinishPanel'].forEach(id=>{const el=$(id);if(el)$('sessionHub').appendChild(el)});
+['noSession','sessionSetup','activeSession','htfScreenshot','tradeStartAfterHtf'].forEach(id=>{const el=$(id);if(el)$('sessionHub').appendChild(el)});$('sessionHub').appendChild($('sessionFinishPanel'));
 $('entrySessionMount').appendChild($('sessionHub'));
 let entrySessionExpanded=false;
 function sessionReady(){return !!(currentSession && currentSession.session_date===localDate() && (String(currentSession.htf_context?.notes||'').trim() && Object.values(currentSession.htf_context?.preflight_checks||{}).every(Boolean) && Object.keys(currentSession.htf_context?.preflight_checks||{}).length>=4));}
-function syncEntrySession(){const ready=sessionReady();$('entrySessionTitle').textContent=currentSession?'Session '+currentSession.session_date:'1 · Session starten';$('entrySessionSub').textContent=currentSession&&currentSession.session_date!==localDate()?'ALTE SESSION – zuerst abschließen':ready?'HTF bereit · '+currentSession.session_date:currentSession?'HTF noch offen':'Vor dem ersten Trade konfigurieren';const today=localDate();const stale=!!currentSession&&currentSession.session_date!==today;const open=!ready||entrySessionExpanded||stale;$('sessionHub').classList.toggle('hidden',!open);$('toggleEntrySession').textContent=stale?'Alte Session öffnen →':open?'Zur Session ↓':'Session / HTF öffnen';$('toggleEntrySession').disabled=false;}
+function syncEntrySession(){const ready=sessionReady();$('entrySessionTitle').textContent=currentSession?'Session '+currentSession.session_date:'1 · Session starten';$('entrySessionSub').textContent=currentSession&&currentSession.session_date!==localDate()?'⚠ ALTE SESSION – zuerst abschließen':ready?'HTF bereit · '+currentSession.session_date:currentSession?'HTF noch offen':'Vor dem ersten Trade konfigurieren';const today=localDate();const stale=!!currentSession&&currentSession.session_date!==today;const open=!ready||entrySessionExpanded||stale;$('entrySessionBar').classList.toggle('tt-old-session-banner',stale);$('sessionHub').classList.toggle('hidden',!open);$('toggleEntrySession').textContent=stale?'Alte Session öffnen →':open?'Zur Session ↓':'Session / HTF öffnen';$('toggleEntrySession').disabled=false;}
 $('toggleEntrySession').addEventListener('click',()=>{entrySessionExpanded=true;syncEntrySession();requestAnimationFrame(()=>$('sessionHub').scrollIntoView({behavior:'smooth',block:'start'}));});
 
 function showSessionHub(){showView('decision');entrySessionExpanded=true;syncEntrySession();requestAnimationFrame(()=>$('entrySessionMount').scrollIntoView({behavior:'smooth',block:'start'}));}
@@ -465,7 +465,7 @@ $('ttCopyOtpSubject')?.addEventListener('click',()=>navigator.clipboard?.writeTe
 $('ttCopyOtpBody')?.addEventListener('click',()=>navigator.clipboard?.writeText($('ttOtpBody').value).then(()=>message('Nachrichtentext kopiert.')).catch(()=>message('Bitte Nachrichtentext manuell kopieren.',true)));
 $('rememberLogin').addEventListener('change',e=>{
  ttSetRemember(e.target.checked);
- $('rememberHint').textContent=ttRemember?'Auf diesem Gerät angemeldet bleiben, auch nach dem Schließen der App.':'Nur in diesem App-Fenster angemeldet bleiben. Nach dem vollständigen Beenden kann eine erneute Anmeldung nötig sein.';
+ $('rememberHint').textContent=ttRemember?'Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.':'Nur in diesem App-Fenster angemeldet bleiben. Nach dem vollständigen Beenden kann eine erneute Anmeldung nötig sein.';
 });
 let ttOtpSubmitting=false;
 $('otpCode').addEventListener('input',()=>{
@@ -514,7 +514,7 @@ async function refresh(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:Math.max(0,savedScroll),behavior:'instant'})));
 }
 async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error){message('Session laden: '+error.message,true);return}currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();}
-function renderSession(){syncEntrySession();$('sessionHubState').classList.toggle('stale-session',!!currentSession&&currentSession.session_date!==localDate());$('sessionHubState').textContent=currentSession?(currentSession.session_date!==localDate()?'⚠ ALTE SESSION '+currentSession.session_date+' – vor neuer Session abschließen':'● Aktive Session: '+currentSession.session_date+' · HTF gilt für alle zugehörigen Trades'):'○ Keine offene Session · Neue Session starten und HTF vorbereiten';$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionFinishPanel').classList.toggle('hidden',!currentSession);if(currentSession)refreshSessionFinishChecklist();$('sessionState').textContent=currentSession?(currentSession.session_date===localDate()?'Heute · offen':'Alt · '+currentSession.session_date):'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';setEmotion($('sessionMoodOptions'),currentSession?.htf_context?.mental_check?.mood||'');$('sessionUrge').value=currentSession?.htf_context?.mental_check?.urge||'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
+function renderSession(){syncEntrySession();$('sessionHubState').classList.toggle('stale-session',!!currentSession&&currentSession.session_date!==localDate());$('sessionHubState').textContent=currentSession?(currentSession.session_date!==localDate()?'⚠ ALTE SESSION '+currentSession.session_date+' – vor neuer Session abschließen':'● Aktive Session: '+currentSession.session_date+' · HTF gilt für alle zugehörigen Trades'):'○ Keine offene Session · Neue Session starten und HTF vorbereiten';$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionFinishPanel').classList.toggle('hidden',!currentSession);if(currentSession)refreshSessionFinishChecklist();else{$('sessionFinishChecklist').textContent='Keine aktive Session.';$('closeSession').disabled=true;}$('sessionState').textContent=currentSession?(currentSession.session_date===localDate()?'Heute · offen':'Alt · '+currentSession.session_date):'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';setEmotion($('sessionMoodOptions'),currentSession?.htf_context?.mental_check?.mood||'');$('sessionUrge').value=currentSession?.htf_context?.mental_check?.urge||'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
 document.querySelectorAll('.htf-check').forEach(el=>{el.checked=!!checks[el.dataset.check]});
 updateSessionCheckStatus();
 const selection=currentSession?.htf_context?.selected_accounts||[];$('sessionAccountsSummary').textContent=selection.length?'Für neue Trades: '+selection.map(x=>{const a=accounts.find(a=>a.id===x.account_id);return (a?.account_name||'Konto')+' · '+x.role+' · '+x.instrument+' × '+x.planned_quantity}).join(' | '):'Noch keine Session-Kontenauswahl gespeichert.';}
@@ -1780,7 +1780,7 @@ async function refreshSessionFinishChecklist(){
    .select('id,setup_type,instrument,direction,entry_at')
    .eq('session_id',sessionId).is('exit_at',null).order('entry_at',{ascending:true}).limit(101);
  if(seq!==finishRequestSeq||currentSession?.id!==sessionId)return;
- if(error){el.textContent='Prüfung fehlgeschlagen: '+error.message;return;}
+ if(error){el.textContent='Prüfung fehlgeschlagen: '+error.message+' · Session-Abschluss gesperrt.';return;}
  const open=data||[];
  el.replaceChildren();
  const headline=document.createElement('p');
@@ -1815,13 +1815,11 @@ $('closeSession').onclick=async()=>{
   if(openError)throw openError;
   if(count>0){report(`${count} offene Trades. Bitte zuerst abschließen.`,true);await refreshSessionFinishChecklist();return;}
   if(!confirm('Session '+currentSession.session_date+' endgültig abschließen?'))return;
-  const {data,error}=await client.from('trading_sessions')
-   .update({status:'closed',closed_at:new Date().toISOString()})
-   .eq('id',sessionId).eq('status','open').select('id');
+  const {data,error}=await client.rpc('close_session_safely_v718',{p_session_id:sessionId});
   if(error)throw error;
-  if(!data?.length)throw new Error('Session wurde zwischenzeitlich geändert. Bitte neu laden.');
-  currentSession=null;renderSession();await loadCount();await loadSessionTrades();await renderHtfImage();
-  report('Session erfolgreich abgeschlossen.');
+  if(data?.status!=='closed'||data?.session_id!==sessionId)throw new Error('Server hat den Abschluss nicht bestätigt.');
+  currentSession=null;renderSession();report('Session erfolgreich abgeschlossen. Du kannst jetzt eine neue Session starten.');showSessionHub();
+  await Promise.allSettled([loadCount(),loadSessionTrades(),renderHtfImage()]);
  }catch(err){report('Session konnte nicht abgeschlossen werden: '+err.message,true);}
  finally{busy=false;if(currentSession)await refreshSessionFinishChecklist();}
 };
@@ -2201,7 +2199,7 @@ client.auth.onAuthStateChange(()=>{setTimeout(authStatus,0)});authStatus();
  $('ttRunDiagnostics')?.addEventListener('click',()=>{
    const lines=[];
    const check=(label,ok)=>lines.push((ok?'✓ ':'✗ ')+label);
-   const required=['app','tabs','decisionView','journalView','tradeDetails','settingsView','ttThemeSelect','ttLayoutSelect','logout','recordEntry','trainingGoal','ttConnection'];
+   const required=['app','tabs','decisionView','journalView','tradeDetails','settingsView','ttThemeSelect','ttLayoutSelect','logout','recordEntry','trainingGoal','ttConnection','sessionFinishPanel','sessionFinishChecklist','otpCode','rememberLogin'];
    check('Kernoberfläche vorhanden',required.every(id=>!!$(id)));
    check('Eindeutige HTML-IDs',(()=>{const ids=[...document.querySelectorAll('[id]')].map(x=>x.id);return ids.length===new Set(ids).size})());
    check('Farbschema aktiv', ['original','graphite','contrast'].includes(document.body.dataset.ttTheme));
@@ -2211,7 +2209,7 @@ client.auth.onAuthStateChange(()=>{setTimeout(authStatus,0)});authStatus();
    check('Browser unterstützt lokale Speicherung',(()=>{try{const k='tt7_diagnostic_probe';localStorage.setItem(k,'1');const ok=localStorage.getItem(k)==='1';localStorage.removeItem(k);return ok}catch(_){return false}})());
    check('Sicherer Kontext für Bild-APIs',window.isSecureContext===true);
    const fail=lines.filter(x=>x.startsWith('✗')).length;
-   $('ttDiagnosticsResult').textContent=lines.join('\n')+'\n'+(fail?fail+' lokale Prüfpunkte fehlgeschlagen.':'Alle lokalen Prüfpunkte bestanden. Keine Aussage zur Serververbindung.');
+   $('ttDiagnosticsResult').textContent=lines.join('\n')+'\n'+(fail?fail+' lokale Prüfpunkte fehlgeschlagen.':'Alle lokalen Prüfpunkte bestanden. Keine Aussage zur Serververbindung oder Anmeldung.');
  });
 })();
 </script>
