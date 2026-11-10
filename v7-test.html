@@ -352,7 +352,7 @@ body[data-tt-theme] .session-end-button:disabled{background:#503b42!important;co
 @media(max-width:420px){.session-finish-trade{flex-direction:column;align-items:stretch}.session-finish-trade button{width:100%}}
 </style><style id="tt716-login-ux">.tt-remember{display:flex;align-items:center;gap:12px;padding:12px 0;font-weight:700}.tt-remember input{width:24px;height:24px;flex:0 0 auto}#otpCode{font-size:26px;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums}#rememberHint{margin:0 0 12px}#otpPanel{margin:14px 0}</style><style id="tt717-clarity">body[data-tt-theme] .tt-old-session-banner{background:#713527!important;border:3px solid #ffae71!important;color:#fff5e8!important;box-shadow:0 0 0 2px #d86841!important}body[data-tt-theme] .tt-old-session-banner button{background:#f7b267!important;color:#251408!important;font-weight:850!important;min-height:54px!important}body[data-tt-theme] .session-end-button:focus-visible{outline:4px solid #ffdd6a!important;outline-offset:4px}</style></head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.31 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.32 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live">⌂ Dashboard</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="analytics">▥ Analyse</button><button data-view="settings">⚙ Settings</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Supabase-Vorlage „Magic link or OTP“: Im Nachrichtentext <code>{{ .Token }}</code> verwenden. iOS-Codevorschläge sind vom Gerät und Mail-Anbieter abhängig.</small></section>
@@ -624,15 +624,15 @@ function riskCard(a,names,closed,history=[]){
     <strong>${escapeHtml(names.get(a.account_id)||'Unbekanntes Konto')}</strong>
     <div class="muted">${escapeHtml(a.role)} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)} · ${recorded?'Initialrisiko: '+usd(a.initial_risk_usd)+' USD':'Initialrisiko: nicht erfasst'}</div>
     <label>Ursprünglicher SL-Abstand (Ticks)
-      <input class="risk-ticks" type="number" inputmode="numeric" min="1" step="1" placeholder="z. B. 40" value="${ticks}" ${closed?'disabled':''}>
+      <input class="risk-ticks" type="number" inputmode="numeric" min="1" step="1" placeholder="z. B. 40" value="${ticks}" ${(closed||recorded)?'disabled':''}>
     </label>
     <div class="muted">Berechnetes Risiko: <strong class="risk-calc">${a.calculated_risk_usd==null?'–':usd(a.calculated_risk_usd)+' USD'}</strong></div>
-    <label style="margin-top:12px"><input class="risk-override" type="checkbox" style="display:inline;width:auto;margin-right:8px" ${override?'checked':''} ${closed?'disabled':''}>Risiko manuell korrigieren</label>
+    <label style="margin-top:12px"><input class="risk-override" type="checkbox" style="display:inline;width:auto;margin-right:8px" ${override?'checked':''} ${(closed||recorded)?'disabled':''}>Risiko manuell korrigieren</label>
     <label>Maßgebliches Initialrisiko (USD)
-      <input class="risk-usd" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="Wird berechnet" value="${recorded?escapeHtml(a.initial_risk_usd):''}" ${(!override||closed)?'disabled':''}>
+      <input class="risk-usd" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="Wird berechnet" value="${recorded?escapeHtml(a.initial_risk_usd):''}" ${(!override||closed||recorded)?'disabled':''}>
     </label>
-    ${closed?'<p class="muted">Trade abgeschlossen – Risikobearbeitung deaktiviert.</p>':`<button type="button" class="secondary wide save-risk" data-id="${a.id}" hidden>Risiko speichern</button>`}
-    <small class="risk-note muted">${recorded?'Bereits gespeicherte Werte: Änderungen werden im Audit-Log protokolliert.':'Noch nicht gespeichert.'}</small>
+    ${closed||recorded?'<p class="muted">Ursprüngliches Risiko gespeichert und für die R-Auswertung gesperrt.</p>':`<button type="button" class="secondary wide save-risk" data-id="${a.id}" hidden>Fehlendes Alt-Risiko einmalig speichern</button>`}
+    <small class="risk-note muted">${recorded?'Initialrisiko bleibt unverändert. SL-Anpassungen separat dokumentieren.':'Noch nicht gespeichert.'}</small>
     <div class="stop-panel" style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px" data-allocation-id="${a.id}">
       <label class="stop-toggle-label"><input type="checkbox" class="stop-toggle" style="display:inline;width:auto;margin-right:10px"  ${closed?'disabled':''}>SL-Verschiebung erfassen <span class="stop-toggle-hint">Antippen, um neuen SL und Grund einzugeben</span></label>
       <div class="stop-fields" hidden>
@@ -848,7 +848,7 @@ async function openTradeDetails(trade){
 <label><input type="checkbox" data-analysis="delta"> Delta</label>
 <label><input type="checkbox" data-analysis="tape"> Tape / DOM</label>
 <label><input type="checkbox" data-analysis="liquidity"> Liquidität / Absorption</label>
-</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide" hidden>Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><div class="image-dropzone" tabindex="0" role="group" aria-label="LTF-Bilder ablegen oder mit Strg+V einfügen"><strong>Bilder hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bilder auswählen · max. 10 gleichzeitig</span><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><span class="image-pick-status" role="status">Noch keine neuen Bilder ausgewählt.</span></div><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account intratrade-emotion"><h3>Emotion während des Trades · freiwillig</h3><div class="emotion-options" data-emotion-group="duringTradeEmotion"><button type="button" data-value="calm">Ruhig</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="uncertain">Unsicherheit</button></div><div class="during-feedback muted" role="status"></div></div><h3>SL-Abstand je Konto (einmal erfassen)</h3>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<details class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
+</div><label>Entry-These / Beobachtung<textarea class="analysis-note" rows="2" placeholder="Warum ist der Trade valide?"></textarea></label><button type="button" class="analysis-save secondary wide" hidden>Analyse speichern</button><div class="analysis-feedback muted" role="status"></div></div><div class="account trade-images"><h3>LTF-Screenshots</h3><p class="muted">Mehrere Bilder pro Trade. Privat gespeichert und auf PC/iPhone verfügbar.</p><div class="image-dropzone" tabindex="0" role="group" aria-label="LTF-Bilder ablegen oder mit Strg+V einfügen"><strong>Bilder hier ablegen oder Strg+V drücken</strong><span class="muted">Alternativ Bilder auswählen · max. 10 gleichzeitig</span><input type="file" class="ltf-file" accept="image/png,image/jpeg,image/webp" multiple><span class="image-pick-status" role="status">Noch keine neuen Bilder ausgewählt.</span></div><button type="button" class="ltf-upload secondary wide">Bilder hinzufügen</button><div class="ltf-feedback muted"></div><div class="ltf-gallery">Bilder werden geladen …</div></div><div class="account intratrade-emotion"><h3>Emotion während des Trades · freiwillig</h3><div class="emotion-options" data-emotion-group="duringTradeEmotion"><button type="button" data-value="calm">Ruhig</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="uncertain">Unsicherheit</button></div><div class="during-feedback muted" role="status"></div></div><h3>Initialrisiko & SL-Verlauf</h3><p class="muted">Bei neuen Trades bereits beim Entry gespeichert. Hier nur SL-Verschiebungen; alte Trades ohne Risiko einmalig ergänzen.</p>${(data||[]).length>1?`<label>Direkt zum Konto springen<select id="jumpAccount"><option value="">Konto auswählen</option>${(data||[]).map(a=>`<option value="${escapeHtml(a.id)}">${escapeHtml(names.get(a.account_id)||'Konto')}</option>`).join('')}</select></label>`:''}${(data||[]).map(a=>riskCard(a,names,!!trade.exit_at,histories.get(a.id)||[])).join('')||'<p>Keine Kontozuordnungen gefunden.</p>'}${exitSection}<details class="account review-editor" data-trade-id="${escapeHtml(trade.id)}">
 <summary><strong>Review nach dem Trade · optional öffnen</strong></summary><h3>Trade-Review · unabhängig vom P&L</h3>
 <p class="muted">Auch nach dem Exit ergänzbar. A+ bedeutet gute Ausführung, nicht zwingend Gewinn.</p>
 <details class="saved-exit-emotion"><summary>Gespeicherte Exit-Emotion anzeigen</summary><div class="emotion-options" data-emotion-group="exitEmotion"><button type="button" data-value="disciplined">Diszipliniert</button><button type="button" data-value="fear">Angst / zu früh</button><button type="button" data-value="greed">Gier / zu lange</button><button type="button" data-value="stress">Stress / Druck</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button></div></details><label>Ausführungsqualität<select class="review-grade"><option value="">Noch nicht bewertet</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>unrated</option></select></label>
@@ -2149,7 +2149,17 @@ $('createSetup').addEventListener('click',async()=>{
  finally{setupCatalogBusy=false;$('createSetup').disabled=false;}
 });
 
-function renderDecision(){const chosen=currentSession?.htf_context?.selected_accounts||[];$('allocationList').innerHTML=chosen.length?chosen.map(v=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label><input style="display:inline;width:auto;margin-right:8px" type="checkbox" class="acct-check" data-id="${a.id}" checked>${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="acct-role" data-id="${a.id}"><option value="follower" ${v.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="acct-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===v.instrument?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="acct-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity)}"></label></div>`}).join(''):'<p class="notice">Wähle zuerst im Dashboard die Konten für diese Session aus.</p>';}
+function renderDecision(){const chosen=currentSession?.htf_context?.selected_accounts||[];$('allocationList').innerHTML=chosen.length?chosen.map(v=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label><input style="display:inline;width:auto;margin-right:8px" type="checkbox" class="acct-check" data-id="${a.id}" checked>${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="acct-role" data-id="${a.id}"><option value="follower" ${v.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="acct-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===v.instrument?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="acct-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity)}"></label><label>Ursprünglicher SL-Abstand (Ticks) · Pflicht<input class="acct-sl-ticks" data-id="${a.id}" type="number" inputmode="numeric" min="1" max="100000" step="1" placeholder="z. B. 40" required></label><p class="muted acct-risk-preview" data-id="${a.id}">Initialrisiko: SL-Ticks eingeben</p></div>`}).join(''):'<p class="notice">Wähle zuerst im Dashboard die Konten für diese Session aus.</p>';}
+function updateEntryRiskPreview(){
+ document.querySelectorAll('#allocationList .acct-check').forEach(c=>{
+  const panel=c.closest('.account');
+  const t=panel.querySelector('.acct-sl-ticks'),qty=panel.querySelector('.acct-qty'),instrument=panel.querySelector('.acct-instrument'),out=panel.querySelector('.acct-risk-preview');
+  const ticks=Number(t.value),quantity=Number(qty.value),tickValue=tickValues[instrument.value];
+  out.textContent=!c.checked?'Konto nicht ausgewählt':(t.value.trim()&&Number.isSafeInteger(ticks)&&ticks>0&&ticks<=100000&&Number.isFinite(quantity)&&quantity>0)?'Initialrisiko: '+usd(riskRound(ticks*quantity*tickValue))+' USD · '+ticks+' Ticks × '+quantity+' '+instrument.value:'Initialrisiko: gültigen SL in ganzen Ticks eingeben';
+ });
+}
+$('allocationList').addEventListener('input',updateEntryRiskPreview);
+$('allocationList').addEventListener('change',updateEntryRiskPreview);
 $('recordEntry').onclick=async()=>{
   if(busy)return;
   if(!currentSession){message('Bitte zuerst eine Session starten.',true);return}if(currentSession.session_date!==localDate()){message('Die offene Session stammt vom '+currentSession.session_date+'. Bitte zuerst abschließen und eine aktuelle Session erstellen.',true);showSessionHub();return}
@@ -2164,11 +2174,14 @@ $('recordEntry').onclick=async()=>{
       account_id:id,
       role:document.querySelector(`.acct-role[data-id="${id}"]`).value,
       instrument:document.querySelector(`.acct-instrument[data-id="${id}"]`).value,
-      planned_quantity:Number(document.querySelector(`.acct-qty[data-id="${id}"]`).value)
+      planned_quantity:Number(document.querySelector(`.acct-qty[data-id="${id}"]`).value),
+      initial_sl_ticks:Number(document.querySelector(`.acct-sl-ticks[data-id="${id}"]`).value),
+      sl_input_raw:document.querySelector(`.acct-sl-ticks[data-id="${id}"]`).value.trim()
     };
   });
   if(!selected.length){message('Mindestens ein Konto auswählen.',true);return}
   if(selected.some(a=>!Number.isFinite(a.planned_quantity)||a.planned_quantity<=0)){message('Kontraktzahl muss größer als 0 sein.',true);return}
+  if(selected.some(a=>!/^\d+$/.test(a.sl_input_raw)||!Number.isSafeInteger(a.initial_sl_ticks)||a.initial_sl_ticks<1||a.initial_sl_ticks>100000)){message('Bitte vor dem Entry für jedes ausgewählte Konto den ursprünglichen SL in ganzen Ticks erfassen.',true);return}
   if(selected.filter(a=>a.role==='leader').length!==1){message('Genau ein ausgewähltes Konto muss Leader sein.',true);return}
   if(tradeCount>=5&&!confirm('Warnung: Bereits '+tradeCount+' Entscheidungen in dieser Session. Trotzdem dokumentieren?'))return;
   const entryEmotion=selectedEmotion($('entryEmotionOptions'));
@@ -2177,19 +2190,19 @@ $('recordEntry').onclick=async()=>{
   $('recordEntry').disabled=true;
   try{
     if(!currentSession || currentSession.session_date!==localDate() || !sessionReady())throw new Error('Nur die heutige vorbereitete Session darf Trades eröffnen.');
-    const {data,error}=await client.rpc('create_trade_with_allocations_v7',{
+    const {data,error}=await client.rpc('create_trade_with_risk_v732',{
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,
       p_direction:$('direction').value,
-      p_allocations:selected,
+      p_allocations:selected.map(({sl_input_raw,...a})=>a),
       p_entry_emotion:entryEmotion||'unreported'
     });
     if(error)throw error;
     if(!data)throw new Error('Keine Trade-ID von der Datenbank zurückgegeben. Bitte vor erneutem Speichern die Trade-Liste prüfen.');
     await loadCount();
     await loadSessionTrades();
-    message('Entry mit Emotion atomar gespeichert: '+selected.length+' Kontozuordnung(en).');
+    message('Entry einschließlich Initial-SL und USD-Risiko atomar gespeichert: '+selected.length+' Konto/Konten.');
     setEmotion($('entryEmotionOptions'),'');updateEntryEmotionWarning();showView('journal');const createdId=typeof data==='string'?data:(data?.trade_id||data?.id||data?.trade?.id||'');const newTrade=sessionTrades.find(t=>t.id===createdId)||(createdId?null:sessionTrades.find(t=>!t.exit_at));if(newTrade){await openTradeDetails(newTrade);$('tradeDetails').scrollIntoView({behavior:'smooth',block:'start'});}else message('Entry gespeichert. Öffne ihn unter Trades.',false);
   }catch(e){
     message('Speichern nicht bestätigt: '+e.message+'\nBei Netzwerkfehlern vor einem erneuten Versuch bitte die Trades prüfen, um doppelte Entries zu vermeiden.',true);
@@ -2398,8 +2411,8 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const html=await response.text();
  const match=html.match(/Version\s+(7\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
- inform(match[1]==='7.31'?'GitHub liefert Version 7.31. Die lokale App ist auf demselben Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 7.31. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+ inform(match[1]==='7.31'?'GitHub liefert Version 7.32. Die lokale App ist auf demselben Stand.':
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 7.32. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser(),contents={};
