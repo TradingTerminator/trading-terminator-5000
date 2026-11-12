@@ -1,0 +1,16 @@
+# V7.38 – knappe Oberfläche und geschlossene Lernkette
+
+- Aktuelle Uhrzeit im Cockpit; heutige Zeitstempel als Uhrzeit mit Sekunden. Ältere Einträge behalten ihr Datum. Keine wiederholten Berlin-/MEZ-/MESZ-Angaben. Intern bleiben Tagesgrenzen und Umrechnung unverändert Europe/Berlin.
+- Wiederholte Hinweise und nicht mehr wirksame alte Emotionsbeschriftungs-Einstellungen aus dem Arbeitsablauf entfernt/ausgeblendet. Die einmalige Kennzeichnung als Journal bleibt bestehen. Keine historischen Daten gelöscht.
+- Session-Kontext und Vorbereitung werden in einem Schritt gespeichert und führen bei vollständiger Vorbereitung direkt zur Trade-Eingabe. Bildauswahl bleibt davor erreichbar, keine zweite Weiter-Schaltfläche nötig.
+- SL-Änderung und Trade-Abschluss benötigen nach der expliziten Speicheraktion keine zweite identische Bestätigung. Eingabeprüfung, Risikoausnahmen, Speicherkonflikte, Datenlöschungen und bewusster Austausch eines aktiven Trainingsfokus behalten ihre Schutzabfragen.
+- Fehler/Gegenmaßnahme im vollständigen Review speichern und genau diese gespeicherte Maßnahme als Trainingsfokus wählen: ein zusammenhängender Bedienvorgang. Fehlende Regelprüfung, Ausführungsqualität oder Trainingsbewertung stoppen vor dem Schreiben mit gezielter Rückmeldung. Bewusster Fokuswechsel bleibt erhalten; keine automatische Wahl nach P&L.
+- Fehlerhafte Sichtbarkeit des geladenen Fokus behoben. Die gewählte Regel steht vor dem nächsten Trade im Cockpit und Entry. Die beim Entry festgehaltene Regel steht im Trade; spätere Fokuswechsel ändern sie nicht.
+- Trainings- und Analysefälle führen direkt in denselben Journal-Review statt in einen zweiten Detaildialog. Rückweg führt zur ursprünglichen Auswertung.
+- Bei teilweiser/nicht erfolgter Umsetzung fragt der vollständige Review nach dem konkreten Hindernis. Ohne passende Gelegenheit ist kein unnötiges Erklärungspflichtfeld nötig. Unvollständige Entwürfe bleiben speicherbar. Umsetzung und P&L bleiben getrennt; kein behaupteter Wirksamkeitsnachweis.
+- Setup-Lexikon liest tatsächliche Beschreibungen aus dem geladenen Katalog. Ein Zugriff auf die nicht vorhandene window-Eigenschaft hatte den brauchbaren Inhalt durch Platzhalter ersetzt.
+- Unabhängige Leseschritte und Anzeigeaktualisierungen laufen parallel; nach bestätigter Review-Speicherung blockiert die Neuberechnung anderer Ansichten nicht den nächsten Schritt. Keine ungespeicherten Journaldaten werden im Hintergrund überschrieben.
+
+Validierung: 68 Node-/DOM-/Gatewaytests und 6 Python-Archivtests (74 insgesamt). Neue Prüfungen: knappe Zeitdarstellung, sichtbarer Fokus, Speichern vor Fokusübernahme mit exakter Quellenzuordnung, unbewertete Trainingsumsetzung, bedingte Erklärung, direkter Review samt Rückweg, echte Setup-Beschreibungen und vollständige Validierung weiterer offener Fehler vor der Fokusübernahme. Syntax, CSP, SRI und Release-Dateihashes geprüft. Keine Datenbankänderung.
+
+Die Tests verwenden für die Oberfläche eine nachgebildete Datenanbindung. Reale iPhone-Touch-/Tastatur-/Scrollbedienung und kompletter angemeldeter Ablauf sind weiterhin praktisch zu bestätigen. Bestehende offene Restore-/Sicherheitsprüfungen sind durch diesen Umbau nicht erledigt. Ein besser verknüpfter Ablauf garantiert keine messbare Lernsteigerung; diese muss anhand dokumentierter Ausführung und Umsetzung geprüft werden.
