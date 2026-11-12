@@ -1191,8 +1191,8 @@ $('tradeDetails').addEventListener('click',async e=>{
  finally{busy=false;btn.disabled=false;}
 });
 const REVIEW_LABELS={fomo:'FOMO',overtrading:'Overtrading',poor_entry:'Schlechter Entry',stop_management:'SL-Verhalten',early_exit:'Zu früher Exit',plan_violation:'Planabweichung',other:'Sonstiges',revenge:'Revenge-Entry',impulsive:'Impulsiver Entry',fear_exit:'Exit aus Angst',greed_exit:'Exit aus Gier',frustration_exit:'Exit aus Frust'};
-async function loadMorningDashboard(){
- const target=$('morningBody');target.textContent='Rückblick wird geladen …';
+async function loadMorningDashboard(quiet=false){
+ const target=$('morningBody');if(!quiet)target.textContent='Rückblick wird geladen …';
  try{
  const {data:sessions,error:sErr}=await client.from('trading_sessions')
   .select('id,session_date,status,htf_context').order('session_date',{ascending:false}).limit(20);
@@ -1221,7 +1221,7 @@ async function loadMorningDashboard(){
  <p>Regelkonform: ${clean}/${checked.length} geprüfte Trades · ${all.length-checked.length} ungeprüft</p>
  <p>Fehler dokumentiert: ${errors.length}</p>
  <p><strong>Erkenntnis:</strong> ${escapeHtml(best)}</p>${limit}`;
- }catch(err){target.textContent='Rückblick nicht verfügbar: '+err.message;}
+ }catch(err){if(!quiet)target.textContent='Rückblick nicht verfügbar: '+err.message;}
 }
 $('reloadMorning').addEventListener('click',loadMorningDashboard);
 const TEST_ITEMS=[
@@ -1678,11 +1678,11 @@ $('analyticsAccount').addEventListener('change',renderAnalytics);
 $('reloadAnalytics').addEventListener('click',loadAnalytics);
 
 
-async function loadOpenReviews(){
+async function loadOpenReviews(quiet=false){
  if(!currentUser)return;
- const el=$('openReviewsBody');el.textContent='Wird geladen …';
+ const el=$('openReviewsBody');if(!quiet)el.textContent='Wird geladen …';
  const {data,error}=await client.from('trades').select('id,session_id,setup_type,direction,instrument,entry_at,exit_at,entry_emotion,exit_emotion,execution_grade,rule_deviation,observations,realized_pnl_usd,initial_risk_usd').not('exit_at','is',null).order('exit_at',{ascending:false}).limit(200);
- if(error){el.textContent='Ladefehler: '+error.message;return;}
+ if(error){if(!quiet)el.textContent='Ladefehler: '+error.message;return;}
  const open=(data||[]).filter(t=>!reviewIsComplete(t));
  el.replaceChildren();
  if(!open.length){el.textContent='Keine offenen Reviews unter den letzten '+(data||[]).length+' abgeschlossenen Trades.';return;}
@@ -2453,7 +2453,7 @@ client.auth.onAuthStateChange((event)=>{
  setTimeout(async()=>{try{await authStatus()}finally{ttAuthRefreshPending=false}},0);
 });
 function compactRefreshControls(){for(const button of document.querySelectorAll('#app button[id]')){if(!/^(reload|refresh)/.test(button.id))continue;const label=button.getAttribute('aria-label')||button.textContent;button.setAttribute('aria-label',label);button.textContent='↻';button.classList.remove('wide');button.classList.add('mini-refresh');if(button.id==='reloadMorning')$('morningDashboard').querySelector('h3').after(button);}}
-let overviewRefreshing=false;async function refreshOverview(){if(overviewRefreshing||busy||document.hidden||!currentUser||$('app').classList.contains('hidden')||$('liveView').classList.contains('hidden'))return;overviewRefreshing=true;try{await Promise.all([loadCount(),loadOpenReviews(),loadMorningDashboard()]);}catch(e){console.warn('Hintergrundaktualisierung:',e.message);}finally{overviewRefreshing=false;}}
+let overviewRefreshing=false;async function refreshOverview(){if(overviewRefreshing||busy||document.hidden||navigator.onLine===false||!currentUser||$('app').classList.contains('hidden')||$('liveView').classList.contains('hidden'))return;overviewRefreshing=true;try{await Promise.all([loadCount(),loadOpenReviews(true),loadMorningDashboard(true)]);}catch(e){console.warn('Hintergrundaktualisierung:',e.message);}finally{overviewRefreshing=false;}}
 compactRefreshControls();setInterval(refreshOverview,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshOverview();});window.addEventListener('online',()=>void refreshOverview());
 setTimeout(authStatus,0);
 

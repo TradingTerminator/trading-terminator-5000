@@ -29,7 +29,7 @@ TradeZella dokumentiert einen einzelnen Trade-Detailbereich mit getrennten Berei
 
 ## Validierung
 
-59 Node-/DOM-/Gatewaytests und 6 Python-Archivtests bestanden (65 insgesamt). Acht neue Fälle prüfen den tatsächlichen Detailrenderer/Reiter/Trade-Kontext, SL-Speicherung ohne Rekonstruktion, BE-Vorschlag samt Gebühren und Editierbarkeit, sichtbare Pflichtskalen/gesperrten unbewerteten Entry, Verwerfen/Rückgängig, Playbook-Trennung unabhängig vom P&L, konsistente Wiederverwendung eines Plans und Berliner Sommer-/Winterzeit.
+60 Node-/DOM-/Gatewaytests und 6 Python-Archivtests bestanden (66 insgesamt). Neun neue Fälle prüfen den tatsächlichen Detailrenderer/Reiter/Trade-Kontext, SL-Speicherung ohne Rekonstruktion, BE-Vorschlag samt Gebühren und Editierbarkeit, sichtbare Pflichtskalen/gesperrten unbewerteten Entry, Verwerfen/Rückgängig, Playbook-Trennung unabhängig vom P&L, konsistente Wiederverwendung eines Plans und Berliner Sommer-/Winterzeit und Hintergrundaktualisierung ohne zwischenzeitliches Leeren der Dashboardkarten.
 
 Additive Migration `required_ratings_for_v737` erzwingt vollständige Entry-/Exit-Skalen und rückblickende Review-Skalen für neue, ausdrücklich mit capture_version 737 markierte Trades. Sie verändert keine historischen Zahlen. Sieben Datenbankprüffälle mit Rollback bestanden, einschließlich vollständigem Zurückrollen eines wegen fehlender Exit-Bewertungen abgelehnten Abschlusses. Bestehende APIs bleiben kompatibel.
 
