@@ -1,9 +1,9 @@
 {
-  "version": "7.36",
+  "version": "7.37",
   "files": {
-    "assets/client-1-d02cf7ff897e.js": "d02cf7ff897e1729eede044f1a0977485f05c09690ee28f06600afb7eb356775",
-    "assets/client-2-0551361e510e.js": "0551361e510e9d2ecc0986facc9349b91de01a8554e92db8093b0cbdac5ea924",
-    "assets/client-3-0538a5fd9268.js": "0538a5fd9268eefd139fb3b6f65acf6be00c0d7ba304b84ffa5341f20536edc4",
+    "assets/client-1-daaa20c34c00.js": "daaa20c34c0075fc0f551d3923ff9bcf4f9f70c569aa54346f139621ddf46eba",
+    "assets/client-2-4c31a91b9dbe.js": "4c31a91b9dbe68739f2fcca8671aa5e474903d94a6fbf11c44065c91db565b67",
+    "assets/client-3-538471d56053.js": "538471d560539e14b50087830fc4a24993edeca5e52f24eef339328ec04c6a3b",
     "vendor/LICENSE-jszip.txt": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4",
     "vendor/LICENSE-supabase.txt": "334dd6820e2eaeab2064e7c59001b810566728a28a41a7c1dbf69bbee17d0936",
     "vendor/jszip-3.10.1.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",

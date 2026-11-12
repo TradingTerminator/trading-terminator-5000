@@ -1,0 +1,19 @@
+-- Run in BEGIN / ROLLBACK; no test journal rows persist.
+CREATE TEMP TABLE tt737_checks(name text,passed boolean);GRANT SELECT,INSERT ON tt737_checks TO authenticated;
+CREATE FUNCTION pg_temp.reject737(q text) RETURNS boolean LANGUAGE plpgsql AS $$BEGIN BEGIN EXECUTE q;EXCEPTION WHEN OTHERS THEN RETURN true;END;RAISE EXCEPTION 'Expected rejection: %',q;END $$;
+SELECT set_config('request.jwt.claims',jsonb_build_object('sub',(SELECT id FROM auth.users LIMIT 1),'role','authenticated')::text,true);SET LOCAL ROLE authenticated;
+WITH a AS(INSERT INTO public.trading_accounts(account_name,account_type,default_instrument,default_quantity) VALUES('TEMP_RATINGS_737','demo','MNQ',1) RETURNING id) SELECT set_config('tt737.a',id::text,true) FROM a;
+WITH s AS(INSERT INTO public.trading_sessions(session_date,status,htf_context) VALUES('2099-05-01','open',jsonb_build_object('selected_accounts',jsonb_build_array(jsonb_build_object('account_id',current_setting('tt737.a'))))) RETURNING id) SELECT set_config('tt737.s',id::text,true) FROM s;
+SELECT set_config('tt737.alloc',jsonb_build_array(jsonb_build_object('account_id',current_setting('tt737.a'),'role','leader','instrument','MNQ','planned_quantity',1,'initial_sl_ticks',40))::text,true);
+INSERT INTO tt737_checks SELECT 'missing_entry_ratings_rejected',pg_temp.reject737(format('SELECT public.record_trade_attempt_v736(%L,''TEST'',''MNQ'',''long'',%L,''unreported'',gen_random_uuid(),''Test'',null,null,''{"capture_version":737,"execution_mode":"independent","emotion_scales":{}}'')',current_setting('tt737.s'),current_setting('tt737.alloc')));
+SELECT set_config('tt737.t',public.record_trade_attempt_v736(current_setting('tt737.s')::uuid,'TEST','MNQ','long',current_setting('tt737.alloc')::jsonb,'unreported',gen_random_uuid(),'Test',null,null,'{"capture_version":737,"execution_mode":"independent","emotion_scales":{"focus":7,"pressure":3,"fomo":1,"revenge":1,"fear":2,"greed":2}}')::text,true);
+INSERT INTO tt737_checks SELECT 'complete_entry_saved',initial_risk_usd=20 FROM public.trades WHERE id=current_setting('tt737.t')::uuid;
+SELECT set_config('tt737.results',(SELECT jsonb_agg(jsonb_build_object('allocation_id',id,'realized_pnl_usd',.5,'fees_usd',1)) FROM public.trade_account_allocations WHERE trade_id=current_setting('tt737.t')::uuid)::text,true);
+INSERT INTO tt737_checks SELECT 'incomplete_exit_rejected',pg_temp.reject737(format('SELECT public.close_trade_with_scales_v736(%L,''BE'',%L,''{"fear":1}'')',current_setting('tt737.t'),current_setting('tt737.results')));
+INSERT INTO tt737_checks SELECT 'failed_exit_rolled_back',exit_at IS NULL FROM public.trades WHERE id=current_setting('tt737.t')::uuid;
+SELECT public.close_trade_with_scales_v736(current_setting('tt737.t')::uuid,'BE',current_setting('tt737.results')::jsonb,'{"fear":1,"stress":1,"greed":1,"frustration":1,"relief":6,"uncertain":2}');
+INSERT INTO tt737_checks SELECT 'complete_exit_saved',exit_at IS NOT NULL AND observations->'exit_emotion_scales'->>'relief'='6' FROM public.trades WHERE id=current_setting('tt737.t')::uuid;
+INSERT INTO tt737_checks SELECT 'missing_retrospective_review_rejected',pg_temp.reject737(format('UPDATE public.trades SET observations=observations||''{"compliance_reviewed":true}''::jsonb WHERE id=%L',current_setting('tt737.t')));
+UPDATE public.trades SET observations=observations||'{"during_emotion_scales":{"fear":2,"greed":1,"uncertain":3}}'::jsonb WHERE id=current_setting('tt737.t')::uuid;
+INSERT INTO tt737_checks SELECT 'during_review_ratings_saved',observations->'during_emotion_scales'->>'uncertain'='3' FROM public.trades WHERE id=current_setting('tt737.t')::uuid;
+RESET ROLE;DO $$BEGIN IF EXISTS(SELECT 1 FROM tt737_checks WHERE passed IS NOT TRUE) THEN RAISE EXCEPTION 'Rating tests failed';END IF;END $$;SELECT jsonb_agg(to_jsonb(t)) AS checks FROM tt737_checks t;
