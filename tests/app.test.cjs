@@ -1,0 +1,184 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const {JSDOM,VirtualConsole}=require('jsdom');const {webcrypto}=require('node:crypto');
+function boot(){
+ let tableHandler=null;let user=null,pending=null,rpcResult={data:{count:0},error:null};const issues=[];const callbacks=[];const downloads=[];
+ const client={auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:fn=>{callbacks.push(fn);return{}},signOut:async()=>{user=null;return{error:null}}},from(name){const ops=[];const response=()=>tableHandler?Promise.resolve(tableHandler(name,ops)):pending?pending:Promise.resolve({data:[],error:null,count:0});let q;q=new Proxy({},{get(t,k){if(k==='then')return (a,b)=>response().then(a,b);return (...args)=>{ops.push({method:k,args});return q;};}});return q;},rpc:async(...args)=>typeof rpcResult==='function'?rpcResult(...args):rpcResult,storage:{from(){return{list:async()=>({data:[],error:null}),download:async()=>({data:new Blob(['test-image']),error:null}),createSignedUrl:async()=>({data:{signedUrl:'https://test.invalid/image'},error:null})}}}};
+ let html=fs.readFileSync('v7-test.html','utf8').replace(/<script[^>]*src="[^"]+"[^>]*><\/script>/g,(tag)=>{const m=tag.match(/src="([^"]+)"/);if(m[1].startsWith('vendor/'))return '';return '<script>'+fs.readFileSync(m[1],'utf8')+'</script>';});
+ const vc=new VirtualConsole();vc.on('jsdomError',e=>issues.push(e.message));
+ const dom=new JSDOM(html,{url:'https://app.tradingterminator.com/v7-test.html',runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:vc,beforeParse(w){w.supabase={createClient:()=>client};w.JSZip=require('jszip');w.URL.createObjectURL=blob=>{downloads.push(blob);return 'blob:test';};w.URL.revokeObjectURL=()=>{};w.HTMLAnchorElement.prototype.click=function(){};w.confirm=()=>true;w.HTMLElement.prototype.scrollIntoView=function(){};w.scrollTo=()=>{};w.scrollBy=()=>{};Object.defineProperty(w.crypto,'randomUUID',{value:()=>webcrypto.randomUUID()});Object.defineProperty(w.crypto,'subtle',{value:webcrypto.subtle});}});
+ return{w:dom.window,issues,downloads,setTableHandler(v){tableHandler=v},setRpc(v){rpcResult=v},setUser(v){user=v},setPending(v){pending=v},close(){dom.window.close()}};
+}
+const tick=()=>new Promise(r=>setTimeout(r,20));
+test('app loads without runtime errors and includes version and limit rationale',async()=>{const b=boot();await tick();assert.deepEqual(b.issues,[]);assert.match(b.w.document.title,/7.35/);assert.ok(b.w.document.getElementById('ttLimitReason'));b.close()});
+test('logout clears account cache, editor, prior sensitive outputs and drafts',async()=>{const b=boot();await tick();b.w.eval("currentUser={id:'A'};allAccounts=[{id:'old'}];editingAccountId='old';accounts=allAccounts;document.getElementById('editAccountName').value='PRIVATE_A';document.getElementById('accountList').textContent='PRIVATE_A';localStorage.setItem('tt7_draft_v3:A:old','private');");await b.w.document.getElementById('logout').onclick();assert.equal(b.w.eval('allAccounts.length'),0);assert.equal(b.w.document.getElementById('editAccountName').value,'');assert.equal(b.w.document.getElementById('accountList').textContent,'');assert.equal(b.w.localStorage.getItem('tt7_draft_v3:A:old'),null);b.close()});
+test('old asynchronous query rejects after identity reset',async()=>{const b=boot();await tick();let resolve;b.setPending(new Promise(r=>resolve=r));const query=b.w.eval("Promise.resolve(client.from('trades').select('*'))");await tick();b.w.eval('resetPrivateState()');resolve({data:[{private:'A'}],error:null});await assert.rejects(query,e=>e.name==='SessionChangedError');b.close()});
+test('multi-error review preserves independent measures and counts secondary error',async()=>{const b=boot();await tick();b.w.document.body.insertAdjacentHTML('beforeend','<form id="testReview"><div class="review-errors"></div><button type="button" class="review-add-error"></button><div class="review-exceptions"></div></form>');b.w.eval(`window.sample={id:'t',rule_deviation:true,observations:{review_errors:[{id:'a',type:'fomo',countermeasure:'Wenn FOMO, dann warten',confirmed_breach:true},{id:'b',type:'poor_entry',countermeasure:'Wenn Trigger fehlt, dann warten',confirmed_breach:true}]}};renderReviewErrors(document.getElementById('testReview'),sample)`);const rows=b.w.eval('collectReviewErrors(document.getElementById("testReview"))');assert.equal(rows.length,2);assert.notEqual(rows[0].countermeasure,rows[1].countermeasure);assert.equal(b.w.eval("METRICS.find(x=>x.key==='poor_entry').has(sample)"),true);assert.equal(b.w.document.querySelectorAll('.review-error-row').length,2);b.close()});
+test('exception with reason stays pending; missing reason becomes breach with measure field',async()=>{const b=boot();await tick();b.w.document.body.insertAdjacentHTML('beforeend','<form id="testReview"><div class="review-errors"></div><button type="button" class="review-add-error"></button><div class="review-exceptions"></div></form>');b.w.eval("renderReviewErrors(document.getElementById('testReview'),{id:'t',observations:{limit_exception:{exceeded:true,reason:'Aufbau geprüft'}}})");assert.equal(b.w.document.querySelector('[data-exception-id]').value,'pending');b.w.eval("renderReviewErrors(document.getElementById('testReview'),{id:'t',observations:{limit_exception:{exceeded:true,reason:null}}})");assert.equal(b.w.document.querySelector('[data-exception-id]').value,'breach');assert.equal(b.w.document.querySelectorAll('.review-error-row').length,1);assert.equal(b.w.document.querySelector('.error-action').value,'');b.close()});
+test('legacy errors and escaped hostile text remain safe',async()=>{const b=boot();await tick();assert.equal(b.w.eval("reviewErrors({id:'old',observations:{review_error:'fomo',countermeasure:'Regel'}}).length"),1);const escaped=b.w.eval(`escapeHtml('<img src=x onerror="bad()">')`);assert.ok(!escaped.includes('<img'));b.close()});
+test('actual ZIP export round-trips through restore validator with image checksums',async()=>{
+ const b=boot();await tick();const owner='00000000-0000-4000-8000-000000000001';b.setUser({id:owner});
+ const tables=['trading_sessions','trade_ideas','trades','stop_adjustments','trade_events','screenshots','corrective_actions','trade_errors','trade_reviews','playbook_entries','trading_accounts','account_groups','account_group_members','trade_account_allocations','account_fills','account_trade_results','allocation_change_log','trading_setup_catalog','training_countermeasures','training_goals_v7','trade_ideas_v733','trade_attempts_v733','trade_entry_requests_v735'];
+ const image=owner+'/trade/t/chart.png';b.setRpc({data:{owner_id:owner,tables:Object.fromEntries(tables.map(t=>[t,[]])),images:[{name:image}]},error:null});
+ b.w.document.getElementById('ttBackupJson').click();for(let i=0;i<50&&!b.downloads.length;i++)await tick();assert.equal(b.downloads.length,1,b.w.document.getElementById('ttDataToolsStatus').textContent);
+ const os=require('node:os'),path=require('node:path'),cp=require('node:child_process');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'tt-backup-test-'));const file=path.join(dir,'backup.zip');
+ try{fs.writeFileSync(file,Buffer.from(await b.downloads[0].arrayBuffer()));const result=cp.spawnSync('python3',['scripts/restore-backup.py',file],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);const report=JSON.parse(result.stdout);assert.equal(report.tables,23);assert.equal(report.verified_images,1);}finally{fs.rmSync(dir,{recursive:true,force:true});b.close();}
+});
+test('a flagged emotion alone is not counted as a confirmed training error',async()=>{const b=boot();await tick();assert.equal(b.w.eval("METRICS.find(x=>x.key==='fomo').has({entry_emotion:'fomo',observations:{}})"),false);assert.equal(b.w.eval("METRICS.find(x=>x.key==='revenge').has({observations:{review_errors:[{type:'revenge',countermeasure:'Wenn Racheimpuls, dann Pause'}]}})"),true);b.close()});
+test('changing error type refreshes reusable measures without overwriting the written action',async()=>{
+ const b=boot();try{await tick();b.w.eval("trainingMeasures=[{error_key:'fomo',rule_text:'Wenn FOMO, dann Pause'},{error_key:'poor_entry',rule_text:'Wenn Trigger fehlt, dann warten'}]");
+ const form=b.w.document.createElement('form');form.innerHTML='<div class="review-errors"></div>';b.w.document.body.append(form);b.w.addReviewError(form,{type:'fomo',countermeasure:'Meine individuelle Maßnahme'});
+ const type=form.querySelector('.error-type'),reuse=form.querySelector('[aria-label="Vorhandene Gegenmaßnahme übernehmen"]');assert.deepEqual([...reuse.options].map(o=>o.value),['','Wenn FOMO, dann Pause']);
+ type.value='poor_entry';type.dispatchEvent(new b.w.Event('change',{bubbles:true}));assert.deepEqual([...reuse.options].map(o=>o.value),['','Wenn Trigger fehlt, dann warten']);assert.equal(form.querySelector('.error-action').value,'Meine individuelle Maßnahme');
+ reuse.value='Wenn Trigger fehlt, dann warten';reuse.dispatchEvent(new b.w.Event('change',{bubbles:true}));assert.equal(b.w.collectReviewErrors(form)[0].countermeasure,'Wenn Trigger fehlt, dann warten');
+ }finally{b.close()}
+});
+test('risk preview handles instruments, quantities and invalid stop inputs',async()=>{
+ const b=boot();try{await tick();const card=b.w.document.createElement('div');card.dataset.qty='2';card.dataset.instrument='MNQ';card.innerHTML='<input class="risk-ticks" value="40"><input class="risk-override" type="checkbox"><input class="risk-usd"><span class="risk-calc"></span>';
+ assert.equal(b.w.updateRiskCard(card),40);assert.equal(card.querySelector('.risk-usd').value,'40.00');
+ card.dataset.instrument='NQ';assert.equal(b.w.updateRiskCard(card),400);
+ for(const invalid of ['','0','-1','1.5','abc']){card.querySelector('.risk-ticks').value=invalid;assert.equal(b.w.updateRiskCard(card),null);assert.equal(card.querySelector('.risk-usd').value,'');}
+ card.querySelector('.risk-ticks').value='40';card.dataset.instrument='unknown';assert.equal(b.w.updateRiskCard(card),null);
+ }finally{b.close()}
+});
+test('local draft recovery preserves the newer draft and isolates owners',async()=>{
+ const b=boot();try{await tick();b.w.eval("currentUser={id:'A'};ttRemember=false");const key='tt7_draft_v3:A:t';
+ const older={version:1,tradeId:'t',savedAt:Date.now()-1000,review:{errors:[{type:'fomo',countermeasure:'Alt'}]}};
+ const newer={...older,savedAt:Date.now(),review:{errors:[{type:'poor_entry',countermeasure:'Neu'}]}};
+ b.w.localStorage.setItem(key,JSON.stringify(older));b.w.sessionStorage.setItem(key,JSON.stringify(newer));b.w.eval("draftMoveUser('A',false)");assert.equal(b.w.draftRead('t').review.errors[0].countermeasure,'Neu');assert.equal(b.w.localStorage.getItem(key),null);
+ b.w.eval("currentUser={id:'B'}");assert.equal(b.w.draftRead('t'),null);assert.ok(b.w.sessionStorage.getItem(key));
+ }finally{b.close()}
+});
+function reviewFixture(b,trade){
+ b.w.eval('sessionTrades='+JSON.stringify([trade]));const panel=b.w.document.getElementById('tradeDetails');panel.innerHTML='<form class="review-editor" data-trade-id="t"><select class="review-compliance"><option value="unknown">Offen</option><option value="clean">Sauber</option><option value="breach">Regelbruch</option></select><select class="review-grade"><option value="A">A</option></select><div class="review-errors"></div><button type="button" class="review-add-error"></button><div class="review-exceptions"></div><textarea class="review-note"></textarea><input class="review-playbook" type="checkbox"><p class="review-feedback"></p><button type="button" class="review-save">Speichern</button></form>';
+ const form=panel.querySelector('form');b.w.renderReviewErrors(form,trade);return form;
+}
+test('review save requires a separate action for every error',async()=>{
+ const b=boot();try{await tick();const form=reviewFixture(b,{id:'t',observations:{review_errors:[{id:'1',type:'fomo',countermeasure:'Wenn FOMO, dann Pause'},{id:'2',type:'poor_entry',countermeasure:''}]}});form.querySelector('.review-save').click();await tick();assert.match(form.querySelector('.review-feedback').textContent,/jeden Fehler/);
+ }finally{b.close()}
+});
+test('review cannot complete while a justified exception is still pending',async()=>{
+ const b=boot();try{await tick();const form=reviewFixture(b,{id:'t',observations:{limit_exception:{exceeded:true,reason:'Zusätzliches geprüftes Setup'}}});form.querySelector('.review-compliance').value='clean';form.querySelector('.review-save').click();await tick();assert.match(form.querySelector('.review-feedback').textContent,/jede Ausnahme/);
+ }finally{b.close()}
+});
+test('review rejects a clean assessment when a breach is confirmed',async()=>{
+ const b=boot();try{await tick();const form=reviewFixture(b,{id:'t',observations:{review_errors:[{id:'1',type:'fomo',countermeasure:'Wenn FOMO, dann Pause',confirmed_breach:true}]}});form.querySelector('.review-compliance').value='clean';form.querySelector('.review-save').click();await tick();assert.match(form.querySelector('.review-feedback').textContent,/widersprechen/);
+ }finally{b.close()}
+});
+test('profitable trade saves two confirmed errors and their independent actions',async()=>{
+ const b=boot();try{await tick();const trade={id:'t',realized_pnl_usd:60,observations:{review_errors:[{id:'1',type:'fomo',countermeasure:'Wenn FOMO, dann Pause',confirmed_breach:true},{id:'2',type:'poor_entry',countermeasure:'Wenn Trigger fehlt, dann warten',confirmed_breach:true}]}};const form=reviewFixture(b,trade);form.querySelector('.review-compliance').value='breach';
+ b.w.eval("conditionalTradeUpdate=async(id,patch)=>{window.savedPatch=patch;return {data:{id,...patch},error:null}};renderSessionSummary=async()=>{};loadProgressAndPlaybook=async()=>{};loadTraining=async()=>{};loadAnalytics=async()=>{};loadOpenReviews=async()=>{};");form.querySelector('.review-save').click();await tick();assert.equal(b.w.savedPatch.rule_deviation,true);assert.equal(b.w.savedPatch.observations.review_errors.length,2);assert.equal(b.w.savedPatch.observations.compliance_reviewed,true);assert.match(form.querySelector('.review-feedback').textContent,/gespeichert/);
+ }finally{b.close()}
+});
+test('draft read automatically recovers a newer alternate-store draft',async()=>{
+ const b=boot();try{await tick();b.w.eval("currentUser={id:'A'};ttRemember=false");const key='tt7_draft_v3:A:t';const now=Date.now();
+ b.w.sessionStorage.setItem(key,JSON.stringify({version:1,tradeId:'t',savedAt:now-1000,analysis:{note:'old'}}));b.w.localStorage.setItem(key,JSON.stringify({version:1,tradeId:'t',savedAt:now,analysis:{note:'new'}}));
+ assert.equal(b.w.draftRead('t').analysis.note,'new');assert.equal(b.w.localStorage.getItem(key),null);
+ b.w.sessionStorage.setItem(key,'broken JSON');b.w.localStorage.setItem(key,JSON.stringify({version:1,tradeId:'t',savedAt:now,analysis:{note:'recovered'}}));assert.equal(b.w.draftRead('t').analysis.note,'recovered');
+ }finally{b.close()}
+});
+test('backup fails visibly without downloading a partial archive on snapshot failure',async()=>{
+ const b=boot();try{await tick();b.setUser({id:'A'});b.setRpc({data:null,error:{message:'Network interrupted'}});b.w.document.getElementById('ttBackupJson').click();await tick();assert.equal(b.downloads.length,0);assert.match(b.w.document.getElementById('ttDataToolsStatus').textContent,/Network interrupted/);assert.equal(b.w.document.getElementById('ttBackupJson').disabled,false);
+ }finally{b.close()}
+});
+test('backup refuses data changed during export',async()=>{
+ const b=boot();try{await tick();b.setUser({id:'A'});let n=0;b.setRpc(()=>({data:{owner_id:'A',tables:{trades:++n===1?[]:[{id:'changed'}]},images:[]},error:null}));b.w.document.getElementById('ttBackupJson').click();await tick();assert.equal(b.downloads.length,0);assert.match(b.w.document.getElementById('ttDataToolsStatus').textContent,/während der Sicherung geändert/);
+ }finally{b.close()}
+});
+test('backup does not download previous-user data after identity changes during ZIP generation',async()=>{
+ const b=boot();try{await tick();b.setUser({id:'A'});b.setRpc({data:{owner_id:'A',tables:{trades:[]},images:[]},error:null});let begin,finish;const started=new Promise(r=>begin=r);b.w.JSZip=function(){return{file(){},generateAsync(){begin();return new Promise(r=>finish=r)}}};b.w.document.getElementById('ttBackupJson').click();await started;b.setUser({id:'B'});finish(new Blob(['archive']));await tick();assert.equal(b.downloads.length,0);assert.match(b.w.document.getElementById('ttDataToolsStatus').textContent,/Benutzer/);
+ }finally{b.close()}
+});
+test('practice summary separates opportunities, no opportunity and unassessed trades regardless of P&L',async()=>{
+ const b=boot();try{await tick();const rows=['followed','partial','missed','no_opportunity','pending'].map((result,i)=>({exit_at:'2026-11-12',realized_pnl_usd:i%2?100:-100,observations:{training_focus:{goal_id:'g'},training_practice:{goal_id:'g',result}}}));rows.push({exit_at:'2026-11-12',observations:{training_focus:{goal_id:'g'}}},{exit_at:null,observations:{training_focus:{goal_id:'g'}}},{exit_at:'2026-11-12',observations:{training_focus:{goal_id:'other'}}});
+ const n=b.w.practiceSummary(rows,'g');assert.equal(n.opportunities,3);assert.equal(n.followed,1);assert.equal(n.partial,1);assert.equal(n.missed,1);assert.equal(n.no_opportunity,1);assert.equal(n.pending,2);
+ }finally{b.close()}
+});
+test('review uses the entry rule and offers practice assessment only after exit',async()=>{
+ const b=boot();try{await tick();const trade={id:'t',observations:{training_focus:{goal_id:'g',rule:'Wenn Trigger fehlt, dann warten.'}}};const form=reviewFixture(b,trade);assert.equal(form.querySelector('.practice-result'),null);assert.match(form.querySelector('.training-practice-review').textContent,/nach dem Exit/);
+ trade.exit_at='2026-11-12';b.w.renderTrainingPractice(form,trade);assert.equal(form.querySelector('.practice-result').value,'pending');form.querySelector('.practice-result').value='no_opportunity';form.querySelector('.practice-note').value='Heute kein entsprechendes Setup';assert.equal(b.w.collectTrainingPractice(form,trade).goal_id,'g');assert.equal(b.w.collectTrainingPractice(form,trade).result,'no_opportunity');
+ }finally{b.close()}
+});
+test('saved review carries the practice result independently of P&L and errors',async()=>{
+ const b=boot();try{await tick();const trade={id:'t',exit_at:'2026-11-12',realized_pnl_usd:-40,observations:{training_focus:{goal_id:'g',rule:'Wenn Trigger fehlt, dann warten.'}}};const form=reviewFixture(b,trade);form.querySelector('.practice-result').value='followed';form.querySelector('.practice-note').value='Trigger abgewartet';
+ b.w.eval("conditionalTradeUpdate=async(id,patch)=>{window.savedPatch=patch;return {data:{id,...patch},error:null}};renderSessionSummary=async()=>{};loadProgressAndPlaybook=async()=>{};loadTraining=async()=>{};loadAnalytics=async()=>{};loadOpenReviews=async()=>{};");form.querySelector('.review-save').click();await tick();assert.equal(b.w.savedPatch.observations.training_practice.result,'followed');assert.equal(b.w.savedPatch.observations.training_practice.note,'Trigger abgewartet');assert.equal(b.w.savedPatch.observations.training_focus.rule,trade.observations.training_focus.rule);
+ }finally{b.close()}
+});
+test('loading a focus displays the manually chosen rule before the session',async()=>{
+ const b=boot();try{await tick();b.w.eval("currentUser={id:'A'}");const goal={id:'g',goal:'Wenn Trigger fehlt, dann warten.',status:'active'};
+ b.setTableHandler((name,ops)=>({data:name==='training_goals_v7'?(ops.some(x=>x.method==='maybeSingle')?goal:[goal]):[],error:null}));await b.w.loadTrainingFocus();assert.match(b.w.document.getElementById('sessionTrainingFocus').textContent,/Wenn Trigger fehlt/);assert.match(b.w.document.getElementById('trainingPracticeSummary').textContent,/0 passende/);b.w.resetPrivateState();assert.doesNotMatch(b.w.document.getElementById('sessionTrainingFocus').textContent,/Wenn Trigger fehlt/);assert.equal(b.w.document.getElementById('trainingPracticeSummary').textContent,'');
+ }finally{b.close()}
+});
+test('focus replacement is explicit and forwards source IDs and expected focus to atomic RPC',async()=>{
+ const b=boot();try{await tick();b.w.eval("currentUser={id:'A'};trainingFocusReady=true;trainingFocusActive={id:'old',goal:'Vorherige Regel'};loadTrainingFocus=async()=>{}");let calls=[];b.setRpc((name,args)=>{calls.push({name,args});return {data:{id:args.p_request_id},error:null}});b.w.confirm=()=>false;assert.equal(await b.w.chooseTrainingFocus('Wenn FOMO, dann Pause.'),undefined);assert.equal(calls.length,0);
+ b.w.confirm=()=>true;assert.equal(await b.w.chooseTrainingFocus('Wenn FOMO, dann Pause.',{tradeId:'t',errorId:'e'}),true);assert.equal(calls.length,1);assert.equal(calls[0].name,'set_training_focus_v735');assert.equal(calls[0].args.p_expected_id,'old');assert.equal(calls[0].args.p_source_trade_id,'t');assert.equal(calls[0].args.p_source_error_id,'e');
+ }finally{b.close()}
+});
+test('unsaved measures cannot be promoted from the review',async()=>{
+ const b=boot();try{await tick();const form=reviewFixture(b,{id:'t',exit_at:'2026-11-12',observations:{compliance_reviewed:true,review_errors:[{id:'e',type:'fomo',countermeasure:'Wenn FOMO, dann Pause.'}]}});form.querySelector('.error-action').value='Ungespeicherte andere Regel';const promote=[...form.querySelectorAll('button')].find(x=>x.textContent==='Als Trainingsschwerpunkt übernehmen');promote.click();await tick();assert.match(form.querySelector('.review-feedback').textContent,/zuerst im Review speichern/);
+ }finally{b.close()}
+});
+test('practice assessment survives local draft capture and restoration without changing the entry rule',async()=>{
+ const b=boot();try{await tick();const trade={id:'t',exit_at:'2026-11-12',observations:{training_focus:{goal_id:'g',rule:'Wenn Trigger fehlt, dann warten.'}}};const form=reviewFixture(b,trade);const panel=b.w.document.getElementById('tradeDetails');panel.dataset.tradeId='t';panel.classList.remove('hidden');
+ form.insertAdjacentHTML('beforeend','<select class="review-error"><option value=""></option></select><textarea class="review-action"></textarea><div data-emotion-group="exitEmotion"></div>');form.querySelector('.practice-result').value='partial';form.querySelector('.practice-note').value='Einmal zu früh reagiert';const draft=b.w.draftCapture();assert.equal(draft.review.practice.goal_id,'g');assert.equal(draft.review.practice.result,'partial');
+ b.w.renderReviewErrors(form,{...trade,observations:{...trade.observations,training_practice:draft.review.practice,review_errors:draft.review.errors}},draft.review.exceptions);assert.equal(form.querySelector('.practice-result').value,'partial');assert.equal(form.querySelector('.practice-note').value,'Einmal zu früh reagiert');assert.match(form.querySelector('.training-practice-review').textContent,/Wenn Trigger fehlt/);
+ }finally{b.close()}
+});
+test('missing entry risk opens collapsed account controls and focuses the required field',async()=>{
+ const b=boot();try{await tick();b.w.eval("setupCatalogReady=true;setupCatalog=[{name:'TEST',active:true}];document.getElementById('setup').value='TEST';accounts=[{id:'a',account_name:'Demo'}];currentSession={id:'s',session_date:localDate(),htf_context:{selected_accounts:[{account_id:'a',role:'leader',instrument:'MNQ',planned_quantity:1}]}};renderDecision();document.getElementById('app').classList.remove('hidden');showView('decision');");const details=b.w.document.getElementById('entryAccounts');details.open=false;await b.w.document.getElementById('recordEntry').onclick();assert.equal(details.open,true);assert.equal(b.w.document.activeElement.className,'acct-sl-ticks');assert.match(b.w.document.getElementById('entryFeedback').textContent,/ursprünglichen SL/);assert.equal(b.w.document.getElementById('recordEntry').disabled,false);
+ }finally{b.close()}
+});
+test('recorded manually adjusted risk remains read-only after preview initialization',async()=>{
+ const b=boot();try{await tick();const card=b.w.document.createElement('div');card.dataset.recorded='true';card.dataset.qty='1';card.dataset.instrument='MNQ';card.innerHTML='<input class="risk-ticks" value="40"><input class="risk-override" type="checkbox" checked><input class="risk-usd" value="25"><span class="risk-calc"></span>';b.w.updateRiskCard(card);assert.equal(card.querySelector('.risk-usd').disabled,true);assert.equal(card.querySelector('.risk-usd').value,'25');
+ }finally{b.close()}
+});
+test('navigation identifies the active main area when training or journal is open',async()=>{
+ const b=boot();try{await tick();b.w.showView('training');assert.equal(b.w.document.querySelector('#tabs [aria-current="page"]').dataset.view,'analytics');assert.equal(b.w.document.getElementById('trainingView').classList.contains('hidden'),false);assert.equal(b.w.document.getElementById('analyticsView').classList.contains('hidden'),true);b.w.showView('journal');assert.equal(b.w.document.querySelectorAll('#tabs [aria-current="page"]').length,1);assert.equal(b.w.document.querySelector('#tabs [aria-current="page"]').dataset.view,'decision');assert.equal(b.w.document.getElementById('journalView').classList.contains('hidden'),false);
+ }finally{b.close()}
+});
+test('every supported review error including other is available in training metrics',async()=>{
+ const b=boot();try{await tick();assert.equal(b.w.eval("Object.keys(REVIEW_LABELS).every(key=>METRICS.some(m=>m.key===key&&!m.good))"),true);assert.equal(b.w.eval("METRICS.find(m=>m.key==='other').has({observations:{review_errors:[{type:'other',countermeasure:'Wenn unklar, dann pausieren'}]}})"),true);
+ }finally{b.close()}
+});
+test('incomplete training assessment keeps an otherwise completed review open',async()=>{
+ const b=boot();try{await tick();const t={id:'t',exit_at:'2026-11-12',execution_grade:'A',observations:{compliance_reviewed:true,training_focus:{goal_id:'g'},review_errors:[]}};assert.equal(b.w.reviewIsComplete(t),false);t.observations.training_practice={goal_id:'g',result:'pending'};assert.equal(b.w.reviewIsComplete(t),false);t.observations.training_practice.result='no_opportunity';assert.equal(b.w.reviewIsComplete(t),true);t.observations.training_practice.result='followed';assert.equal(b.w.reviewIsComplete(t),true);
+ }finally{b.close()}
+});
+test('unreviewed trades cannot dilute the documented error rate',async()=>{
+ const b=boot();try{await tick();const t={exit_at:'2026-11-12',observations:{compliance_reviewed:true,review_errors:[{type:'fomo',countermeasure:'Wenn FOMO, dann warten'}]}};const text=b.w.documentedErrorRate([t,...Array.from({length:24},()=>({observations:{}}))]);assert.match(text,/100 %/);assert.match(text,/1 geprüft, 24 ungeprüft/);assert.match(b.w.documentedErrorRate([{observations:{}}]),/nicht berechenbar/);
+ }finally{b.close()}
+});
+test('aggregate R requires complete initial risks and final results for every allocation',async()=>{
+ const b=boot();try{await tick();const alloc=[{id:'a',initial_risk_usd:20},{id:'b',initial_risk_usd:null}],results=[{allocation_id:'a',realized_pnl_usd:20,fees_usd:1,result_status:'final'},{allocation_id:'b',realized_pnl_usd:20,fees_usd:1,result_status:'final'}];assert.equal(b.w.allocationSummary(alloc,results).rMultiple,null);alloc[1].initial_risk_usd=20;assert.equal(b.w.allocationSummary(alloc,results).rMultiple,1);assert.equal(b.w.allocationSummary(alloc,results.slice(0,1)).rMultiple,null);results[1].result_status='pending';assert.equal(b.w.allocationSummary(alloc,results).rMultiple,null);assert.equal(b.w.finiteValue(null),false);assert.equal(b.w.finiteValue(0),true);
+ }finally{b.close()}
+});
+test('historical trade opens without adding it to the active session or changing session identity',async()=>{
+ const b=boot();try{await tick();const past={id:'past',session_id:'old',setup_type:'TEST',instrument:'MNQ',direction:'long',exit_at:'2026-11-12',observations:{}};b.w.eval("currentSession={id:'current'};sessionTrades=[{id:'live',session_id:'current'}];openTradeDetails=async(t)=>{window.openedHistory=t};");b.setTableHandler((name)=>({data:name==='trades'?past:[],error:null}));await b.w.openJournalTradeById('past');assert.equal(b.w.eval('sessionTrades.length'),1);assert.equal(b.w.eval('sessionTrades[0].id'),'live');assert.equal(b.w.eval('currentSession.id'),'current');assert.equal(b.w.openedHistory.id,'past');assert.equal(b.w.document.getElementById('sessionTrades').classList.contains('hidden'),false);
+ }finally{b.close()}
+});
+test('current detail context takes priority over a stale copy in the session list',async()=>{
+ const b=boot();try{await tick();b.w.eval("sessionTrades=[{id:'t',observations:{review_note:'old'}}];detailTrade={id:'t',observations:{review_note:'fresh'}}");assert.equal(b.w.detailTradeById('t').observations.review_note,'fresh');b.w.resetPrivateState();assert.equal(b.w.detailTradeById('t'),null);
+ }finally{b.close()}
+});
+test('saved historical detail patch updates any matching active-session copy without inserting history',async()=>{
+ const b=boot();try{await tick();b.w.eval("sessionTrades=[{id:'t',observations:{review_note:'old'}}];detailTrade={id:'t',observations:{review_note:'fresh'}};applyTradePatch(detailTrade,{observations:{review_note:'saved'}})");assert.equal(b.w.eval('sessionTrades[0].observations.review_note'),'saved');b.w.eval("applyTradePatch({id:'history'},{observations:{review_note:'history'}})");assert.equal(b.w.eval('sessionTrades.length'),1);
+ }finally{b.close()}
+});
+test('a slower historical navigation cannot replace the later selected trade',async()=>{
+ const b=boot();try{await tick();let release;const slow=new Promise(r=>release=r);b.setTableHandler((name,ops)=>{const id=ops.find(x=>x.method==='eq')?.args[1];return id==='slow'?slow:{data:{id:'latest'},error:null};});b.w.eval("openTradeDetails=async(t)=>{window.latestOpened=t.id};");const first=b.w.openJournalTradeById('slow');await tick();await b.w.openJournalTradeById('latest');release({data:{id:'slow'},error:null});await first;assert.equal(b.w.latestOpened,'latest');
+ }finally{b.close()}
+});
+test('review stays open for an unassigned breach or an unevaluated day-limit exception',async()=>{
+ const b=boot();try{await tick();const t={exit_at:'2026-11-12',execution_grade:'A',rule_deviation:true,observations:{compliance_reviewed:true,review_errors:[]}};assert.equal(b.w.reviewIsComplete(t),false);t.rule_deviation=false;t.observations.limit_exception={exceeded:true,reason:'Begründung'};assert.equal(b.w.reviewIsComplete(t),false);t.observations.exception_reviews={'daily-limit':'accepted'};assert.equal(b.w.reviewIsComplete(t),true);
+ }finally{b.close()}
+});
+test('session summary marks missing account results and does not calculate partial R',async()=>{
+ const b=boot();try{await tick();b.setTableHandler(name=>({data:name==='trade_account_allocations'?[{id:'a',trade_id:'t',account_id:'same',initial_risk_usd:20},{id:'b',trade_id:'t',account_id:'same',initial_risk_usd:20}]:name==='account_trade_results'?[{allocation_id:'a',realized_pnl_usd:20,result_status:'final'}]:[],error:null}));await b.w.renderSessionSummary([{id:'t',exit_at:'2026-11-12',realized_pnl_usd:40,initial_risk_usd:40,observations:{}}]);const el=b.w.document.getElementById('sessionSummaryBody');assert.equal(el.querySelectorAll('.stat strong')[3].textContent,'–');assert.match(el.textContent,/Ergebnisse unvollständig/);assert.match(el.textContent,/R offen/);
+ }finally{b.close()}
+});
+test('analytics excludes provisional or missing account results from decision R averages',async()=>{
+ const b=boot();try{await tick();b.w.document.getElementById('analyticsAccount').innerHTML='<option value="all">Alle</option>';b.w.eval("analyticsRows=[{id:'t',initial_risk_usd:20,realized_pnl_usd:20,observations:{}}];analyticsAccountRows=[{id:'a',trade_id:'t',initial_risk_usd:20}];analyticsResults=[{allocation_id:'a',realized_pnl_usd:20,result_status:'pending'}];renderAnalytics()");assert.match(b.w.document.getElementById('analyticsSummary').textContent,/nicht berechenbar/);b.w.eval("analyticsResults[0].result_status='final';renderAnalytics()");assert.match(b.w.document.getElementById('analyticsSummary').textContent,/1.00 R/);
+ }finally{b.close()}
+});
+test('training focus retry reuses request identity after an unconfirmed response',async()=>{
+ const b=boot();try{await tick();b.w.eval("currentUser={id:'owner'};trainingFocusReady=true;trainingFocusActive={id:'old'};loadTrainingFocus=async()=>{};");const calls=[];b.setRpc(async(name,args)=>{calls.push(args);return calls.length===1?{data:null,error:{message:'Antwort unterbrochen'}}:{data:{id:args.p_request_id},error:null}});await assert.rejects(b.w.chooseTrainingFocus('Wenn FOMO, dann Pause.'));await b.w.chooseTrainingFocus('Wenn FOMO, dann Pause.');assert.equal(calls.length,2);assert.equal(calls[0].p_request_id,calls[1].p_request_id);assert.equal(calls[0].p_expected_id,calls[1].p_expected_id);
+ }finally{b.close()}
+});

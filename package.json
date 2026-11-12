@@ -1,0 +1,17 @@
+{
+  "name": "trading-terminator-5000",
+  "version": "7.35.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "check": "node scripts/verify-release.cjs",
+    "build": "node scripts/build-release.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.119.0",
+    "jszip": "3.10.1"
+  },
+  "devDependencies": {
+    "jsdom": "31.0.0"
+  }
+}
