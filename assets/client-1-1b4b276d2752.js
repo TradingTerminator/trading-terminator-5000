@@ -26,12 +26,21 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='7.35';
+const TT_VERSION='7.36';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
+const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark']]};
+function readScales(group){return Object.fromEntries([...(group?.querySelectorAll('[data-scale]')||[])].filter(el=>el.dataset.rated==='true').map(el=>[el.dataset.scale,Number(el.value)]));}
+function updateScaleLabels(root=document){root.querySelectorAll('[data-scale]').forEach(el=>{const output=el.closest('.rating-row')?.querySelector('output');if(output)output.textContent=el.dataset.rated==='true'?el.value+' / 10':'nicht bewertet';});}
+function buildScaleGroup(group,kind,values){if(!group)return;const prior=values||readScales(group);group.dataset.scaleGroup=kind;group.innerHTML=(SCALE_DEFS[kind]||[]).map(([key,label,low,high],i)=>`${i===2?'<details><summary>Weitere Empfindungen (optional)</summary>':''}<div class="rating-row"><label><span>${escapeHtml(label)}</span><output></output><input type="range" min="1" max="10" step="1" value="${Number.isInteger(prior[key])&&prior[key]>=1&&prior[key]<=10?prior[key]:5}" data-scale="${key}" data-rated="${Number.isInteger(prior[key])&&prior[key]>=1&&prior[key]<=10}" aria-label="${escapeHtml(label)}"></label><div class="rating-ends"><span>1 · ${escapeHtml(low)}</span><span>10 · ${escapeHtml(high)}</span></div></div>`).join('')+((SCALE_DEFS[kind]||[]).length>2?'</details>':'');updateScaleLabels(group);}
+function clearScales(group){group?.querySelectorAll('[data-scale]').forEach(el=>{el.dataset.rated='false';el.value='5';});updateScaleLabels(group);}
+function enhanceEmotionScales(root=document){root.querySelectorAll('[data-emotion-group]').forEach(group=>{const kind=group.dataset.emotionGroup;if(SCALE_DEFS[kind]&&!group.dataset.scaleGroup)buildScaleGroup(group,kind);});}
+function sessionContextText(){const notes=[...document.querySelectorAll('.htf-note')].filter(el=>el.value.trim()).map(el=>el.closest('.context-row').querySelector('label').textContent.trim()+': '+el.value.trim());if($('htf').value.trim())notes.push($('htf').value.trim());return notes.join('\n');}
+document.addEventListener('input',e=>{if(!e.target.matches('[data-scale]'))return;e.target.dataset.rated='true';updateScaleLabels(e.target.closest('[data-scale-group]'));if(e.target.closest('#entryEmotionOptions'))updateEntryEmotionWarning();saveWorkspace();});
+
 function selectedEmotion(group){return group?.querySelector('button[aria-pressed="true"]')?.dataset.value||'';}
 function setEmotion(group,value){if(!group)return;group.querySelectorAll('button[data-value]').forEach(b=>{const selected=b.dataset.value===value;b.setAttribute('aria-pressed',selected?'true':'false');b.classList.toggle('emotion-selected',selected);});}
-function updateEntryEmotionWarning(){const value=selectedEmotion($('entryEmotionOptions'));const warn=$('entryEmotionWarning');const text={fomo:'FOMO erkannt: Verpasst du gerade einen Move? Setup und Risiko nochmals prüfen.',revenge:'Revenge-Trading erkannt: Handelst du, um Verluste zurückzuholen?',impulsive:'Impulsiver Entry: Prüfe Marktstruktur, Setup und Risiko.'}[value];warn.textContent=text||'';warn.classList.toggle('hidden',!text);}
+function updateEntryEmotionWarning(){const rated=readScales($('entryEmotionOptions'));const value=rated.fomo>=7?'fomo':rated.revenge>=7?'revenge':selectedEmotion($('entryEmotionOptions'));const warn=$('entryEmotionWarning');const text={fomo:'FOMO erkannt: Verpasst du gerade einen Move? Setup und Risiko nochmals prüfen.',revenge:'Revenge-Trading erkannt: Handelst du, um Verluste zurückzuholen?',impulsive:'Impulsiver Entry: Prüfe Marktstruktur, Setup und Risiko.'}[value];warn.textContent=text||'';warn.classList.toggle('hidden',!text);}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-emotion-group] button[data-value]');if(!b)return;const emotionGroup=b.closest('[data-emotion-group]');if(emotionGroup.dataset.emotionGroup==='exitCommitEmotion'){const on=b.getAttribute('aria-pressed')==='true';b.setAttribute('aria-pressed',String(!on));b.classList.toggle('emotion-selected',!on);}else setEmotion(emotionGroup,b.dataset.value);if(b.closest('[data-emotion-group]').id==='entryEmotionOptions')updateEntryEmotionWarning();if(b.closest('[data-emotion-group]').id==='sessionMoodOptions'&&currentSession&&!busy)$('saveHtf').click();});
 let ttToastTimer;
 function ttToast(s,err=false){const el=$('ttToast');if(!el)return;el.textContent=s;el.classList.toggle('toast-error',err);el.classList.add('toast-visible');clearTimeout(ttToastTimer);ttToastTimer=setTimeout(()=>el.classList.remove('toast-visible'),3200);}
@@ -77,9 +86,12 @@ const qc=$('qualityChecklist');if(qc)$('settingsView').appendChild(qc);
 ['noSession','sessionSetup','activeSession','htfScreenshot','tradeStartAfterHtf'].forEach(id=>{const el=$(id);if(el)$('sessionHub').appendChild(el)});$('sessionHub').appendChild($('sessionFinishPanel'));
 $('entrySessionMount').appendChild($('sessionHub'));
 const focusBanner=document.createElement('div');focusBanner.id='sessionTrainingFocus';focusBanner.className='card';focusBanner.setAttribute('role','status');$('entrySessionMount').prepend(focusBanner);
+const entryForm=$('entryForm'),entryEmotionCard=$('entryEmotionOptions').closest('.card');
+$('entryAccounts').after(entryEmotionCard);const directionField=$('direction').closest('.direction-field');$('ttIdeaPanel').before(directionField);directionField.after($('instrument').closest('label'));
+$('tradeNewTab').textContent='Neuer Trade';$('toggleEntrySession').textContent='Session bearbeiten';$('goToTradeEntry').textContent='Weiter zum Trade';
 let entrySessionExpanded=false;
 function sessionReady(){return !!(currentSession && currentSession.session_date===localDate() && (String(currentSession.htf_context?.notes||'').trim() && Object.values(currentSession.htf_context?.preflight_checks||{}).every(Boolean) && Object.keys(currentSession.htf_context?.preflight_checks||{}).length>=4));}
-function syncEntrySession(){const ready=sessionReady();$('entrySessionTitle').textContent=currentSession?'Session '+currentSession.session_date:'1 · Session starten';$('entrySessionSub').textContent=currentSession&&currentSession.session_date!==localDate()?'⚠ ALTE SESSION – zuerst abschließen':ready?'HTF bereit · '+currentSession.session_date:currentSession?'HTF noch offen':'Vor dem ersten Trade konfigurieren';const today=localDate();const stale=!!currentSession&&currentSession.session_date!==today;const open=!ready||entrySessionExpanded||stale;$('entrySessionBar').classList.toggle('tt-old-session-banner',stale);$('sessionHub').classList.toggle('hidden',!open);$('toggleEntrySession').textContent=stale?'Alte Session öffnen →':open?'Zur Session ↓':'Session / HTF öffnen';$('toggleEntrySession').disabled=false;}
+function syncEntrySession(){const ready=sessionReady();$('entrySessionTitle').textContent=currentSession?'Session '+currentSession.session_date:'1 · Session starten';$('entrySessionSub').textContent=currentSession&&currentSession.session_date!==localDate()?'⚠ ALTE SESSION – zuerst abschließen':ready?'HTF bereit · '+currentSession.session_date:currentSession?'HTF noch offen':'Vor dem ersten Trade konfigurieren';const today=localDate();const stale=!!currentSession&&currentSession.session_date!==today;const open=!ready||entrySessionExpanded||stale;$('entrySessionBar').classList.toggle('tt-old-session-banner',stale);$('sessionHub').classList.toggle('hidden',!open);$('toggleEntrySession').textContent=stale?'Alte Session öffnen →':open?'Zur Session ↓':'Session / HTF öffnen';$('toggleEntrySession').disabled=false;$('entryForm').classList.toggle('hidden',!ready||open);$('tradeStartAfterHtf').classList.toggle('hidden',!ready||!open);$('sessionTrainingFocus').classList.toggle('hidden',!trainingFocusActive);}
 $('toggleEntrySession').addEventListener('click',()=>{entrySessionExpanded=true;syncEntrySession();requestAnimationFrame(()=>$('sessionHub').scrollIntoView({behavior:'smooth',block:'start'}));});
 
 function showSessionHub(){showView('decision');entrySessionExpanded=true;syncEntrySession();requestAnimationFrame(()=>$('entrySessionMount').scrollIntoView({behavior:'smooth',block:'start'}));}
@@ -92,7 +104,7 @@ let authEpoch=0,authStatusSeq=0;
 function resetPrivateState(){
  authEpoch++;trainingFocusPending=null;detailTrade=null;journalOpenSeq++;sessionLoadSeq++;summarySeq++; trainingFocusSeq++;trainingFocusActive=null;trainingFocusGoals=[];trainingFocusReady=false;$('trainingGoal').value='';$('trainingPracticeSummary').textContent='';drawTrainingFocus(); clearTimeout(draftTimer);draftDirty=false;draftOwnerId=null;
  clearTimeout(ltfAutosaveTimer);ltfAutosavePending=false;detailRequestSeq++;htfRenderSequence++;trainingLoadVersion++;finishRequestSeq++;
- entryRequestId=null;currentSession=null;accounts=[];allAccounts=[];sessionTrades=[];trainingRows=[];analyticsRows=[];analyticsAccountRows=[];analyticsResults=[];trainingMeasures=[];setupCatalog=[];setupCatalogReady=false;ttIdeas=[];ttAttempts=[];editingAccountId=null;tradeCount=0;busy=false;
+ entryRequestId=null;clearScales($('entryEmotionOptions'));currentSession=null;accounts=[];allAccounts=[];sessionTrades=[];trainingRows=[];analyticsRows=[];analyticsAccountRows=[];analyticsResults=[];trainingMeasures=[];setupCatalog=[];setupCatalogReady=false;ttIdeas=[];ttAttempts=[];editingAccountId=null;tradeCount=0;busy=false;
  const hosts=['accountList','sessionTradeList','tradeDetails','morningBody','trainingList','trainingDetail','analyticsSummary','analyticsDetail','openReviewsBody','progressBody','playbookBody','topFiveBody','setupCards','setupManagerList','htfImagePreview','sessionAccountList','allocationList','sessionSummaryBody','trainingFocusBody','playbookLexicon'];
  for(const id of hosts){const el=$(id);if(el){el.replaceChildren();if(id==='tradeDetails'){el.dataset.tradeId='';el.classList.add('hidden');}}}
  for(const el of document.querySelectorAll('#app input,#app textarea,#app select')){if(el.type==='file')el.value='';else if(el.type==='checkbox')el.checked=el.defaultChecked;else if(el.tagName==='SELECT')el.selectedIndex=0;else el.value=el.defaultValue||'';}
@@ -105,7 +117,8 @@ async function authStatus(){
  const seq=++authStatusSeq;const {data,error}=await client.auth.getUser();if(seq!==authStatusSeq)return;
  const next=error?null:data?.user;const authError=error?.name==='AuthSessionMissingError'?null:error;
  if(authError){for(const id of ['app','tabs','homeBar'])$(id).classList.add('hidden');$('loginView').classList.remove('hidden');message('Anmeldestatus momentan nicht prüfbar. Lokale Entwürfe bleiben erhalten.',true);return;}
- if(next?.id!==currentUser?.id){const old=currentUser?.id;resetPrivateState();if(old)draftPurgeUser(old);currentUser=next||null;}
+ if(next?.id!==currentUser?.id){const old=currentUser?.id;resetPrivateState();if(old){draftPurgeUser(old);purgeWorkspace(old);}currentUser=next||null;}
+ if(next?.id===currentUser?.id&&currentUser&&!$('app').classList.contains('hidden'))return;
  const signed=!!currentUser;$('loginView').classList.toggle('hidden',signed);
  if(!signed){for(const id of ['app','tabs','homeBar','logout'])$(id).classList.add('hidden');message(authError?'Anmeldung erneut prüfen: '+authError.message:'Bitte anmelden.',!!authError);return;}
  const epoch=authEpoch;message('Daten werden geladen …');
@@ -163,15 +176,30 @@ $('verifyOtp').onclick=async()=>{
  finally{btn.disabled=false;ttOtpSubmitting=false}
 };
 $('logout').onclick=async()=>{
- const old=currentUser?.id;draftFlush();resetPrivateState();currentUser=null;authStatusSeq++;if(old)draftPurgeUser(old);
+ const old=currentUser?.id;draftFlush();if(old)purgeWorkspace(old);resetPrivateState();currentUser=null;authStatusSeq++;if(old)draftPurgeUser(old);
  $('loginView').classList.remove('hidden');
  const {error}=await client.auth.signOut();
  if(error){ttAuthStorage.removeItem(TT_AUTH_KEY);message('Lokal abgemeldet. Server-Abmeldung nicht bestätigt: '+error.message,true);}else message('Abgemeldet.');
 };
+let workspaceRestoring=false;
+function workspaceKey(owner=currentUser?.id){return owner?'tt7_workspace_v736:'+owner:null;}
+function purgeWorkspace(owner){for(const storage of [localStorage,sessionStorage])try{storage.removeItem(workspaceKey(owner))}catch(_){}}
+function captureFields(root){return [...root.querySelectorAll('input:not([type=file]),select,textarea')].filter(el=>el.id||el.dataset.id||el.dataset.check||el.dataset.note||el.dataset.scale).map(el=>({id:el.id,cls:el.className,account:el.dataset.id,check:el.dataset.check,note:el.dataset.note,scale:el.dataset.scale,group:el.closest('[data-scale-group]')?.dataset.scaleGroup,type:el.type,value:el.value,checked:el.checked,rated:el.dataset.rated}));}
+function applyFields(root,rows){for(const row of rows||[]){const el=row.id?$(row.id):[...root.querySelectorAll('input,select,textarea')].find(el=>row.account?el.dataset.id===row.account&&el.className===row.cls:row.check?el.dataset.check===row.check:row.note?el.dataset.note===row.note:row.scale?el.dataset.scale===row.scale&&el.closest('[data-scale-group]')?.dataset.scaleGroup===row.group:false);if(!el||!root.contains(el))continue;if(el.type==='checkbox'||el.type==='radio')el.checked=!!row.checked;else el.value=row.value;if(row.rated)el.dataset.rated=row.rated;}updateScaleLabels(root);}
+function saveWorkspace(){if(!currentUser||workspaceRestoring||$('app').classList.contains('hidden'))return;try{const item={version:1,owner:currentUser.id,session:currentSession?.id||null,at:Date.now(),view:[...document.querySelectorAll('#app>section[id$="View"]')].find(el=>!el.classList.contains('hidden'))?.id.replace('View','')||'live',scroll:window.scrollY,expanded:entrySessionExpanded,setup:$('setup').value,request:entryRequestId,fields:captureFields($('decisionView')),sessionFields:captureFields($('sessionHub')),details:[...document.querySelectorAll('#decisionView details')].map((el,i)=>({id:el.id,index:i,open:el.open})),setupOpen:!$('sessionSetup').classList.contains('hidden'),sessionDraftMode};const storage=ttRemember?localStorage:sessionStorage;storage.setItem(workspaceKey(),JSON.stringify(item));(ttRemember?sessionStorage:localStorage).removeItem(workspaceKey());}catch(_){}}
+function readWorkspace(){try{const raw=[localStorage,sessionStorage].map(st=>{try{return JSON.parse(st.getItem(workspaceKey())||'null')}catch(_){return null}}).filter(x=>x?.owner===currentUser?.id&&Date.now()-x.at<86400000).sort((a,b)=>b.at-a.at);return raw[0]||null;}catch(_){return null;}}
+function restoreWorkspace(item){if(!item||item.owner!==currentUser?.id||item.session!==(currentSession?.id||null))return;workspaceRestoring=true;try{entrySessionExpanded=!!item.expanded;if(item.setupOpen){sessionDraftMode=item.sessionDraftMode||'start';renderSessionAccounts();$('sessionSetup').classList.remove('hidden');$('noSession').classList.add('hidden');}applyFields($('decisionView'),item.fields);applyFields($('sessionHub'),item.sessionFields);$('setup').value=item.setup||'';entryRequestId=item.request||null;renderSetupCards();syncDirectionButtons();ttRefreshIdeaMode();updateEntryAccountMode();updateEntryRiskPreview();for(const d of item.details||[]){const el=d.id?$(d.id):$('decisionView').querySelectorAll('details')[d.index];if(el)el.open=d.open;}syncEntrySession();}finally{workspaceRestoring=false;}}
+document.addEventListener('input',e=>{if(e.target.closest('#decisionView'))saveWorkspace();});document.addEventListener('change',e=>{if(e.target.closest('#decisionView'))saveWorkspace();});
+window.addEventListener('pagehide',saveWorkspace);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveWorkspace();});
+window.addEventListener('scroll',()=>{if(!document.hidden)saveWorkspace();},{passive:true});
+
 async function refresh(){
   let savedView='live',savedTrade='',savedScroll=0;
   try{savedView=sessionStorage.getItem('tt7_active_view')||localStorage.getItem('tt7_active_view')||'live';savedTrade=sessionStorage.getItem('tt7_active_trade_id')||'';savedScroll=Number(sessionStorage.getItem('tt7_scroll_y')||0)}catch(_){}
+  const workspace=readWorkspace();
   await loadSetupCatalog();await loadAccounts();await loadSession();renderDecision();
+  restoreWorkspace(workspace);
+  if(workspace&&workspace.session===(currentSession?.id||null)){savedView=workspace.view||savedView;savedScroll=workspace.scroll||0;}
   await Promise.all([loadMorningDashboard(),loadProgressAndPlaybook(),loadTraining(),loadAnalytics(),loadOpenReviews()]);
   showView(['live','decision','journal','accounts','analytics','training','playbook','settings'].includes(savedView)?savedView:'live');
   if(savedTrade&&savedView==='journal'){
@@ -181,10 +209,10 @@ async function refresh(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:Math.max(0,savedScroll),behavior:'instant'})));
 }
 async function loadSession(){const {data,error}=await client.from('trading_sessions').select('id,session_date,status,htf_context,created_at').eq('status','open').order('created_at',{ascending:false}).limit(1);if(error)throw new Error('Session laden: '+error.message);currentSession=data?.[0]??null;renderSession();await loadCount();await loadSessionTrades();await ttLoadIdeas();await renderHtfImage();}
-function renderSession(){syncEntrySession();$('sessionHubState').classList.toggle('stale-session',!!currentSession&&currentSession.session_date!==localDate());$('sessionHubState').textContent=currentSession?(currentSession.session_date!==localDate()?'⚠ ALTE SESSION '+currentSession.session_date+' – vor neuer Session abschließen':'● Aktive Session: '+currentSession.session_date+' · HTF gilt für alle zugehörigen Trades'):'○ Keine offene Session · Neue Session starten und HTF vorbereiten';$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionFinishPanel').classList.toggle('hidden',!currentSession);if(currentSession)refreshSessionFinishChecklist();else{$('sessionFinishChecklist').textContent='Keine aktive Session.';$('closeSession').disabled=true;}$('sessionState').textContent=currentSession?(currentSession.session_date===localDate()?'Heute · offen':'Alt · '+currentSession.session_date):'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.notes??'';setEmotion($('sessionMoodOptions'),currentSession?.htf_context?.mental_check?.mood||'');$('sessionUrge').value=currentSession?.htf_context?.mental_check?.urge||'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
+function renderSession(){syncEntrySession();$('sessionHubState').classList.toggle('stale-session',!!currentSession&&currentSession.session_date!==localDate());$('sessionHubState').textContent=currentSession?(currentSession.session_date!==localDate()?'⚠ ALTE SESSION '+currentSession.session_date+' – vor neuer Session abschließen':'● Aktive Session: '+currentSession.session_date+' · HTF gilt für alle zugehörigen Trades'):'○ Keine offene Session · Neue Session starten und HTF vorbereiten';$('noSession').classList.toggle('hidden',!!currentSession);$('sessionSetup').classList.add('hidden');$('activeSession').classList.toggle('hidden',!currentSession);$('sessionFinishPanel').classList.toggle('hidden',!currentSession);if(currentSession)refreshSessionFinishChecklist();else{$('sessionFinishChecklist').textContent='Keine aktive Session.';$('closeSession').disabled=true;}$('sessionState').textContent=currentSession?(currentSession.session_date===localDate()?'Heute · offen':'Alt · '+currentSession.session_date):'Keine';$('sessionInfo').textContent=currentSession?'Datum: '+currentSession.session_date:'';$('htf').value=currentSession?.htf_context?.free_notes??(currentSession?.htf_context?.structured_notes?'':currentSession?.htf_context?.notes??'');buildScaleGroup($('sessionMoodOptions'),'session',currentSession?.htf_context?.mental_check?.scales);document.querySelectorAll('.htf-note').forEach(el=>el.value=currentSession?.htf_context?.structured_notes?.[el.dataset.note]||'');$('sessionUrge').value=currentSession?.htf_context?.mental_check?.urge||'';$('decisionSession').textContent=currentSession?'Aktive Session: '+currentSession.session_date:'Bitte zuerst eine Session starten.';const checks=currentSession?.htf_context?.preflight_checks||{};
 document.querySelectorAll('.htf-check').forEach(el=>{el.checked=!!checks[el.dataset.check]});
 updateSessionCheckStatus();
-const selection=currentSession?.htf_context?.selected_accounts||[];$('sessionAccountsSummary').textContent=selection.length?'Für neue Trades: '+selection.map(x=>{const a=accounts.find(a=>a.id===x.account_id);return (a?.account_name||'Konto')+' · '+x.role+' · '+x.instrument+' × '+x.planned_quantity}).join(' | '):'Noch keine Session-Kontenauswahl gespeichert.';}
+const selection=currentSession?.htf_context?.selected_accounts||[];$('sessionAccountsSummary').textContent=selection.length?'Verfügbar in dieser Session: '+selection.map(x=>{const a=accounts.find(a=>a.id===x.account_id);return (a?.account_name||'Konto')+' · verfügbar'}).join(' | '):'Noch keine Session-Kontenauswahl gespeichert.';}
 function updateSessionCheckStatus(){
  const items=[...document.querySelectorAll('.htf-check')],done=items.filter(el=>el.checked).length;
  $('sessionCheckStatus').textContent=`${done}/${items.length} Checks erledigt${done===items.length?' · Vorbereitung vollständig':' · offene Punkte vor Entry beachten'}`;
@@ -442,7 +470,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 function snapshotExitDraft(){
   const editor=document.querySelector('#tradeDetails .exit-editor');
   if(!editor)return null;
-  return {reason:editor.querySelector('.exit-reason')?.value||'',emotion:selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),emotions:[...editor.querySelectorAll('[data-emotion-group="exitCommitEmotion"] button[aria-pressed="true"]')].map(b=>b.dataset.value),
+  return {scales:readScales(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),reason:editor.querySelector('.exit-reason')?.value||'',emotion:selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),emotions:[...editor.querySelectorAll('[data-emotion-group="exitCommitEmotion"] button[aria-pressed="true"]')].map(b=>b.dataset.value),
     accounts:[...editor.querySelectorAll('.exit-account')].map(c=>({
       id:c.dataset.id,unit:c.querySelector('.exit-unit')?.value||'ticks',
       amount:c.querySelector('.exit-amount')?.value||'',fees:c.querySelector('.exit-fees')?.value||''
@@ -453,7 +481,7 @@ function restoreExitDraft(draft){
   const editor=document.querySelector('#tradeDetails .exit-editor');
   if(!editor)return;
   editor.querySelector('.exit-reason').value=draft.reason||'';
-  const exitGroup=editor.querySelector('[data-emotion-group="exitCommitEmotion"]');
+  const exitGroup=editor.querySelector('[data-emotion-group="exitCommitEmotion"]');if(draft.scales)buildScaleGroup(exitGroup,'exitCommitEmotion',draft.scales);
   const restored=(Array.isArray(draft.emotions)?draft.emotions:(draft.emotion?[draft.emotion]:[])).filter(v=>typeof v==='string');
   exitGroup?.querySelectorAll('button[data-value]').forEach(b=>{const on=restored.includes(b.dataset.value);b.setAttribute('aria-pressed',String(on));b.classList.toggle('emotion-selected',on);});
   for(const item of (Array.isArray(draft.accounts)?draft.accounts:[])){
@@ -504,8 +532,8 @@ async function openTradeDetails(trade){
     const initialRisk=totals.risk,pnlTotal=totals.pnl,feesTotal=totals.fees;
     const exitSection=trade.exit_at?
       `<div class="account"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}<br>Haltedauer: ${escapeHtml(durationLabel(trade.entry_at,trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe brutto${totals.completeResults?'':' (Ergebnisse unvollständig)'}: ${usd(pnlTotal)} USD · ${totals.rMultiple!==null?totals.rMultiple.toFixed(2)+' R':'R offen – Initialrisiken oder Ergebnisse unvollständig'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
-      `<div class="account exit-editor"><h3>Trade abschließen · alle Konten gemeinsam</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<h4>Emotionen beim Exit · Mehrfachauswahl möglich</h4><div class="emotion-options" data-emotion-group="exitCommitEmotion"><button type="button" data-value="disciplined">Nach Plan</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button><button type="button" data-value="stress">Stress</button></div><p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
-    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">Entry (Berlin): ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><div class="account ltf-analysis"><h3>LTF-Beobachtungen (optional, nach dem Trade)</h3><p class="muted">Optional: Markiere nur die tatsächlich beobachteten Signale. Ergänze unten die konkrete Entry-These: Was wurde wo bestätigt, was hätte sie widerlegt? Haken werden sofort gespeichert.</p>
+      `<div class="account exit-editor"><h3>Trade abschließen · alle Konten gemeinsam</h3><p class="muted">Für jedes Konto das tatsächlich realisierte Ergebnis in Ticks oder USD erfassen. Die zuletzt gewählte Einheit wird gemerkt. Ergebnis = Brutto-P&L vor Gebühren; Gebühren separat. Keine Brokerorder.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<h4>Empfindungen beim Exit · 1–10</h4><div class="emotion-options" data-emotion-group="exitCommitEmotion"><button type="button" data-value="disciplined">Nach Plan</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button><button type="button" data-value="stress">Stress</button></div><p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade endgültig abschließen</button></div>`;
+    panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">${trade.observations?.entry_context_v736?'Ausführung: '+(trade.observations.entry_context_v736.execution_mode==='copy'?'Copy-Modus':'Einzelkonto')+'<br>'+Object.entries(trade.observations.entry_context_v736.emotion_scales||{}).map(([k,v])=>escapeHtml(SCALE_DEFS.entryEmotion.find(d=>d[0]===k)?.[1]||k)+': '+escapeHtml(v)+'/10').join(' · ')+'<br>':''}Entry (Berlin): ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><div class="account ltf-analysis"><h3>LTF-Beobachtungen (optional, nach dem Trade)</h3><p class="muted">Optional: Markiere nur die tatsächlich beobachteten Signale. Ergänze unten die konkrete Entry-These: Was wurde wo bestätigt, was hätte sie widerlegt? Haken werden sofort gespeichert.</p>
 <div class="analysis-grid">
 <label><input type="checkbox" data-analysis="structure"> Struktur / Bruch</label>
 <label><input type="checkbox" data-analysis="volume"> Volumen Preis/Zeit</label>
@@ -578,7 +606,7 @@ async function openTradeDetails(trade){
       mobileHint.textContent='Am Handy: später am PC ergänzen. Vorhandene Bilder bleiben sichtbar.';
       imageSection.insertBefore(mobileHint,imageSection.querySelector('.ltf-gallery'));
     }
-    applyEmotionLabels(panel);
+    applyEmotionLabels(panel);if(trade.observations?.exit_emotion_scales){const saved=panel.querySelector('.saved-exit-emotion');if(saved){const out=document.createElement('p');out.textContent=Object.entries(trade.observations.exit_emotion_scales).map(([k,v])=>(SCALE_DEFS.exitCommitEmotion.find(d=>d[0]===k)?.[1]||k)+': '+v+'/10').join(' · ');saved.append(out);}}
     const review=panel.querySelector('.review-editor');
     if(review){
       const obs=trade.observations||{};
@@ -594,7 +622,7 @@ async function openTradeDetails(trade){
       for(const measure of measures){const option=document.createElement('option');option.value=measure;option.textContent=measure.length>65?measure.slice(0,65)+'…':measure;reuse.appendChild(option);}
       reuse.addEventListener('change',()=>{if(reuse.value)review.querySelector('.review-action').value=reuse.value;});
     }
-    setEmotion(panel.querySelector('[data-emotion-group="duringTradeEmotion"]'),trade.observations?.during_trade_emotion||'');
+    buildScaleGroup(panel.querySelector('[data-emotion-group="duringTradeEmotion"]'),'duringTradeEmotion',trade.observations?.during_emotion_scales||{});
     const recoverable=draftRead(trade.id);
     if(recoverable&&trade.exit_at)recoverable.exit=null;
     if(recoverable&&(recoverable.exit||recoverable.analysis||recoverable.review)){
@@ -678,15 +706,15 @@ $('tradeDetails').addEventListener('click',async e=>{
  }catch(err){feedback.textContent='Nicht gespeichert: '+err.message;}
  finally{busy=false;btn.disabled=false;}
 });
-$('tradeDetails').addEventListener('click',async e=>{
- const btn=e.target.closest('[data-emotion-group="duringTradeEmotion"] button[data-value]');if(!btn||busy)return;
+$('tradeDetails').addEventListener('change',async e=>{
+ const btn=e.target.closest('[data-emotion-group="duringTradeEmotion"] [data-scale]');if(!btn||busy)return;
  const panel=$('tradeDetails'),trade=detailTradeById(panel.dataset.tradeId);if(!trade)return;
  const emotion=selectedEmotion(panel.querySelector('[data-emotion-group="duringTradeEmotion"]'));
  const feedback=panel.querySelector('.during-feedback');
- if(!emotion){feedback.textContent='Bitte zuerst eine Emotion auswählen.';return;}
+ if(!Object.keys(readScales(btn.closest('[data-scale-group]'))).length)return;
  busy=true;btn.disabled=true;feedback.textContent='Speichert …';
  try{
-  const observations={...(trade.observations||{}),during_trade_emotion:emotion,during_trade_emotion_at:new Date().toISOString()};
+  const observations={...(trade.observations||{}),during_trade_emotion:emotion||null,during_emotion_scales:readScales(btn.closest('[data-scale-group]')),during_trade_emotion_at:new Date().toISOString()};
   const {data,error}=await conditionalTradeUpdate(trade.id,{observations},trade.observations,'observations');
   if(error)throw error;if(!data){tradeConflictFeedback(feedback);return;}
   applyTradePatch(trade,{observations:data.observations});feedback.textContent='Emotion mit Zeitstempel gespeichert.';
@@ -1365,7 +1393,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   editor.querySelectorAll('input,select').forEach(el=>el.style.outline='');
   if(!reason){fail('Bitte Exit-Grund auswählen.',editor.querySelector('.exit-reason'));return;}
   const exitEmotion=selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]'));const exitEmotions=[...editor.querySelectorAll('[data-emotion-group="exitCommitEmotion"] button[aria-pressed="true"]')].map(b=>b.dataset.value);
-  if(!exitEmotion){fail('Bitte die Emotion beim Exit auswählen.');return;}
+  const exitScales=readScales(editor.querySelector('[data-emotion-group="exitCommitEmotion"]'));if(!Object.keys(exitScales).length){fail('Bitte mindestens eine Empfindung auf der Skala bewerten.');return;}
   const results=[];
   for(const card of editor.querySelectorAll('.exit-account')){
     const result=exitResult(card);
@@ -1388,7 +1416,7 @@ $('tradeDetails').addEventListener('click',async e=>{
   busy=true;btn.disabled=true;btn.textContent='Wird abgeschlossen …';feedback.textContent='Abschluss wird gespeichert …';feedback.style.color='';
   try{
     const tradeId=$('tradeDetails').dataset.tradeId;
-    const {data,error}=await client.rpc('close_trade_with_emotions_v7',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results,p_exit_emotions:exitEmotions});
+    const {data,error}=await client.rpc('close_trade_with_scales_v736',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results,p_scales:exitScales});
     if(error)throw error;
     if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
     message('Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
@@ -1504,15 +1532,15 @@ async function loadCount(){
 }
 
 function openSessionSetup(mode){sessionDraftMode=mode;renderSessionAccounts();$('sessionSetup').classList.remove('hidden');$('noSession').classList.add('hidden');$('activeSession').classList.toggle('hidden',mode==='start');}
-function renderSessionAccounts(){const selected=sessionDraftMode==='change'?(currentSession?.htf_context?.selected_accounts||[]):[];$('sessionAccountList').innerHTML=accounts.length?accounts.map(a=>{const v=selected.find(x=>x.account_id===a.id);return `<div class="account"><label><input class="sess-check" data-id="${a.id}" type="checkbox" style="display:inline;width:auto" ${v?'checked':''}> ${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="sess-role" data-id="${a.id}"><option value="follower" ${v?.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v?.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v?.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="sess-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v?.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="sess-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v?.planned_quantity||a.default_quantity)}"></label></div>`}).join(''):'<p class="notice">Noch keine Konten vorhanden. Lege zuerst unter „Konten“ ein Konto an.</p><button type="button" class="secondary wide" id="goAccounts">Kontenverwaltung öffnen</button>';}
+function renderSessionAccounts(){const selected=sessionDraftMode==='change'?(currentSession?.htf_context?.selected_accounts||[]):[];$('sessionAccountList').innerHTML=accounts.length?accounts.map(a=>`<label class="account-pick"><input class="sess-check" data-id="${escapeHtml(a.id)}" type="checkbox" ${selected.some(x=>x.account_id===a.id)?'checked':''}> ${escapeHtml(a.account_name)} <small>· ${escapeHtml(a.default_instrument)}</small></label>`).join(''):'<p>Lege zuerst unter Konten ein Konto an.</p><button type="button" id="goAccounts">Konten öffnen</button>';}
 function sessionFeedback(text){$('sessionSetupFeedback').textContent=text;message(text,true)}
-function getSessionSelection(){return [...document.querySelectorAll('.sess-check:checked')].map(c=>{const id=c.dataset.id;return {account_id:id,role:document.querySelector(`.sess-role[data-id="${id}"]`).value,instrument:document.querySelector(`.sess-instrument[data-id="${id}"]`).value,planned_quantity:Number(document.querySelector(`.sess-qty[data-id="${id}"]`).value)};});}
+function getSessionSelection(){return [...document.querySelectorAll('.sess-check:checked')].map(c=>{const a=accounts.find(a=>a.id===c.dataset.id);return{account_id:a.id,instrument:a.default_instrument,planned_quantity:Number(a.default_quantity)};});}
 $('startSession').onclick=()=>{if(currentSession){message('Es ist bereits eine Session offen. Schließe sie zuerst ab; offene Trades müssen zuvor dokumentiert werden.',true);return;}openSessionSetup('start');};
 $('changeSessionAccounts').onclick=()=>openSessionSetup('change');
 $('cancelSession').onclick=()=>{renderSession();};
-$('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){sessionFeedback('Bitte mindestens ein Konto links mit dem Häkchen auswählen.');$('sessionAccountList').scrollIntoView({behavior:'smooth',block:'center'});return}if(selection.filter(x=>x.role==='leader').length!==1){sessionFeedback('Bitte bei genau einem ausgewählten Konto die Rolle Leader einstellen. Aktuell: '+selection.filter(x=>x.role==='leader').length+'.');$('sessionAccountList').scrollIntoView({behavior:'smooth',block:'center'});return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){sessionFeedback('Kontraktzahl muss für jedes ausgewählte Konto größer als null sein.');return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){if(currentSession)throw new Error('Es ist bereits eine Session offen. Bitte zuerst abschließen.');const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();await renderHtfImage();if(sessionDraftMode==='start'){message('Session gestartet. Bitte jetzt HTF-Kontext und Checks speichern.');showSessionHub();}}catch(e){sessionFeedback('Session konnte nicht gespeichert werden: '+e.message)}finally{busy=false;$('confirmSession').disabled=false}};
+$('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){sessionFeedback('Bitte mindestens ein Konto links mit dem Häkchen auswählen.');$('sessionAccountList').scrollIntoView({behavior:'smooth',block:'center'});return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){sessionFeedback('Kontraktzahl muss für jedes ausgewählte Konto größer als null sein.');return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){if(currentSession)throw new Error('Es ist bereits eine Session offen. Bitte zuerst abschließen.');const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();await renderHtfImage();if(sessionDraftMode==='start'){message('Session gestartet. Bitte jetzt HTF-Kontext und Checks speichern.');showSessionHub();}}catch(e){sessionFeedback('Session konnte nicht gespeichert werden: '+e.message)}finally{busy=false;$('confirmSession').disabled=false}};
 $('sessionUrge').addEventListener('change',()=>{if(currentSession&&!busy)$('saveHtf').click();});
-$('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:$('htf').value,preflight_checks:Object.fromEntries([...document.querySelectorAll('.htf-check')].map(el=>[el.dataset.check,el.checked])),mental_check:{mood:selectedEmotion($('sessionMoodOptions')),urge:$('sessionUrge').value}};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;entrySessionExpanded=false;syncEntrySession();message('HTF-Kontext und mentaler Session-Check gespeichert.');$('sessionEmotionStatus').textContent='Mentale Verfassung gespeichert.'}};
+$('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:sessionContextText(),structured_notes:Object.fromEntries([...document.querySelectorAll('.htf-note')].map(el=>[el.dataset.note,el.value.trim()])),free_notes:$('htf').value,preflight_checks:Object.fromEntries([...document.querySelectorAll('.htf-check')].map(el=>[el.dataset.check,el.checked])),mental_check:{...(currentSession.htf_context?.mental_check||{}),scales:readScales($('sessionMoodOptions')),urge:$('sessionUrge').value}};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;saveWorkspace();syncEntrySession();message('HTF-Kontext und mentaler Session-Check gespeichert.');$('sessionEmotionStatus').textContent='Mentale Verfassung gespeichert.'}};
 $('refreshFinishChecklist').addEventListener('click',()=>refreshSessionFinishChecklist());
 let finishRequestSeq=0;
 async function refreshSessionFinishChecklist(){
@@ -1655,6 +1683,7 @@ const EMOTION_DEFAULTS={
 const EMOTION_TITLES={entryEmotion:'Vor dem Trade',duringTradeEmotion:'Während des Trades',exitCommitEmotion:'Nach dem Trade'};
 function emotionLabels(){return currentUser?.user_metadata?.tt7_emotion_labels||{};}
 function applyEmotionLabels(root=document){
+ enhanceEmotionScales(root);
  const labels=emotionLabels();
  for(const [group,defaults] of Object.entries(EMOTION_DEFAULTS)){
   root.querySelectorAll('[data-emotion-group="'+group+'"] button[data-value]').forEach(button=>{
@@ -1728,7 +1757,7 @@ function renderSetupCards(){
   button.addEventListener('click',()=>{
    $('setup').value=item.name;
    $('setupSelectionStatus').textContent='Ausgewählt: '+item.name;
-   renderSetupCards();
+   renderSetupCards();saveWorkspace();
   });
   target.appendChild(button);
  }
@@ -1847,27 +1876,37 @@ function ttRefreshIdeaMode(){
  $('ttIdeaPlanned').classList.toggle('hidden',spontaneous);
  $('ttSpontaneousInfo').classList.toggle('hidden',!spontaneous);
  const id=$('ttIdeaSelect').value,idea=ttIdeas.find(x=>x.id===id);
- $('ttNewIdeaFields').classList.toggle('hidden',!!id);
+ $('ttNewIdeaFields').classList.toggle('hidden',$('ttIdeaMode').value!=='planned');$('ttIdeaSelect').closest('label').classList.toggle('hidden',$('ttIdeaMode').value!=='existing');
  const attemptNo=idea?ttAttempts.filter(a=>a.idea_id===id).length+1:1;
  $('ttAttemptWarning').classList.toggle('hidden',!idea||attemptNo<4);
- $('ttIdeaStatus').textContent=idea?'Geplant · Versuch '+attemptNo+' · ursprünglicher Plan: '+idea.thesis+' · Trigger: '+idea.trigger_condition+' · Invalidation: '+idea.invalidation:'Neue Idee zuerst speichern; der Zeitpunkt wird serverseitig festgehalten.';
+ $('ttIdeaStatus').textContent=idea?'Geplant · Versuch '+attemptNo+' · ursprünglicher Plan: '+idea.thesis+' · Trigger: '+idea.trigger_condition+' · Invalidation: '+idea.invalidation:'Wird zusammen mit dem Entry gespeichert. Vormerken ist nur nötig, wenn du die Idee vorher festhalten möchtest.';
  for(const id of ['ttCheckThesis','ttCheckTrigger','ttCheckRisk','ttCheckMotivation'])$(id).value='';
 }
 $('ttIdeaMode').addEventListener('change',ttRefreshIdeaMode);
-$('ttIdeaSelect').addEventListener('change',ttRefreshIdeaMode);
+$('ttIdeaSelect').addEventListener('change',()=>{const idea=ttIdeas.find(x=>x.id===$('ttIdeaSelect').value);if(idea){$('setup').value=idea.setup_type;$('instrument').value=idea.instrument;$('direction').value=idea.direction;renderSetupCards();syncDirectionButtons();}ttRefreshIdeaMode();});
 $('ttSaveIdea').onclick=async()=>{
  if(!currentSession||!sessionReady()){message('Zuerst heutige Session vorbereiten.',true);return;}
  const thesis=$('ttIdeaThesis').value.trim(),trigger=$('ttIdeaTrigger').value.trim(),invalidation=$('ttIdeaInvalidation').value.trim();
- if(!thesis||!trigger||!invalidation||!$('setup').value){message('Setup, These, Trigger und Invalidation sind Pflicht.',true);return;}
+ if(!$('setup').value){entryFeedback('Wähle zuerst oben dein Setup.',$('setupCards').querySelector('button'));return;}if(!thesis||!trigger||!invalidation){entryFeedback('Bitte These, Trigger und Invalidation ergänzen.',!thesis?$('ttIdeaThesis'):!trigger?$('ttIdeaTrigger'):$('ttIdeaInvalidation'));return;}
  const btn=$('ttSaveIdea');btn.disabled=true;
  try{
   const {data,error}=await client.from('trade_ideas_v733').insert({session_id:currentSession.id,setup_type:$('setup').value,instrument:$('instrument').value,direction:$('direction').value,thesis,trigger_condition:trigger,invalidation}).select('id').single();
   if(error)throw error;
-  await ttLoadIdeas();$('ttIdeaSelect').value=data.id;ttRefreshIdeaMode();
+  await ttLoadIdeas();$('ttIdeaSelect').value=data.id;$('ttIdeaMode').value='existing';ttRefreshIdeaMode();saveWorkspace();
   message('Handelsidee gespeichert. Bitte erst danach im ATAS einsteigen; ein tatsächlicher Broker-Entry wird hier nicht automatisch überprüft.');
  }catch(e){message('Handelsidee nicht gespeichert: '+e.message,true);}finally{btn.disabled=false;}
 };
-function renderDecision(){const chosen=currentSession?.htf_context?.selected_accounts||[];$('allocationList').innerHTML=chosen.length?chosen.map(v=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label><input style="display:inline;width:auto;margin-right:8px" type="checkbox" class="acct-check" data-id="${a.id}" checked>${escapeHtml(a.account_name)}</label><div class="grid"><label>Rolle<select class="acct-role" data-id="${a.id}"><option value="follower" ${v.role==='follower'?'selected':''}>Follower</option><option value="leader" ${v.role==='leader'?'selected':''}>Leader</option><option value="manual" ${v.role==='manual'?'selected':''}>Manuell</option></select></label><label>Instrument<select class="acct-instrument" data-id="${a.id}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===v.instrument?'selected':''}>${x}</option>`).join('')}</select></label></div><label>Kontrakte<input class="acct-qty" data-id="${a.id}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity)}"></label><label>Ursprünglicher SL-Abstand (Ticks) · Pflicht<input class="acct-sl-ticks" data-id="${a.id}" type="number" inputmode="numeric" min="1" max="100000" step="1" placeholder="z. B. 40" required></label><p class="muted acct-risk-preview" data-id="${a.id}">Initialrisiko: SL-Ticks eingeben</p></div>`}).join(''):'<p class="notice">Öffne oben die Session und wähle die Konten aus.</p>';}
+function renderDecision(){
+ const before=captureFields($('allocationList'));const chosen=currentSession?.htf_context?.selected_accounts||[];
+ $('allocationList').innerHTML=chosen.map((v,i)=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label class="account-pick"><input type="checkbox" class="acct-check" data-id="${escapeHtml(a.id)}" ${i===0?'checked':''}>${escapeHtml(a.account_name)}</label><label class="acct-copy-role hidden"><input type="radio" name="copyLeader" class="acct-leader" data-id="${escapeHtml(a.id)}" ${i===0?'checked':''}>Quellkonto (Leader)</label><input type="hidden" class="acct-role" data-id="${escapeHtml(a.id)}" value="${i===0?'leader':'follower'}"><div class="account-fields"><div class="grid"><label>Instrument<select class="acct-instrument" data-id="${escapeHtml(a.id)}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label><label>Kontrakte<input class="acct-qty" data-id="${escapeHtml(a.id)}" type="number" min="0.01" step="0.01" value="${Number(v.planned_quantity||a.default_quantity)}"></label></div><label>Ursprünglicher SL (Ticks)<input class="acct-sl-ticks" data-id="${escapeHtml(a.id)}" type="number" inputmode="numeric" min="1" max="100000" step="1" placeholder="z. B. 40" required></label><p class="muted acct-risk-preview" data-id="${escapeHtml(a.id)}"></p></div></div>`;}).join('')||'<p>Wähle zuerst verfügbare Session-Konten.</p>';
+ applyFields($('allocationList'),before);updateEntryAccountMode();updateEntryRiskPreview();$('entryLimitField').classList.toggle('hidden',tradeCount<5);
+}
+function updateEntryAccountMode(changed){const copy=$('entryCopy').checked,checks=[...$('allocationList').querySelectorAll('.acct-check')];if(!copy){const winner=changed?.checked?changed:checks.find(c=>c.checked);checks.forEach(c=>c.checked=c===winner);}const selected=checks.filter(c=>c.checked);let leader=$('allocationList').querySelector('.acct-leader:checked');if(!leader||!selected.some(c=>c.dataset.id===leader.dataset.id)){leader=$('allocationList').querySelector('.acct-leader[data-id="'+selected[0]?.dataset.id+'"]');if(leader)leader.checked=true;}
+ for(const c of checks){const panel=c.closest('.account');panel.querySelector('.account-fields').classList.toggle('hidden',!c.checked);panel.querySelector('.acct-copy-role').classList.toggle('hidden',!copy||!c.checked);panel.querySelector('.acct-role').value=c.checked&&(!copy||leader?.dataset.id===c.dataset.id)?'leader':'follower';}
+ $('entryCopyHint').textContent=copy?'Beteiligte Konten anhaken und ein Quellkonto wählen. Ein Copy-Trade zählt als eine Entscheidung.':'Einzeltrade: ein Konto wählen. Unabhängiger Trade auf dem anderen Konto = neuer Trade in derselben Session.';
+}
+$('entryCopy').addEventListener('change',()=>{updateEntryAccountMode();updateEntryRiskPreview();saveWorkspace();});
+$('allocationList').addEventListener('change',e=>{updateEntryAccountMode(e.target.matches('.acct-check')?e.target:null);updateEntryRiskPreview();saveWorkspace();});
 function updateEntryRiskPreview(){
  document.querySelectorAll('#allocationList .acct-check').forEach(c=>{
   const panel=c.closest('.account');
@@ -1907,11 +1946,11 @@ $('recordEntry').onclick=async()=>{
   if(selected.some(a=>!Number.isFinite(a.planned_quantity)||a.planned_quantity<=0)){message('Kontraktzahl muss größer als 0 sein.',true);return}
   const missingRisk=selected.find(a=>!/^\d+$/.test(a.sl_input_raw)||!Number.isSafeInteger(a.initial_sl_ticks)||a.initial_sl_ticks<1||a.initial_sl_ticks>100000);
   if(missingRisk){entryFeedback('Bitte für jedes ausgewählte Konto den ursprünglichen SL in ganzen Ticks erfassen. Der Kontenbereich ist jetzt geöffnet.',document.querySelector('.acct-sl-ticks[data-id="'+missingRisk.account_id+'"]'));return}
-  if(selected.filter(a=>a.role==='leader').length!==1){message('Genau ein ausgewähltes Konto muss Leader sein.',true);return}
+  if(!$('entryCopy').checked&&selected.length!==1){entryFeedback('Ohne Copy-Modus genau ein Konto wählen.',$('entryCopy'));return;}if($('entryCopy').checked&&(selected.length<2||selected.filter(a=>a.role==='leader').length!==1)){entryFeedback('Im Copy-Modus mindestens zwei Konten und ein Quellkonto wählen.',$('entryCopy'));return;}
   if(tradeCount>=5&&!confirm('Tageslimit überschritten. Ohne Begründung wird der zusätzliche Trade als Regelbruch erfasst. Trotzdem dokumentieren?'))return;
   const spontaneous=$('ttIdeaMode').value==='spontaneous';
-  const entryIdeaId=spontaneous?null:$('ttIdeaSelect').value;
-  if(!spontaneous&&!entryIdeaId){entryFeedback('Zuerst eine Handelsidee speichern oder eine vorhandene wählen. Spontane Trades kannst du über den Modus erfassen.',$('ttIdeaSelect'));return;}
+  const entryIdeaId=$('ttIdeaMode').value==='existing'?$('ttIdeaSelect').value:null;
+  let newIdea=null;if(!spontaneous&&!entryIdeaId){if($('ttIdeaMode').value==='existing'){entryFeedback('Bitte eine vorhandene Idee auswählen.',$('ttIdeaSelect'));return;}newIdea={thesis:$('ttIdeaThesis').value.trim(),trigger_condition:$('ttIdeaTrigger').value.trim(),invalidation:$('ttIdeaInvalidation').value.trim()};const missing=!newIdea.thesis?$('ttIdeaThesis'):!newIdea.trigger_condition?$('ttIdeaTrigger'):!newIdea.invalidation?$('ttIdeaInvalidation'):null;if(missing){entryFeedback('Bitte die neue Idee mit These, Trigger und Invalidation ergänzen.',missing);return;}}
   const idea=entryIdeaId?ttIdeas.find(x=>x.id===entryIdeaId):null;
   if(idea&&(idea.setup_type!==setup||idea.instrument!==$('instrument').value||idea.direction!==$('direction').value)){
     message('Setup, Instrument und Richtung müssen mit der gespeicherten Handelsidee übereinstimmen.',true);return;
@@ -1929,11 +1968,14 @@ $('recordEntry').onclick=async()=>{
   $('recordEntry').disabled=true;
   try{
     if(!currentSession || currentSession.session_date!==localDate() || !sessionReady())throw new Error('Nur die heutige vorbereitete Session darf Trades eröffnen.');
-    const {data,error}=await client.rpc('record_trade_attempt_v735',{
+    entryRequestId=entryRequestId||crypto.randomUUID();saveWorkspace();
+    const {data,error}=await client.rpc('record_trade_attempt_v736',{
       p_client_request_id:entryRequestId||(entryRequestId=crypto.randomUUID()),
       p_limit_reason:$('ttLimitReason').value.trim()||null,
       p_idea_id:entryIdeaId,
       p_warning_answers:entryWarningAnswers,
+      p_new_idea:newIdea,
+      p_entry_context:{execution_mode:$('entryCopy').checked?'copy':'independent',emotion_scales:readScales($('entryEmotionOptions'))},
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,
@@ -1943,7 +1985,7 @@ $('recordEntry').onclick=async()=>{
     });
     if(error)throw error;
     if(!data)throw new Error('Keine Trade-ID von der Datenbank zurückgegeben. Bitte vor erneutem Speichern die Trade-Liste prüfen.');
-    entryRequestId=null;$('ttLimitReason').value='';
+    entryRequestId=null;$('ttLimitReason').value='';purgeWorkspace(currentUser.id);$('allocationList').replaceChildren();$('ttIdeaMode').value='planned';$('ttIdeaSelect').value='';for(const id of ['ttIdeaThesis','ttIdeaTrigger','ttIdeaInvalidation'])$(id).value='';clearScales($('entryEmotionOptions'));
     await loadCount();
     await loadSessionTrades();
     await ttLoadIdeas();
@@ -2111,7 +2153,7 @@ function initTrainingFocus(){
   trainingFocusBusy=true;drawTrainingFocus();
   try{const {data,error}=await client.from('training_goals_v7').update({status:'practiced',practiced_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',goal.id).eq('status','active').eq('updated_at',goal.updated_at).select('id').maybeSingle();if(currentUser?.id!==owner)return;if(error)throw error;if(!data)throw new Error('Schwerpunkt wurde zwischenzeitlich geändert. Bitte neu laden.');$('trainingGoal').value='';await loadTrainingFocus();trainingFocusMessage('Schwerpunkt bewusst beendet. Bewertungen bleiben erhalten.');}catch(err){if(currentUser?.id===owner)trainingFocusMessage('Nicht gespeichert: '+err.message,true);}finally{trainingFocusBusy=false;drawTrainingFocus();}
  });
- client.auth.onAuthStateChange(()=>{trainingFocusSeq++;trainingFocusActive=null;trainingFocusGoals=[];trainingFocusReady=false;$('trainingGoal').value='';$('trainingPracticeSummary').textContent='';drawTrainingFocus();setTimeout(()=>{void loadTrainingFocus();},100);});
+ client.auth.onAuthStateChange((event,session)=>{if(event==='TOKEN_REFRESHED'||(event==='SIGNED_IN'&&session?.user?.id===currentUser?.id))return;trainingFocusSeq++;trainingFocusActive=null;trainingFocusGoals=[];trainingFocusReady=false;$('trainingGoal').value='';$('trainingPracticeSummary').textContent='';drawTrainingFocus();setTimeout(()=>{void loadTrainingFocus();},100);});
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&currentUser)void loadTrainingFocus();});
  drawTrainingFocus();void loadTrainingFocus();
 }
