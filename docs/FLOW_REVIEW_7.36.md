@@ -6,7 +6,7 @@ Session-Konten sind nur verfügbare Konten. Keine Leader-/Follower-Auswahl, Meng
 
 Session-Vorbereitung und Tradeformular werden nacheinander angezeigt. Nach der Vorbereitung führt eine einzige Weiter-Aktion zum Trade. Reihenfolge: Setup, Richtung/Markt, Idee, Konto/Copy und Initialrisiko, Verfassung, Entry. Die redundante Neuer-Trade-Unteraktion entfällt. Fehlendes Setup fokussiert die sichtbare Setupauswahl.
 
-Neue Ideen werden mit dem Entry in einer Datenbanktransaktion angelegt; Vormerken ist optional. Re-Entry wählt eine bereits gespeicherte Idee und übernimmt Setup, Richtung und Markt. Die bestehenden Warnungen für wiederholte Versuche bleiben erhalten. Spontane Trades bleiben dokumentierbar.
+Neue Ideen werden mit dem Entry in einer Datenbanktransaktion angelegt; Vormerken ist optional und aufklappbar. Die Metadaten unterscheiden eine mit dem Entry erfasste von einer zuvor gespeicherten Idee. Re-Entry wählt eine bereits gespeicherte Idee und übernimmt Setup, Richtung und Markt. Die bestehenden Warnungen für wiederholte Versuche bleiben erhalten. Spontane Trades bleiben dokumentierbar.
 
 ## Ansicht und Entwürfe
 
@@ -20,7 +20,7 @@ Vier HTF-Zeilen verbinden Prüf-Haken mit jeweils einem Notizfeld: Struktur/Extr
 
 ## Validierung und Grenzen
 
-50 Node-/DOM-/Gatewaytests sowie 6 Python-Archivtests bestanden. Acht neue Tests betreffen Kontenmodell, SL-Erhaltung, Auth-Wiederprüfung, Wiederaufnahme, gezielte Ideenvalidierung, atomaren Entry-Payload, Skalen/Exit-Entwurf und tatsächliche Formularreihenfolge. 11 zusätzliche Datenbank-Prüffälle mit Rollback bestanden: neue Idee/Entry/Risiko, Retry, getrennte Konten, Copy-Zuordnungen/Risikosumme, unzulässige Mehrkonten-Einzeltrades, abweichender Retry, unveränderliche Entry-Bewertung, Zahlenvalidierung, Exit und Bewertungen, laufende Bewertungen sowie Fremdzugriff.
+51 Node-/DOM-/Gatewaytests sowie 6 Python-Archivtests bestanden. Neun neue Tests betreffen Kontenmodell, SL-Erhaltung, Auth-Wiederprüfung, Wiederaufnahme, gezielte Ideenvalidierung, atomaren Entry-Payload, Skalen/Exit-Entwurf und tatsächliche Formularreihenfolge sowie die Wiederaufnahme ausgefüllter Re-Entry-Warnfragen. 11 zusätzliche Datenbank-Prüffälle mit Rollback bestanden: neue Idee/Entry/Risiko, Retry, getrennte Konten, Copy-Zuordnungen/Risikosumme, unzulässige Mehrkonten-Einzeltrades, abweichender Retry, unveränderliche Entry-Bewertung, Zahlenvalidierung, Exit und Bewertungen, laufende Bewertungen sowie Fremdzugriff.
 
 Migration `entry_flow_and_emotion_scales_v736` additiv angewendet. Bestehende APIs bleiben während des Rollouts kompatibel. Keine neue SECURITY-DEFINER-Funktion; neue Endpunkte verwenden RLS und die bereits geprüfte Erfassungsfunktion.
 

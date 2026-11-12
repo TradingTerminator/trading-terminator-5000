@@ -215,9 +215,9 @@ updateSessionCheckStatus();
 const selection=currentSession?.htf_context?.selected_accounts||[];$('sessionAccountsSummary').textContent=selection.length?'Verfügbar in dieser Session: '+selection.map(x=>{const a=accounts.find(a=>a.id===x.account_id);return (a?.account_name||'Konto')+' · verfügbar'}).join(' | '):'Noch keine Session-Kontenauswahl gespeichert.';}
 function updateSessionCheckStatus(){
  const items=[...document.querySelectorAll('.htf-check')],done=items.filter(el=>el.checked).length;
- $('sessionCheckStatus').textContent=`${done}/${items.length} Checks erledigt${done===items.length?' · Vorbereitung vollständig':' · offene Punkte vor Entry beachten'}`;
+ $('sessionCheckStatus').textContent=`${done}/${items.length} Checks erledigt${done===items.length?(sessionContextText()?' · Kontext speichern':' · mindestens eine Kontextnotiz ergänzen'):' · offene Punkte vor Entry beachten'}`;
 }
-document.querySelectorAll('.htf-check').forEach(el=>el.addEventListener('change',updateSessionCheckStatus));
+document.querySelectorAll('.htf-check').forEach(el=>el.addEventListener('change',updateSessionCheckStatus));document.querySelectorAll('.htf-note,#htf').forEach(el=>el.addEventListener('input',updateSessionCheckStatus));
 const berlinTime=iso=>iso?new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).format(new Date(iso)):'–';
 let sessionTrades=[],detailTrade=null,journalOpenSeq=0,sessionLoadSeq=0,summarySeq=0;
 function detailTradeById(id){return detailTrade?.id===id?detailTrade:(sessionTrades.find(t=>t.id===id)||null);}
@@ -1540,7 +1540,7 @@ $('changeSessionAccounts').onclick=()=>openSessionSetup('change');
 $('cancelSession').onclick=()=>{renderSession();};
 $('confirmSession').onclick=async()=>{if(busy)return;const selection=getSessionSelection();if(!selection.length){sessionFeedback('Bitte mindestens ein Konto links mit dem Häkchen auswählen.');$('sessionAccountList').scrollIntoView({behavior:'smooth',block:'center'});return}if(selection.some(x=>!Number.isFinite(x.planned_quantity)||x.planned_quantity<=0)){sessionFeedback('Kontraktzahl muss für jedes ausgewählte Konto größer als null sein.');return}busy=true;$('confirmSession').disabled=true;try{if(sessionDraftMode==='start'){if(currentSession)throw new Error('Es ist bereits eine Session offen. Bitte zuerst abschließen.');const {data,error}=await client.from('trading_sessions').insert({session_date:localDate(),status:'open',htf_context:{selected_accounts:selection}}).select('id,session_date,status,htf_context,created_at').single();if(error)throw error;currentSession=data;await loadCount();message('Session mit '+selection.length+' Konto/Konten gestartet.');}else{const ctx={...(currentSession.htf_context||{}),selected_accounts:selection};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)throw error;currentSession.htf_context=data.htf_context;message('Kontenauswahl für kommende Trades gespeichert.');}renderSession();renderDecision();await loadSessionTrades();await renderHtfImage();if(sessionDraftMode==='start'){message('Session gestartet. Bitte jetzt HTF-Kontext und Checks speichern.');showSessionHub();}}catch(e){sessionFeedback('Session konnte nicht gespeichert werden: '+e.message)}finally{busy=false;$('confirmSession').disabled=false}};
 $('sessionUrge').addEventListener('change',()=>{if(currentSession&&!busy)$('saveHtf').click();});
-$('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:sessionContextText(),structured_notes:Object.fromEntries([...document.querySelectorAll('.htf-note')].map(el=>[el.dataset.note,el.value.trim()])),free_notes:$('htf').value,preflight_checks:Object.fromEntries([...document.querySelectorAll('.htf-check')].map(el=>[el.dataset.check,el.checked])),mental_check:{...(currentSession.htf_context?.mental_check||{}),scales:readScales($('sessionMoodOptions')),urge:$('sessionUrge').value}};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;saveWorkspace();syncEntrySession();message('HTF-Kontext und mentaler Session-Check gespeichert.');$('sessionEmotionStatus').textContent='Mentale Verfassung gespeichert.'}};
+$('saveHtf').onclick=async()=>{if(!currentSession)return;const ctx={...(currentSession.htf_context??{}),notes:sessionContextText(),structured_notes:Object.fromEntries([...document.querySelectorAll('.htf-note')].map(el=>[el.dataset.note,el.value.trim()])),free_notes:$('htf').value,preflight_checks:Object.fromEntries([...document.querySelectorAll('.htf-check')].map(el=>[el.dataset.check,el.checked])),mental_check:{...(currentSession.htf_context?.mental_check||{}),scales:readScales($('sessionMoodOptions')),urge:$('sessionUrge').value}};const {data,error}=await client.from('trading_sessions').update({htf_context:ctx}).eq('id',currentSession.id).filter('htf_context','eq',JSON.stringify(currentSession.htf_context||{})).select('htf_context').single();if(error)message('Kontext: '+error.message,true);else{currentSession.htf_context=data.htf_context;saveWorkspace();syncEntrySession();message('HTF-Kontext und mentaler Session-Check gespeichert.');$('sessionEmotionStatus').textContent=sessionReady()?'Vorbereitung gespeichert. Weiter zum Trade.':'Gespeichert. Für den Entry alle vier Punkte prüfen und mindestens eine Kontextnotiz ergänzen.'}};
 $('refreshFinishChecklist').addEventListener('click',()=>refreshSessionFinishChecklist());
 let finishRequestSeq=0;
 async function refreshSessionFinishChecklist(){
@@ -1870,20 +1870,20 @@ function ttRenderIdeaSelect(){
  if(ttIdeas.some(x=>x.id===previous&&x.status==='active'))select.value=previous;
  ttRefreshIdeaMode();
 }
-function ttRefreshIdeaMode(){
+function ttRefreshIdeaMode(resetChecks=false){
  if(!$('ttIdeaMode'))return;
  const spontaneous=$('ttIdeaMode').value==='spontaneous';
  $('ttIdeaPlanned').classList.toggle('hidden',spontaneous);
  $('ttSpontaneousInfo').classList.toggle('hidden',!spontaneous);
- const id=$('ttIdeaSelect').value,idea=ttIdeas.find(x=>x.id===id);
+ const id=$('ttIdeaSelect').value,idea=$('ttIdeaMode').value==='existing'?ttIdeas.find(x=>x.id===id):null;
  $('ttNewIdeaFields').classList.toggle('hidden',$('ttIdeaMode').value!=='planned');$('ttIdeaSelect').closest('label').classList.toggle('hidden',$('ttIdeaMode').value!=='existing');
  const attemptNo=idea?ttAttempts.filter(a=>a.idea_id===id).length+1:1;
  $('ttAttemptWarning').classList.toggle('hidden',!idea||attemptNo<4);
  $('ttIdeaStatus').textContent=idea?'Geplant · Versuch '+attemptNo+' · ursprünglicher Plan: '+idea.thesis+' · Trigger: '+idea.trigger_condition+' · Invalidation: '+idea.invalidation:'Wird zusammen mit dem Entry gespeichert. Vormerken ist nur nötig, wenn du die Idee vorher festhalten möchtest.';
- for(const id of ['ttCheckThesis','ttCheckTrigger','ttCheckRisk','ttCheckMotivation'])$(id).value='';
+ if(resetChecks===true)for(const id of ['ttCheckThesis','ttCheckTrigger','ttCheckRisk','ttCheckMotivation'])$(id).value='';
 }
-$('ttIdeaMode').addEventListener('change',ttRefreshIdeaMode);
-$('ttIdeaSelect').addEventListener('change',()=>{const idea=ttIdeas.find(x=>x.id===$('ttIdeaSelect').value);if(idea){$('setup').value=idea.setup_type;$('instrument').value=idea.instrument;$('direction').value=idea.direction;renderSetupCards();syncDirectionButtons();}ttRefreshIdeaMode();});
+$('ttIdeaMode').addEventListener('change',()=>ttRefreshIdeaMode(true));
+$('ttIdeaSelect').addEventListener('change',()=>{const idea=ttIdeas.find(x=>x.id===$('ttIdeaSelect').value);if(idea){$('setup').value=idea.setup_type;$('instrument').value=idea.instrument;$('direction').value=idea.direction;renderSetupCards();syncDirectionButtons();}ttRefreshIdeaMode(true);});
 $('ttSaveIdea').onclick=async()=>{
  if(!currentSession||!sessionReady()){message('Zuerst heutige Session vorbereiten.',true);return;}
  const thesis=$('ttIdeaThesis').value.trim(),trigger=$('ttIdeaTrigger').value.trim(),invalidation=$('ttIdeaInvalidation').value.trim();
@@ -1975,7 +1975,7 @@ $('recordEntry').onclick=async()=>{
       p_idea_id:entryIdeaId,
       p_warning_answers:entryWarningAnswers,
       p_new_idea:newIdea,
-      p_entry_context:{execution_mode:$('entryCopy').checked?'copy':'independent',emotion_scales:readScales($('entryEmotionOptions'))},
+      p_entry_context:{execution_mode:$('entryCopy').checked?'copy':'independent',idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,
