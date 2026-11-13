@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.00</title>
+<title>Trading Terminator 5000 · V8.01</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="v8.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.00 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.01 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -89,7 +89,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.00';
+const TT_VERSION='8.01';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -860,7 +860,7 @@ function learningSummaryHtml(rows){const closed=rows.filter(t=>t.exit_at),comple
 // Local feedback is mirrored into the visible toast even when validation fails below the fold.
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled&&b.matches('.review-save,.save-stop,.save-risk,.close-trade-action,#saveHtf,#confirmSession,#saveTrainingGoal'))ttToast('Eingabe wird geprüft …');},true);
 const feedbackObserver=new MutationObserver(records=>{const nodes=new Set(records.map(r=>r.target.nodeType===3?r.target.parentElement:r.target));for(const node of nodes){const host=node.closest?.('.review-feedback,.stop-feedback,.exit-feedback,.during-feedback');const text=host?.textContent?.trim();if(text){const error=/nicht gespeichert|fehl|ungültig|bitte|widerspr|zuerst|konflikt|nicht übernommen/i.test(text);ttToast(text,error);}}});feedbackObserver.observe($('tradeDetails'),{subtree:true,childList:true,characterData:true});
-// V8.00: one idea, many attempts; retrospective assessment never changes the original plan.
+// V8.01: one idea, many attempts; retrospective assessment never changes the original plan.
 const IDEA_REASONS={early_entry:'Zu früh eingestiegen',late_entry:'Zu spät eingestiegen',missed_trigger:'Trigger verpasst',stopped:'Vorher ausgestoppt',uncertainty:'Unsicherheit / Abbruch',other:'Sonstiges'};
 const IDEA_OUTCOMES={confirmed:'Ziel vor Invalidation erreicht',partial:'Teilweise bestätigt',invalidated:'Idee invalidiert',unclear:'Nicht beurteilbar'};
 const IDEA_PARTICIPATION={none:'Nicht eingestiegen',stopped:'Vorher ausgestoppt',early_exit:'Vorher ausgestiegen',captured:'Bewegung mitgenommen',unclear:'Unklar'};
@@ -2244,7 +2244,7 @@ initTrainingFocus();
 <script id="tt-diagnostics-module">
 (function(){
  'use strict';
- const TT_VERSION='8.00';
+ const TT_VERSION='8.01';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -2362,7 +2362,7 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const match=html.match(/Version\s+(8\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
  inform(match[1]===TT_VERSION?'Veröffentlicht: '+TT_VERSION+' · gleicher Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.00. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.01. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');
@@ -2416,7 +2416,7 @@ byId('ttServerHealth')?.addEventListener('click',()=>run('Live-Systemprüfung',a
 })();
 </script>
 <script>
-// V8.00: one context per task, shared evidence, explicit next actions.
+// V8.01: one context per task, shared evidence, explicit next actions.
 let sessionIndex=new Map(),sessionIndexOwner=null,sessionIndexLoaded=0,journalScope='current',bookRows=[],bookOwner=null;
 function tradeLabel(t){return t?.session_trade_no?'Trade '+t.session_trade_no:'Trade #'+String(t?.id||'').slice(0,6);}
 function sessionLabel(s){return s?'Session '+berlinTime(s.created_at)+' · '+(s.status==='open'?'offen':'geschlossen'):'Session-Zuordnung wird geladen';}
@@ -2476,7 +2476,7 @@ async function savePendingReviewImages(form){const zone=form?.querySelector('.tr
 function renderConfigurationHistory(){const el=$('sessionAccountsSummary');if(!el)return;let history=$('sessionConfigHistory');if(!history){history=document.createElement('details');history.id='sessionConfigHistory';el.after(history);}history.replaceChildren();const rows=currentSession?.htf_context?.account_configuration_history||[];history.hidden=!rows.length;const label=document.createElement('summary');label.textContent='Vorgaben-Verlauf · '+rows.length+' Stände';history.append(label);for(const r of rows){const p=document.createElement('p');p.className='compact-help';p.textContent=berlinTime(r.changed_at)+' · '+(r.next||[]).map(a=>(allAccounts.find(x=>x.id===a.account_id)?.account_name||'Konto')+' '+(a.instrument||'')+' × '+(a.planned_quantity||'?')+' · SL '+(a.initial_sl_ticks||'?')).join(' / ');history.append(p);}el.closest('details.card').hidden=!currentSession;}
 const sessionRender741=renderSession;renderSession=function(){sessionRender741();renderConfigurationHistory();};
 </script><script>
-// V8.00: one workspace, one next action, field-level review navigation.
+// V8.01: one workspace, one next action, field-level review navigation.
 const REVIEW_TARGETS742=[['Exit dokumentieren','exit','.exit-reason'],['Ausführungsqualität bewerten','review','.review-grade'],['Regeln prüfen','review','.review-compliance'],['Fehler und Gegenmaßnahmen vervollständigen','review','.review-errors'],['Ausnahmen bewerten','review','.review-exceptions'],['Emotionen während des Trades rückblickend bewerten','review','.intratrade-emotion'],['Umsetzung der Trainingsregel bewerten','review','.practice-result']];
 function jumpToReviewField742(pane,selector){showView('journal');$('sessionTrades').classList.remove('hidden');selectTradePane(pane,false);const form=$('tradeDetails').querySelector('.review-editor'),target=$('tradeDetails').querySelector(selector);if(!target)return;const step=target.closest('[data-review-step]');if(step)showReviewStep742(form,Number(step.dataset.reviewStep),false);let node=target;while(node&&node!==$('tradeDetails')){if(node.tagName==='DETAILS')node.open=true;node=node.parentElement;}target.scrollIntoView({block:'center',behavior:'smooth'});const field=target.matches('input,select,textarea,button')?target:target.querySelector('input,select,textarea,button');field?.focus({preventScroll:true});target.classList.add('field-highlight');setTimeout(()=>target.classList.remove('field-highlight'),1800);}
 const status742=updateTradeStatus;updateTradeStatus=function(trade){status742(trade);const status=$('tradeDetails').querySelector('.review-progress');if(!status||$('tradeDetails').dataset.tradeId!==trade.id)return;status.replaceChildren();const missing=reviewChecklist(trade).filter(x=>!x.done);const title=document.createElement('strong');title.textContent=missing.length?missing.length+' Angaben fehlen':'✓ Review abgeschlossen';status.append(title);for(const item of missing){const route=REVIEW_TARGETS742.find(x=>x[0]===item.label);if(!route)continue;const b=document.createElement('button');b.type='button';b.className='missing-link';b.textContent=item.label+' →';b.onclick=()=>jumpToReviewField742(route[1],route[2]);status.append(b);}const next=$('tradeDetails').querySelector('[data-trade-pane=overview]>.flow-step');if(next)next.textContent=trade.exit_at?(missing.length?'Trade geschlossen · fehlende Angaben oben ergänzen':'Trade und Review abgeschlossen'):'Trade läuft · SL-Änderung oder Exit erfassen';};
