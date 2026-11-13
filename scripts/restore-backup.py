@@ -8,8 +8,8 @@ TABLES={'trading_sessions','trade_ideas','trades','stop_adjustments','trade_even
 def normalize_restore_rows(table,rows):
  # Older backups predate the additive V7.40 fields. Explicit recordset inserts
  # bypass column defaults, so supply only absent defaults, never overwrite history.
- if table!='trade_ideas_v733':return rows
- return [{**({'learning_review':{},'learning_revision':0}),**row} for row in rows]
+ defaults={'trade_ideas_v733':{'learning_review':{},'learning_revision':0},'trading_setup_catalog':{'rules':{}}}.get(table,{})
+ return [{**defaults,**row} for row in rows]
 def validate(path):
  with zipfile.ZipFile(path) as z:
   names=z.namelist()

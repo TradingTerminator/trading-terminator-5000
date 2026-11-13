@@ -7,8 +7,8 @@ const redirect='<!doctype html><html lang="de"><head><meta charset="utf-8"><meta
 for(const name of ['index.html','v7-Test.html','v6.html'])fs.writeFileSync(path.join(root,name),redirect);
 fs.rmSync(path.join(root,'dist'),{recursive:true,force:true});fs.mkdirSync(path.join(root,'dist'),{recursive:true});
 for(const name of ['index.html','v7-test.html','v7-Test.html','v6.html','CNAME','assets','vendor'])fs.cpSync(path.join(root,name),path.join(root,'dist',name),{recursive:true});
-const hashes={};for(const dir of ['assets','vendor'])for(const name of fs.readdirSync(path.join(root,dir))){const p=path.join(dir,name);hashes[p]=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,p))).digest('hex');}fs.writeFileSync(path.join(root,'release-integrity.json'),JSON.stringify({version:'7.40',files:hashes},null,2)+'\n');
-console.log('Built V7.40 with '+n+' external scripts and a self-only script policy.');
+const hashes={};for(const dir of ['assets','vendor'])for(const name of fs.readdirSync(path.join(root,dir))){const p=path.join(dir,name);hashes[p]=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,p))).digest('hex');}fs.writeFileSync(path.join(root,'release-integrity.json'),JSON.stringify({version:'7.41',files:hashes},null,2)+'\n');
+console.log('Built V7.41 with '+n+' external scripts and a self-only script policy.');
 
 const allowed=['/','/index.html','/v7-test.html','/v7-Test.html','/v6.html',...Object.keys(hashes).map(x=>'/'+x)];
 const worker=fs.readFileSync(path.join(root,'ops/headers-worker.template.mjs'),'utf8').replace('/* ALLOWED_FILES */',JSON.stringify(allowed)).replace('/* CSP_VALUE */',JSON.stringify(csp+"; frame-ancestors 'none'"));fs.writeFileSync(path.join(root,'ops/headers-worker.mjs'),worker);
