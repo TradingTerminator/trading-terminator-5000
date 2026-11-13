@@ -51,3 +51,12 @@ document.querySelector('header h1').textContent='Trading Terminator';document.qu
 // Add useful names, keep secondary controls out of the primary workspaces.
 $('qualityChecklist')?.closest('details')?.classList.add('hidden');$('playbookPanel').querySelector('h3').textContent='Gesicherte Lernbeispiele';
 showView('live');
+
+// Keep the displayed initial risk synchronized with explicit account edits.
+function v8UpdateRiskSummary(){
+ const chosen=[...$('allocationList').querySelectorAll('.acct-check:checked')];
+ const values=chosen.map(c=>{const card=c.closest('.account');return {instrument:card.querySelector('.acct-instrument').value,quantity:Number(card.querySelector('.acct-qty').value),ticks:Number(card.querySelector('.acct-sl-ticks').value)};});
+ const valid=values.length>0&&values.every(x=>Number.isSafeInteger(x.quantity)&&x.quantity>0&&Number.isSafeInteger(x.ticks)&&x.ticks>0&&x.ticks<=100000&&Number.isFinite(tickValues[x.instrument]));
+ $('entryFinalSummary').textContent=valid?$('setup').value+' · '+$('direction').value.toUpperCase()+' · '+values.map(x=>x.quantity+' '+x.instrument+' · '+x.ticks+' SL-Ticks').join(' / ')+' · Gesamtrisiko '+usd(values.reduce((total,x)=>total+x.quantity*x.ticks*tickValues[x.instrument],0))+' USD':'Konto, ganze Kontrakte und gültigen SL prüfen.';
+}
+$('allocationList').addEventListener('input',v8UpdateRiskSummary);$('allocationList').addEventListener('change',v8UpdateRiskSummary);
