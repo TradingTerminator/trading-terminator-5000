@@ -1,6 +1,6 @@
 // Deployment requires control of the Cloudflare route app.tradingterminator.com/*.
 // GitHub Pages ignores custom _headers files; this is a separate header gateway.
-const ALLOWED=new Set(["/","/index.html","/v7-test.html","/v7-Test.html","/v6.html","/assets/client-1-415d89e6a773.js","/assets/client-2-5484b90718d7.js","/assets/client-3-17865d042106.js","/assets/client-4-6d7faee1a4fb.js","/vendor/LICENSE-jszip.txt","/vendor/LICENSE-supabase.txt","/vendor/jszip-3.10.1.min.js","/vendor/supabase-2.119.0.js"]);
+const ALLOWED=new Set(["/","/index.html","/v7-test.html","/v7-Test.html","/v6.html","/assets/client-1-5f610ddce1f7.js","/assets/client-2-55d37b0fa911.js","/assets/client-3-ddebcbcd6909.js","/assets/client-4-f28b9b1466ed.js","/assets/client-5-cc2a85f0d741.js","/vendor/LICENSE-jszip.txt","/vendor/LICENSE-supabase.txt","/vendor/jszip-3.10.1.min.js","/vendor/supabase-2.119.0.js"]);
 const CSP="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://hogrdcqblpcrqgdtsvjv.supabase.co; connect-src 'self' https://hogrdcqblpcrqgdtsvjv.supabase.co wss://hogrdcqblpcrqgdtsvjv.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; frame-ancestors 'none'";
 export default {async fetch(request){
  const url=new URL(request.url);
