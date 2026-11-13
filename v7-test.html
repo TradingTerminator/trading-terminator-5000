@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://hogrdcqblpcrqgdtsvjv.supabase.co; connect-src 'self' https://hogrdcqblpcrqgdtsvjv.supabase.co wss://hogrdcqblpcrqgdtsvjv.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V7.39</title>
+<title>Trading Terminator 5000 · V7.40</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -143,7 +143,7 @@ button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #ff
 #tradeDetails{scroll-margin-top:16px}
 @media(max-width:600px){.session-hub{padding:12px 10px}.direction-buttons .direction-choice{min-height:66px}}
 
-/* V7.39: clear state, one page scroll, compact controls */
+/* V7.40: clear state, one page scroll, compact controls */
 html{overflow-x:clip;overflow-y:visible}body{overflow-x:clip;overflow-y:visible;height:auto;min-height:100%;max-height:none}
 .workflow-status{margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:9px}.state-pending{border-color:#e5b35c!important;color:#ffe2a6!important}.state-done{border-color:#55cba4!important}.trade-panes button.state-pending::after{content:' •'}.trade-panes button.state-done::after{content:' ✓'}
 .review-feedback:not(:empty),.stop-feedback:not(:empty),.exit-feedback:not(:empty){padding:10px;border:1px solid #7db6cf;border-radius:8px;background:#183746;color:#fff}.review-feedback{scroll-margin-top:80px}.review-save{margin-top:14px}.error-focus-choice,.error-breach-choice{display:flex!important;align-items:center;gap:10px}.error-focus-choice input,.error-breach-choice input{width:22px!important;height:22px;flex:0 0 22px}.session-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.session-toolbar button{min-height:44px;padding:8px 12px}.session-toolbar p{flex:1 1 180px;margin:0}.analytics-toolbar{display:flex;gap:10px;align-items:center;margin:12px 0}.analytics-toolbar label{flex:1;margin:0}.analytics-toolbar button{flex:0 0 44px}.review-missing{font-size:13px;line-height:1.5}.error-hint{font-size:13px}#logout{white-space:nowrap;flex-shrink:0}#sessionSummaryBody .row,#morningBody .row{flex-wrap:wrap;align-items:flex-start}
@@ -387,7 +387,7 @@ body[data-tt-theme] .session-end-button:disabled{background:#503b42!important;co
 #liveClock{font-variant-numeric:tabular-nums;font-size:16px;color:var(--muted);white-space:nowrap}.training-reminder{padding:10px 0;border-left:3px solid var(--accent);padding-left:10px;margin:10px 0}#sessionTrainingFocus{border:0!important;padding:8px!important;background:transparent!important}.tiny-note:empty{display:none}.trade-pane>details{margin:12px 0}.trade-identity .muted{font-size:13px}#liveView .page-intro h2{margin-bottom:0}
 </style></head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.39 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 7.40 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -427,8 +427,8 @@ Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</tex
 
 <script src="vendor/supabase-2.119.0.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
 <script src="vendor/jszip-3.10.1.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
-<script src="assets/client-1-522b56a6f4b3.js" integrity="sha384-9s7h4J/fYF+GDc6xnAicTiM1TpUJsCc8f/NaZGKLB1wS1V1qNDDfZtU5bDzAd611" crossorigin="anonymous"></script>
-<script src="assets/client-2-0c9418c38965.js" integrity="sha384-cmuO1mFmTmPG8yFOjIF1GGU2BACzdbzjvIkmO5tXoTVDfUMv5LZ5GJ6DSho6L2SE" crossorigin="anonymous"></script>
+<script src="assets/client-1-ac11d5b69a1a.js" integrity="sha384-/Vj2GtHTDaiBxUQ8RMQbckdyhoIKg5xoQrkAom8joT/AQ3uOzRldGuqQ3NrW1oQu" crossorigin="anonymous"></script>
+<script src="assets/client-2-c32fe41569dc.js" integrity="sha384-y8Fd13gqi4Vnmwg4aLm08tT3aQB/qRDL7OqPBXAS00KgSi0nHDM6pIjcs2ZZpeLW" crossorigin="anonymous"></script>
 
-<script src="assets/client-3-4b23464f87f0.js" integrity="sha384-Tem+/UClsvTVL20l+DE/TURcYIgW9sUhpbwBKTVVa0vsg0XTgFv2RiH0WpaG3hgK" crossorigin="anonymous"></script>
+<script src="assets/client-3-271ee1c384b6.js" integrity="sha384-4hZaiFb+sXhA4lSvTnP82RwgiCQQx5sTRETjuKRdH/ICFvjDLV2vwqgY2JMsOnD1" crossorigin="anonymous"></script>
 </body></html>

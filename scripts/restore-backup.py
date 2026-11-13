@@ -5,6 +5,11 @@ Requires psycopg[binary] only for --restore. Never accepts a production target.
 import argparse, hashlib, json, os, pathlib, uuid, zipfile, urllib.request, urllib.parse
 SOURCE_PROJECT='hogrdcqblpcrqgdtsvjv'
 TABLES={'trading_sessions','trade_ideas','trades','stop_adjustments','trade_events','screenshots','corrective_actions','trade_errors','trade_reviews','playbook_entries','trading_accounts','account_groups','account_group_members','trade_account_allocations','account_fills','account_trade_results','allocation_change_log','trading_setup_catalog','training_countermeasures','training_goals_v7','trade_ideas_v733','trade_attempts_v733','trade_entry_requests_v735'}
+def normalize_restore_rows(table,rows):
+ # Older backups predate the additive V7.40 fields. Explicit recordset inserts
+ # bypass column defaults, so supply only absent defaults, never overwrite history.
+ if table!='trade_ideas_v733':return rows
+ return [{**({'learning_review':{},'learning_revision':0}),**row} for row in rows]
 def validate(path):
  with zipfile.ZipFile(path) as z:
   names=z.namelist()
@@ -71,7 +76,7 @@ def restore(doc,images,target_owner):
       new_path=owner+path[len(old):];storage('POST',new_path,b);uploaded.append(new_path)
      for name in order:conn.execute(sql.SQL('alter table public.{} disable trigger user').format(sql.Identifier(name)))
      for name in order:
-      rows=transform(doc['tables'][name])
+      rows=normalize_restore_rows(name,transform(doc['tables'][name]))
       if not rows:continue
       columns=conn.execute("select column_name from information_schema.columns where table_schema='public' and table_name=%s order by ordinal_position",(name,)).fetchall();columns=[c[0] for c in columns]
       conn.execute(sql.SQL('insert into public.{} ({}) overriding system value select {} from jsonb_populate_recordset(null::public.{},%s::jsonb)').format(sql.Identifier(name),sql.SQL(',').join(map(sql.Identifier,columns)),sql.SQL(',').join(map(sql.Identifier,columns)),sql.Identifier(name)),(json.dumps(rows),))
