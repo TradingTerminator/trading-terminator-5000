@@ -1,5 +1,5 @@
 
-// V8.00: one context per task, shared evidence, explicit next actions.
+// V8.01: one context per task, shared evidence, explicit next actions.
 let sessionIndex=new Map(),sessionIndexOwner=null,sessionIndexLoaded=0,journalScope='current',bookRows=[],bookOwner=null;
 function tradeLabel(t){return t?.session_trade_no?'Trade '+t.session_trade_no:'Trade #'+String(t?.id||'').slice(0,6);}
 function sessionLabel(s){return s?'Session '+berlinTime(s.created_at)+' · '+(s.status==='open'?'offen':'geschlossen'):'Session-Zuordnung wird geladen';}

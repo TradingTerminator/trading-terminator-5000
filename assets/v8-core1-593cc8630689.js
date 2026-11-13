@@ -26,7 +26,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.00';
+const TT_VERSION='8.01';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -797,7 +797,7 @@ function learningSummaryHtml(rows){const closed=rows.filter(t=>t.exit_at),comple
 // Local feedback is mirrored into the visible toast even when validation fails below the fold.
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled&&b.matches('.review-save,.save-stop,.save-risk,.close-trade-action,#saveHtf,#confirmSession,#saveTrainingGoal'))ttToast('Eingabe wird geprüft …');},true);
 const feedbackObserver=new MutationObserver(records=>{const nodes=new Set(records.map(r=>r.target.nodeType===3?r.target.parentElement:r.target));for(const node of nodes){const host=node.closest?.('.review-feedback,.stop-feedback,.exit-feedback,.during-feedback');const text=host?.textContent?.trim();if(text){const error=/nicht gespeichert|fehl|ungültig|bitte|widerspr|zuerst|konflikt|nicht übernommen/i.test(text);ttToast(text,error);}}});feedbackObserver.observe($('tradeDetails'),{subtree:true,childList:true,characterData:true});
-// V8.00: one idea, many attempts; retrospective assessment never changes the original plan.
+// V8.01: one idea, many attempts; retrospective assessment never changes the original plan.
 const IDEA_REASONS={early_entry:'Zu früh eingestiegen',late_entry:'Zu spät eingestiegen',missed_trigger:'Trigger verpasst',stopped:'Vorher ausgestoppt',uncertainty:'Unsicherheit / Abbruch',other:'Sonstiges'};
 const IDEA_OUTCOMES={confirmed:'Ziel vor Invalidation erreicht',partial:'Teilweise bestätigt',invalidated:'Idee invalidiert',unclear:'Nicht beurteilbar'};
 const IDEA_PARTICIPATION={none:'Nicht eingestiegen',stopped:'Vorher ausgestoppt',early_exit:'Vorher ausgestiegen',captured:'Bewegung mitgenommen',unclear:'Unklar'};

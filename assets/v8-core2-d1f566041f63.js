@@ -1,7 +1,7 @@
 
 (function(){
  'use strict';
- const TT_VERSION='8.00';
+ const TT_VERSION='8.01';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -19,7 +19,7 @@ const $=id=>document.getElementById(id);
    const required=['app','tabs','decisionView','journalView','tradeDetails','settingsView','ttThemeSelect','ttLayoutSelect','logout','recordEntry','trainingGoal','ttConnection','sessionFinishPanel','sessionFinishChecklist','otpCode','rememberLogin'];
    check('Kernoberfläche vorhanden',required.every(id=>!!$(id)));
    check('Eindeutige HTML-IDs',(()=>{const ids=[...document.querySelectorAll('[id]')].map(x=>x.id);return ids.length===new Set(ids).size})());
-   check('Farbschema aktiv', ['original','graphite','contrast'].includes(document.body.dataset.ttTheme));
+   check('Farbschema aktiv', ['original','graphite','contrast','ocean','forest','light'].includes(document.body.dataset.ttTheme));
    check('Layout aktiv', ['comfortable','compact'].includes(document.body.dataset.ttLayout));
    check('Farben werden angewandt',getComputedStyle(document.body).backgroundColor!=='rgba(0, 0, 0, 0)');
    check('Supabase SDK geladen',!!window.supabase&&typeof window.supabase.createClient==='function');

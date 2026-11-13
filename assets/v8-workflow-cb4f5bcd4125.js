@@ -46,8 +46,17 @@ $('sessionTrades').before(v8Button('＋ Weiteren Trade vorbereiten',()=>goToTrad
 // Session completion stays accessible in preparation; blocked until open trades are closed.
 v8Session.append($('sessionFinishPanel'));$('sessionFinishPanel').querySelector('h3')?.remove();
 const mountV7=mountTradePanes;mountTradePanes=function(trade,...args){mountV7(trade,...args);const area=trade.exit_at?'after':'trade';nav.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.v8Nav===area?'page':'false'));};
-const resetV7=resetPrivateState;resetPrivateState=function(){resetV7();V8.reviewCount=0;V8.route='live';for(const id of ['v8SessionView','v8AfterView','v8ReviewsView'])$(id).classList.add('hidden');$('v8NextTitle').textContent='Session vorbereiten';$('v8SessionTitle').textContent='Noch keine aktive Session';$('v8SessionDescription').textContent='';$('v8PendingText').textContent='';$('v8NextDescription').textContent='Konten und Risiko festlegen.';};
+const resetV7=resetPrivateState;resetPrivateState=function(){resetV7();ttAppearance();for(const id of ['ttCorners','ttText','ttMotion']){const select=$(id),value=document.body.dataset[id];if(select&&[...select.options].some(o=>o.value===value))select.value=value;}V8.reviewCount=0;V8.route='live';for(const id of ['v8SessionView','v8AfterView','v8ReviewsView'])$(id).classList.add('hidden');$('v8NextTitle').textContent='Session vorbereiten';$('v8SessionTitle').textContent='Noch keine aktive Session';$('v8SessionDescription').textContent='';$('v8PendingText').textContent='';$('v8NextDescription').textContent='Konten und Risiko festlegen.';};
 document.querySelector('header h1').textContent='Trading Terminator';document.querySelector('header small').textContent='VERSION 8 · Trading & Lernen';
 // Add useful names, keep secondary controls out of the primary workspaces.
 $('qualityChecklist')?.closest('details')?.classList.add('hidden');$('playbookPanel').querySelector('h3').textContent='Gesicherte Lernbeispiele';
 showView('live');
+
+// Keep the displayed initial risk synchronized with explicit account edits.
+function v8UpdateRiskSummary(){
+ const chosen=[...$('allocationList').querySelectorAll('.acct-check:checked')];
+ const values=chosen.map(c=>{const card=c.closest('.account');return {instrument:card.querySelector('.acct-instrument').value,quantity:Number(card.querySelector('.acct-qty').value),ticks:Number(card.querySelector('.acct-sl-ticks').value)};});
+ const valid=values.length>0&&values.every(x=>Number.isSafeInteger(x.quantity)&&x.quantity>0&&Number.isSafeInteger(x.ticks)&&x.ticks>0&&x.ticks<=100000&&Number.isFinite(tickValues[x.instrument]));
+ $('entryFinalSummary').textContent=valid?$('setup').value+' · '+$('direction').value.toUpperCase()+' · '+values.map(x=>x.quantity+' '+x.instrument+' · '+x.ticks+' SL-Ticks').join(' / ')+' · Gesamtrisiko '+usd(values.reduce((total,x)=>total+x.quantity*x.ticks*tickValues[x.instrument],0))+' USD':'Konto, ganze Kontrakte und gültigen SL prüfen.';
+}
+$('allocationList').addEventListener('input',v8UpdateRiskSummary);$('allocationList').addEventListener('change',v8UpdateRiskSummary);
