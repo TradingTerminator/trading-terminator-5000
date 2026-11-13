@@ -10,6 +10,10 @@ class BackupTests(unittest.TestCase):
    z.writestr('journal.json',json.dumps(d));z.writestr('README.txt','test')
    for k,v in (extra or {}).items():z.writestr(k,v)
   return f.name
+ def test_legacy_idea_defaults_for_additive_schema(self):
+  rows=restore.normalize_restore_rows('trade_ideas_v733',[{'id':'old'}]);self.assertEqual(rows[0]['learning_review'],{});self.assertEqual(rows[0]['learning_revision'],0);self.assertNotIn('target_zone',rows[0])
+ def test_idea_history_is_preserved_on_restore(self):
+  row={'id':'i','target_zone':'Zone','target_recorded_at':'2026-11-13','learning_review':{'outcome':'confirmed'},'learning_revision':5};self.assertEqual(restore.normalize_restore_rows('trade_ideas_v733',[row]),[row])
  def test_complete_backup(self):
   d,images=restore.validate(self.archive());self.assertEqual(len(d['tables']),23);self.assertEqual(images,[])
  def test_missing_table_rejected(self):
