@@ -1,10 +1,11 @@
 {
-  "version": "7.41",
+  "version": "7.42",
   "files": {
-    "assets/client-1-415d89e6a773.js": "415d89e6a773500fc874c726e73f3978d85ccd9ce0b9b038fa804fb318407c4a",
-    "assets/client-2-5484b90718d7.js": "5484b90718d75243d069f6084bb4e9c6c7b1fd98edcf9d3ef9c0d90623168a7c",
-    "assets/client-3-17865d042106.js": "17865d042106c8204d8899e8946b7b3bf95abeef2d19d367239c741d6dfa5962",
-    "assets/client-4-6d7faee1a4fb.js": "6d7faee1a4fb7fca84af91b499496b8ac4e45afc112b4c1dc511850ad12feec4",
+    "assets/client-1-c3a98237f13d.js": "c3a98237f13d3af88c733f7ee81f1d1514e75853df21fddedac97820cb693a8b",
+    "assets/client-2-55d37b0fa911.js": "55d37b0fa911c7a552fb7ef4efed8288d4463ca82d53a18cd36048d0cbb57965",
+    "assets/client-3-ddebcbcd6909.js": "ddebcbcd69095a95e8e56d0f6173db17552dc7901ce21062b705320b15773bac",
+    "assets/client-4-f28b9b1466ed.js": "f28b9b1466edf2e078b4b3e6121a2494af4b974a7e58d0e86168f5589e3b3efe",
+    "assets/client-5-cc2a85f0d741.js": "cc2a85f0d741a09bebd740bc764397319dbf8020f85aca5dfac4b2fec1ea9122",
     "vendor/LICENSE-jszip.txt": "566c953c6090b1218ca6217dd7359d45dde46581968586dc607d59a78af6a9c4",
     "vendor/LICENSE-supabase.txt": "334dd6820e2eaeab2064e7c59001b810566728a28a41a7c1dbf69bbee17d0936",
     "vendor/jszip-3.10.1.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
