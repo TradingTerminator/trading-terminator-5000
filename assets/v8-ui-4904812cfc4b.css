@@ -25,3 +25,7 @@ body[data-tt-text=large] :is(label,button,.setup-guide-check){font-size:16px}bod
 /* Bottom navigation stays within thumb reach and reserves space for content. */
 #v8BackBar{position:fixed;bottom:0;left:0;right:0;z-index:35;margin:0;padding:10px max(14px,calc((100vw - 1028px)/2)) calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
 #v8BackButton{min-height:44px;justify-content:flex-start}body.v8-has-back main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}body.v8-has-back #backToTop{bottom:calc(84px + env(safe-area-inset-bottom))}body.v8-has-back #ttToast{bottom:calc(84px + env(safe-area-inset-bottom))}
+
+.v8-htf-bias{font-size:12px;color:var(--muted);border-left:3px solid var(--accent);padding:5px 10px;margin:10px 0}.v8-htf-example{border-top:1px solid var(--line);padding-top:10px}#v8HtfSetups button{flex-direction:column;align-items:flex-start}#v8HtfSetups img{width:100%;max-height:140px;object-fit:contain;border-radius:8px}#v8TechnicalPoints .context-row{padding:12px 0;border-bottom:1px solid var(--line)}#v8TechnicalPoints .account-pick{margin:8px 0}#v8MentalWarning button{margin:4px}#v8HtfFeedback:not(:empty){padding:12px;background:var(--tt-warning-bg);color:var(--tt-warning-text);border-radius:8px}
+
+@media(max-width:420px){#v8Navigation button[data-v8-nav=after]{font-size:12px;letter-spacing:-.25px;white-space:nowrap}}
