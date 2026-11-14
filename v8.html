@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://hogrdcqblpcrqgdtsvjv.supabase.co; connect-src 'self' https://hogrdcqblpcrqgdtsvjv.supabase.co wss://hogrdcqblpcrqgdtsvjv.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.03</title>
+<title>Trading Terminator 5000 · V8.04</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,10 +20,10 @@
 
 
 
-<link rel="stylesheet" href="assets/v8-ui-4904812cfc4b.css">
+<link rel="stylesheet" href="assets/v8-ui-080308ddca2b.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.03 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.04 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -63,10 +63,10 @@ Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</tex
 
 <script src="vendor/supabase-2.119.0.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
 <script src="vendor/jszip-3.10.1.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
-<script src="assets/v8-core1-7a2cce5873b5.js" integrity="sha384-eHDsV79OOqNLRh7Jf/9Z+s5UWUfSCSslHpSSwCecIn0XAh7dqyHMu2hmA+Z6F0/f" crossorigin="anonymous"></script>
-<script src="assets/v8-core2-99f2ccf77b22.js" integrity="sha384-IHXjszzCDkbCDaqHLGKwdvvNOj8+QdlSa88rAafypMniklm0kKWJl0xvPhnRnQjo" crossorigin="anonymous"></script>
+<script src="assets/v8-core1-0171f6fbbd61.js" integrity="sha384-pJ3m8D754JTffihmDFl6R1nZoPoCdGJgA8bjXMHhQx/dAcTQgboCLzNTc/uTeWPX" crossorigin="anonymous"></script>
+<script src="assets/v8-core2-2da3fd6cd8d0.js" integrity="sha384-3Rv69cAKegiDmLtlfyvNYIrbbIHWHOTTTaat+gf+CUZ1NaHMJyecNDlN01UDVbUl" crossorigin="anonymous"></script>
 
-<script src="assets/v8-core3-513f0c96e108.js" integrity="sha384-+FyXn9kFplyuEB+I1mfU5pTUiyYw0YfUrsTIv5qPhp50PIgBRiOponkUoRsWJ2CI" crossorigin="anonymous"></script>
+<script src="assets/v8-core3-885968eb56c7.js" integrity="sha384-516Nfi3+1gM9R2U98m+eTjDONX/H5ZhVWvznwv/AmE+KSISZ0puHQGgfIA8C7GQg" crossorigin="anonymous"></script>
 <script src="assets/v8-core4-f7a79974bb16.js" integrity="sha384-8u9SzRPWRN1KZNeduI/E83gHPWm7KO6B3xIWnRpbzX5i7UlUlf08txEusVxbmlAm" crossorigin="anonymous"></script><script src="assets/v8-core5-dabd08119397.js" integrity="sha384-tt3nAwaAA3VCgrORPEYS/yfj/NL3qrU591f5aXJ/KU51/L1GxCFLMHB0OhkEId9g" crossorigin="anonymous"></script>
-<script src="assets/v8-workflow-29d8299d3374.js" integrity="sha384-WwO1cHZuLlAsKvvju99Pmzvs181cx8MjOT+HCjBPd56IrKceKPi3q1Dzyu/gjpr3" crossorigin="anonymous"></script>
-<script src="assets/v8-htf-a18a790676bc.js" integrity="sha384-FnYAzz113WE9oswdHMF4s3x6KlsqkkNN1hSPUyGV21QN8Fd3s06sMB7vC2hTl3Bf" crossorigin="anonymous"></script></body></html>
+<script src="assets/v8-workflow-04bdf5cd2335.js" integrity="sha384-nyyTFGY5tk93cnGhXRci1Fn5S1e/nuy8jQaIFJFrNcDpTBWpHH8Szc8jVCP60BNV" crossorigin="anonymous"></script>
+<script src="assets/v8-htf-78c184a43ffd.js" integrity="sha384-CFSuMkoVBZMO9AiDytf+d16lFJnyN6F6G69nmXENG/j52W53jRKEkI5NfvZ3SZcV" crossorigin="anonymous"></script></body></html>

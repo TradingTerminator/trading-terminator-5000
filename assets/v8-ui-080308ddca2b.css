@@ -29,3 +29,21 @@ body[data-tt-text=large] :is(label,button,.setup-guide-check){font-size:16px}bod
 .v8-htf-bias{font-size:12px;color:var(--muted);border-left:3px solid var(--accent);padding:5px 10px;margin:10px 0}.v8-htf-example{border-top:1px solid var(--line);padding-top:10px}#v8HtfSetups button{flex-direction:column;align-items:flex-start}#v8HtfSetups img{width:100%;max-height:140px;object-fit:contain;border-radius:8px}#v8TechnicalPoints .context-row{padding:12px 0;border-bottom:1px solid var(--line)}#v8TechnicalPoints .account-pick{margin:8px 0}#v8MentalWarning button{margin:4px}#v8HtfFeedback:not(:empty){padding:12px;background:var(--tt-warning-bg);color:var(--tt-warning-text);border-radius:8px}
 
 @media(max-width:420px){#v8Navigation button[data-v8-nav=after]{font-size:12px;letter-spacing:-.25px;white-space:nowrap}}
+
+/* Preparation: labels above fields, compact results, and one unmistakable completion action. */
+#sessionHub .session-checks label{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:12px 0;min-width:0}
+#sessionHub .session-checks label[hidden],#saveHtf[hidden],#v8MentalWarning[hidden]{display:none!important}
+#sessionHub .session-checks :is(input,select,textarea){width:100%;min-width:0;margin:0}
+#sessionHub .session-checks h4{margin:22px 0 10px;font-size:17px}
+#v8TechnicalPoints{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+#v8TechnicalPoints .context-row{margin:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+#v8TechnicalPoints strong{display:block;font-size:15px;margin-bottom:8px}
+#v8TechnicalPoints details{margin-top:6px}#v8TechnicalPoints summary{font-size:12px;padding:6px 0}
+#v8PreparationProgress{display:grid;gap:4px;margin:20px 0 10px;font-size:13px}
+#v8PreparationProgress[hidden]{display:none}#v8PreparationProgress button{justify-content:flex-start;text-align:left;text-decoration:underline;padding:8px 0;min-height:44px;font-size:13px}
+#saveHtf.v8-prepare-primary{display:flex;background:var(--accent);color:var(--button-text,#fff);border:2px solid var(--accent);font-size:16px;font-weight:750;min-height:56px;width:100%;margin:8px 0 24px;padding:14px}
+#saveHtf:disabled{opacity:.55}#v8MentalWarning .v8-mental-actions{display:flex;flex-wrap:wrap;gap:8px}#v8MentalWarning button{margin:0;min-height:44px}
+#v8MentalContinue[aria-pressed=true]{outline:2px solid currentColor;outline-offset:2px}
+.v8-setup-warning{background:var(--tt-warning-bg);color:var(--tt-warning-text);border-left:3px solid var(--warn);padding:10px 12px;border-radius:8px}
+#sessionHub :is(input,select,textarea,button,details){scroll-margin-block:100px}
+@media(max-width:680px){#v8TechnicalPoints{grid-template-columns:1fr}#v8MentalWarning .v8-mental-actions button{width:100%}}
