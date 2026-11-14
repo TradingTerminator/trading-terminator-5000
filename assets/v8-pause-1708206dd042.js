@@ -1,0 +1,45 @@
+/* A voluntary break: always dismissible, never a trading lock. */
+const V8P={owner:null,session:null,until:null,returnFocus:null};
+const v8PauseScreen=document.createElement('div');
+v8PauseScreen.id='v8PauseScreen';v8PauseScreen.hidden=true;v8PauseScreen.setAttribute('role','dialog');v8PauseScreen.setAttribute('aria-modal','true');v8PauseScreen.setAttribute('aria-labelledby','v8PauseTitle');
+v8PauseScreen.innerHTML='<div class="v8-pause-card"><span class="v8-kicker">Zeit für dich · freiwillig</span><h2 id="v8PauseTitle">Wie lange möchtest du pausieren?</h2><div id="v8PauseChoice"><div class="v8-pause-presets" role="group" aria-label="Pausendauer"><button type="button" data-pause-minutes="5">5 Minuten</button><button type="button" data-pause-minutes="10">10 Minuten</button><button type="button" data-pause-minutes="15">15 Minuten</button></div><label>Eigene Dauer in Minuten<input id="v8PauseMinutes" type="number" min="1" max="180" step="1" value="5" inputmode="numeric"></label><p id="v8PauseError" role="status"></p><button id="v8PauseStart" type="button">Pause starten</button></div><div id="v8PauseRunning" hidden><p id="v8PauseTimer" role="timer" aria-label="Verbleibende Pausenzeit">05:00</p><p id="v8PauseEndTime"></p><p id="v8PauseState" role="status"></p></div><p class="compact-help">Deine Eingaben bleiben erhalten. Du kannst jederzeit zurück.</p><button type="button" id="v8PauseExit" class="secondary">Zurück ohne Pause</button></div>';
+$('app').append(v8PauseScreen);
+function v8PauseKey(){return currentUser?.id?'tt8_voluntary_pause_'+currentUser.id:null;}
+function v8PauseStorage(){return ttRemember?localStorage:sessionStorage;}
+function v8PersistPause(){const key=v8PauseKey();if(!key)return;try{v8PauseStorage().setItem(key,JSON.stringify({owner:V8P.owner,session:V8P.session,until:V8P.until}));(ttRemember?sessionStorage:localStorage).removeItem(key);}catch(_){}}
+function v8PauseVisible(){return !v8PauseScreen.hidden;}
+function v8SetPauseOpen(open){v8PauseScreen.hidden=!open;document.body.classList.toggle('v8-voluntary-pause',open);$('tabs').inert=open;document.querySelector('header').inert=open;for(const node of $('app').children)if(node!==v8PauseScreen)node.inert=open;}
+function v8ChoosePause(){
+ if(!currentUser||!currentSession)return;V8P.returnFocus=document.activeElement;V8P.owner=currentUser.id;V8P.session=currentSession.id;V8P.until=null;
+ $('v8PauseTitle').textContent='Wie lange möchtest du pausieren?';$('v8PauseChoice').hidden=false;$('v8PauseRunning').hidden=true;$('v8PauseExit').textContent='Zurück ohne Pause';$('v8PauseError').textContent='';v8SetPauseOpen(true);$('v8PauseMinutes').focus();
+}
+function v8PauseRemaining(until=V8P.until,now=Date.now()){return Number.isFinite(until)?Math.max(0,Math.ceil((until-now)/1000)):0;}
+function v8TickPause(){
+ if(!v8PauseVisible()||!V8P.until)return;const left=v8PauseRemaining();$('v8PauseTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+ const state=left?'Du kannst die Pause jederzeit vorzeitig beenden.':'Pause beendet. Prüfe kurz, wie du dich jetzt fühlst.';if($('v8PauseState').textContent!==state)$('v8PauseState').textContent=state;
+ $('v8PauseExit').textContent=left?'Pause vorzeitig beenden':'Zur Vorbereitung';
+}
+function v8ShowRunningPause(){
+ $('v8PauseTitle').textContent='Pause';$('v8PauseChoice').hidden=true;$('v8PauseRunning').hidden=false;$('v8PauseEndTime').textContent='Bis '+clockTime(new Date(V8P.until).toISOString())+' Uhr · Deutschland';v8SetPauseOpen(true);v8TickPause();$('v8PauseExit').focus();
+}
+function v8StartPause(){
+ const minutes=Number($('v8PauseMinutes').value);if(!Number.isInteger(minutes)||minutes<1||minutes>180){$('v8PauseError').textContent='Bitte 1 bis 180 ganze Minuten wählen.';return;}
+ if(V8P.owner!==currentUser?.id||V8P.session!==currentSession?.id){v8EndPause();return;}
+ V8P.until=Date.now()+minutes*60000;V8H.paused=true;V8H.ack='';V8H.request=null;v8UpdateMental();saveWorkspace();v8PersistPause();v8ShowRunningPause();
+}
+function v8EndPause(){
+ const wasRunning=!!V8P.until,key=v8PauseKey();if(key)try{localStorage.removeItem(key);sessionStorage.removeItem(key);}catch(_){}
+ V8P.until=null;V8H.paused=false;v8SetPauseOpen(false);v8UpdateMental();saveWorkspace();if(wasRunning){showView('session');v8FocusPreparation('sessionMoodOptions');}else if(V8P.returnFocus?.isConnected)V8P.returnFocus.focus();
+}
+function v8RestorePause(){
+ if(!currentUser||!currentSession)return;const key=v8PauseKey();let item;try{item=JSON.parse(v8PauseStorage().getItem(key)||'null');}catch(_){return;}
+ if(!item||item.owner!==currentUser.id||item.session!==currentSession.id||!Number.isFinite(item.until)||item.until<Date.now()-86400000||item.until>Date.now()+10800000)return;
+ V8P.owner=item.owner;V8P.session=item.session;V8P.until=item.until;V8H.paused=true;V8H.ack='';v8ShowRunningPause();v8UpdateMental();
+}
+$('v8PauseStart').onclick=v8StartPause;$('v8PauseExit').onclick=v8EndPause;
+for(const button of v8PauseScreen.querySelectorAll('[data-pause-minutes]'))button.onclick=()=>{$('v8PauseMinutes').value=button.dataset.pauseMinutes;for(const pick of v8PauseScreen.querySelectorAll('[data-pause-minutes]'))pick.setAttribute('aria-pressed',String(pick===button));};
+v8PauseScreen.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();v8EndPause();}if(e.key==='Tab'){const controls=[...v8PauseScreen.querySelectorAll('button,input')].filter(el=>!el.disabled&&!el.closest('[hidden]'));const index=controls.indexOf(document.activeElement);if(e.shiftKey&&index<=0){e.preventDefault();controls.at(-1)?.focus();}else if(!e.shiftKey&&index===controls.length-1){e.preventDefault();controls[0]?.focus();}}});
+setInterval(v8TickPause,1000);document.addEventListener('visibilitychange',v8TickPause);
+const pauseSessionRender=renderSession;renderSession=function(...args){pauseSessionRender(...args);v8RestorePause();};
+const pauseRestoreWorkspace=restoreWorkspace;restoreWorkspace=function(...args){pauseRestoreWorkspace(...args);v8RestorePause();};
+const pauseReset=resetPrivateState;resetPrivateState=function(...args){v8SetPauseOpen(false);V8P.owner=null;V8P.session=null;V8P.until=null;V8P.returnFocus=null;pauseReset(...args);};

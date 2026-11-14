@@ -1,0 +1,579 @@
+{
+  "version": 1,
+  "checked_at": "2026-11-14T19:36:13.402565Z",
+  "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values.",
+  "sources": {
+    "BLS": {
+      "url": "https://www.bls.gov/schedule/",
+      "fetched_at": "2026-11-14T19:36:13.402565Z",
+      "ok": true
+    },
+    "BEA": {
+      "url": "https://www.bea.gov/news/schedule",
+      "fetched_at": "2026-11-14T19:36:13.402565Z",
+      "ok": true
+    }
+  },
+  "events": [
+    {
+      "id": "10ec4d436b92c4f84fdd25cc",
+      "source": "BLS",
+      "title": "Consumer Price Index",
+      "at": "2026-11-10T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "588147195eaec08166115929",
+      "source": "BLS",
+      "title": "Real Earnings",
+      "at": "2026-11-10T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "e88c61797261a6956004e05d",
+      "source": "BLS",
+      "title": "Producer Price Index",
+      "at": "2026-11-13T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "c8ed8e0aada5b27b1275fcaf",
+      "source": "BLS",
+      "title": "U.S. Import and Export Price Indexes",
+      "at": "2026-11-17T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "88c6fc73a84d9e99d6666274",
+      "source": "BEA",
+      "title": "Outdoor Recreation Economic Statistics",
+      "at": "2026-11-18T15:00:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "e214f9670e8d50005192128f",
+      "source": "BLS",
+      "title": "Employer-Reported Workplace Injuries and Illnesses (Annual)",
+      "at": "2026-11-18T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "9d827f04dde0a7e68eeb49dd",
+      "source": "BEA",
+      "title": "Activities of U.S. Multinational Enterprises",
+      "at": "2026-11-20T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "6e4b0bf4ab99108f281fee86",
+      "source": "BLS",
+      "title": "State Employment and Unemployment (Monthly)",
+      "at": "2026-11-20T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "363a0386c2646167d84e31a6",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2026-11-25T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "601acddbf1c1f430b4fbf283",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2026-11-25T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "13bb675ff54c7d36d3bfeb4d",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2026-11-25T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a6fd684a4a2e8be0afcea522",
+      "source": "BLS",
+      "title": "Job Openings and Labor Turnover Survey",
+      "at": "2026-12-01T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "671faae8a254d20fcde6743e",
+      "source": "BEA",
+      "title": "GDP by County and Personal Income by County",
+      "at": "2026-12-02T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "13bdc1bad208a248996a44d8",
+      "source": "BLS",
+      "title": "County Employment and Wages",
+      "at": "2026-12-02T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "f02ca5d2c8a713a3112abe79",
+      "source": "BLS",
+      "title": "Metropolitan Area Employment and Unemployment (Monthly)",
+      "at": "2026-12-02T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "4b14936df3abc6c06f692eac",
+      "source": "BLS",
+      "title": "Employment Situation",
+      "at": "2026-12-04T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "67ec704ea810492241e56a47",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2026-12-08T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "4add25512b1e2e71ff3313ac",
+      "source": "BLS",
+      "title": "Productivity and Costs",
+      "at": "2026-12-08T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "71e14e5ac4cf7979a6669134",
+      "source": "BEA",
+      "title": "Real Personal Consumption Expenditures by State and Real Personal Income by State",
+      "at": "2026-12-10T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "8314e400d574043865a03340",
+      "source": "BLS",
+      "title": "Consumer Price Index",
+      "at": "2026-12-10T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "511ad304b0ece9d474186792",
+      "source": "BLS",
+      "title": "Real Earnings",
+      "at": "2026-12-10T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "62a160d460dbcf24a82e7dc1",
+      "source": "BLS",
+      "title": "Producer Price Index",
+      "at": "2026-12-15T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "8ff03cb6d4bd96371747e441",
+      "source": "BLS",
+      "title": "Census of Fatal Occupational Injuries",
+      "at": "2026-12-16T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "9ef0d2d2e82f7965722f322c",
+      "source": "BLS",
+      "title": "Employer Costs for Employee Compensation",
+      "at": "2026-12-16T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "a50e6d5f5c57be662f9be4ef",
+      "source": "BLS",
+      "title": "U.S. Import and Export Price Indexes",
+      "at": "2026-12-17T13:30:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "e2b83e4903ba2233e1310b83",
+      "source": "BEA",
+      "title": "U.S. International Transactions and Investment Position",
+      "at": "2026-12-18T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "efe4ed7a61fc3b6b96c6e7d8",
+      "source": "BLS",
+      "title": "State Employment and Unemployment (Monthly)",
+      "at": "2026-12-18T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "8c1b92edca9777bfbea4b0d8",
+      "source": "BLS",
+      "title": "Work Experience of the Population (Annual)",
+      "at": "2026-12-18T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "4436395a3e1a33682de9474e",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2026-12-23T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "ee3c83058ead0fc5a7cdef0e",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2026-12-23T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "23aba4f5be7af799507eb791",
+      "source": "BEA",
+      "title": "Gross Domestic Product by State and Personal Income by State",
+      "at": "2026-12-23T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "1a6ad05b3b5d2933c31000f1",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2026-12-23T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "987616329e75f352aa3e9c99",
+      "source": "BLS",
+      "title": "Metropolitan Area Employment and Unemployment (Monthly)",
+      "at": "2026-12-30T15:00:00Z",
+      "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "53882ac35f983bb05ce0137e",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-01-07T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "968029ed1e27c33f687661ae",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-01-28T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "15c7a2a654e39d1481246edb",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-01-28T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "286dc24e5700291d37554c57",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-02-04T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "0b067e9150a84ac57294b0ba",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-02-25T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "4aa92a63947799882f1fd0e6",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-02-25T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "2b6d7ccd85790827b8c46745",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-03-09T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a6a2cbf15f1d0c13e1dd3bc5",
+      "source": "BEA",
+      "title": "U.S. International Transactions and Investment Position",
+      "at": "2027-03-24T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "e1ac08ed2e515a8b0a1592be",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2027-03-31T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "4ecdaa244971451cf8f3e807",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-03-31T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a71330961efac24ff1bb3ddd",
+      "source": "BEA",
+      "title": "Gross Domestic Product by State and Personal Income by State",
+      "at": "2027-03-31T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "0b9f67780b5c5c892a0beae0",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-03-31T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a91653ba78a8441a5ac991f7",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-04-06T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "182bb37eedd897a97ae54b72",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-04-29T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "94f3e3095069ac1e0ffdec04",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-04-29T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "1372317ef1ffadeef50799b8",
+      "source": "BEA",
+      "title": "Activities of U.S. Affiliates of Foreign Multinational Enterprises",
+      "at": "2027-04-30T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "7ee2087497958fbd1ec0f7d2",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-05-05T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "14f024b6013b504942510ee6",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2027-05-27T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "405789478daba4ed460a72ea",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-05-27T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "304ae5c3d3057b6d56d03881",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-05-27T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "f4ec1faae46a472505bfaacf",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-06-09T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "4b42e3955a0692f076b3618b",
+      "source": "BEA",
+      "title": "New Foreign Direct Investment in the United States",
+      "at": "2027-06-10T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "44500c4a1ea6d3040c27b5f2",
+      "source": "BEA",
+      "title": "U.S. International Transactions and Investment Position",
+      "at": "2027-06-24T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "2e7df0d57752ca22b333b9f7",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2027-06-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "34603e85fa353ae7849fe5bf",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-06-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "48e41eb4ccabeb2fbf235c05",
+      "source": "BEA",
+      "title": "Gross Domestic Product by State and Personal Income by State",
+      "at": "2027-06-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "9bcb6d6c40f9b36a4572013e",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-06-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "f016a3c93f0c6674c080771f",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-07-07T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a1042bef64b0e324868a6295",
+      "source": "BEA",
+      "title": "U.S. Trade in Services Detailed Tables",
+      "at": "2027-07-07T14:00:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "d45373174af39a4cf4c94573",
+      "source": "BEA",
+      "title": "Direct Investment by Country and Industry",
+      "at": "2027-07-20T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "0f91126cb5e22a95eb625be4",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-07-29T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "b3a6ebadd91ac5faff78cbb7",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-07-29T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "765b540f1ca4ae88530b6554",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-08-05T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "f7fab661653714b8e2ed87ea",
+      "source": "BEA",
+      "title": "Activities of U.S. Multinational Enterprises",
+      "at": "2027-08-20T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a0a0bebff8617b5896cfb7ed",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2027-08-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "8026d997576261e9571fff69",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-08-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "689e15b041a8b3ab8ecf8d09",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-08-25T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "b5e0611f1b12e29bbf29f586",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-09-08T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "973e3c93c505a36da294ff0c",
+      "source": "BEA",
+      "title": "U.S. International Transactions and Investment Position",
+      "at": "2027-09-22T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "a696ebb022136efe4eee1171",
+      "source": "BEA",
+      "title": "Corporate Profits",
+      "at": "2027-09-30T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "cf814fb12549b839149b7638",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-09-30T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "f3a7b52ec154e62c26484560",
+      "source": "BEA",
+      "title": "Gross Domestic Product by State and Personal Income by State",
+      "at": "2027-09-30T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "5a934c5cc8985968989579c2",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-09-30T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "afeb726de4d742153773acc1",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-10-06T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "f0d7cda94b933de8dcc4c360",
+      "source": "BEA",
+      "title": "Gross Domestic Product",
+      "at": "2027-10-28T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "3ff31ae50b77470956e37d06",
+      "source": "BEA",
+      "title": "Personal Income and Outlays",
+      "at": "2027-10-28T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "2244d9f5a7f2cf8239b65843",
+      "source": "BEA",
+      "title": "U.S. International Trade in Goods and Services",
+      "at": "2027-11-04T12:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    }
+  ]
+}

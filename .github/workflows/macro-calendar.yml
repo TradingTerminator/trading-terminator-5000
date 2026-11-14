@@ -1,0 +1,42 @@
+name: Refresh official macro calendar
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/macro-calendar.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+permissions:
+  contents: write
+  pages: write
+concurrency:
+  group: macro-calendar
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+      - name: Refresh BLS and BEA public schedules
+        id: fetch
+        continue-on-error: true
+        run: python3 scripts/update-macro-calendar.py
+      - name: Publish schedule or visible failure state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          git add data/macro-calendar.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Refresh official BLS and BEA calendar'
+            git push origin HEAD:main
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent
+      - name: Report source failure
+        if: steps.fetch.outcome == 'failure'
+        run: exit 1
