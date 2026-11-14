@@ -21,3 +21,7 @@ body[data-tt-text=large]{font-size:17px}body[data-tt-text=large] input,body[data
 body[data-tt-layout=compact] .v8-tile,body[data-tt-layout=compact] .emotion-section,body[data-tt-layout=compact] .book-entry{padding:12px;margin-block:10px}
 body[data-tt-corners=square] :is(.v8-tile,.emotion-section,.book-entry,.trade-panes,.review-steps,#tabs){border-radius:2px!important}
 body[data-tt-text=large] :is(label,button,.setup-guide-check){font-size:16px}body[data-tt-text=large] :is(.v8-after-grid p,.v8-primary p,.rating-row output){font-size:16px}
+
+/* Bottom navigation stays within thumb reach and reserves space for content. */
+#v8BackBar{position:fixed;bottom:0;left:0;right:0;z-index:35;margin:0;padding:10px max(14px,calc((100vw - 1028px)/2)) calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
+#v8BackButton{min-height:44px;justify-content:flex-start}body.v8-has-back main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}body.v8-has-back #backToTop{bottom:calc(84px + env(safe-area-inset-bottom))}body.v8-has-back #ttToast{bottom:calc(84px + env(safe-area-inset-bottom))}

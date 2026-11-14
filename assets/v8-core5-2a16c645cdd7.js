@@ -19,7 +19,7 @@ function initSlimWorkspace742(){
  const jump=document.createElement('button');jump.id='trainingCasesJump';jump.type='button';jump.className='ghost';jump.textContent='Dokumentierte Fälle ansehen →';jump.onclick=()=>{const d=$('trainingList').closest('details');if(d)d.open=true;$('trainingList').scrollIntoView({block:'start'});};guide.append(jump);
  const practiceStatus=document.createElement('p');practiceStatus.id='trainingEmpty742';practiceStatus.className='compact-help';practiceStatus.textContent='Noch keine aktive Regel. Prüfe unten einen dokumentierten Fehler und seine Gegenmaßnahme.';$('trainingGoal').closest('label').before(practiceStatus);
  const draw741=drawTrainingFocus;drawTrainingFocus=function(){draw741();practiceStatus.hidden=!!trainingFocusActive;if($('editTrainingGoal'))$('editTrainingGoal').hidden=!trainingFocusActive;};drawTrainingFocus();
- const accountsBack=document.createElement('button');accountsBack.type='button';accountsBack.className='ghost';accountsBack.textContent='← Einstellungen';accountsBack.onclick=()=>showView('settings');$('accountsView').prepend(accountsBack);
+
  $('playbookView').querySelector('h2').textContent='Dein Playbook';$('playbookLexicon').closest('.card').querySelector('h3').hidden=true;
  const bookCases=$('playbookPanel');const folded=document.createElement('details');folded.className='card';const summary=document.createElement('summary');summary.textContent='Alle gemerkten Lernbeispiele';folded.append(summary);bookCases.before(folded);folded.append(bookCases);
  // Current-session heading must never label a historical review as active.

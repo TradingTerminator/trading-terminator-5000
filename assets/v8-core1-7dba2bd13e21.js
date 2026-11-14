@@ -26,7 +26,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.01';
+const TT_VERSION='8.02';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -1646,7 +1646,7 @@ $('saveAccountEdit').onclick=async()=>{
     }).eq('id',editingAccountId).select('id').single();
     if(error)throw error;
     if(!data)throw new Error('Keine Kontoänderung bestätigt.');
-    closeAccountEditor();await loadAccounts();message('Kontoänderungen gespeichert.');
+    closeAccountEditor();await loadAccounts();message('Kontoänderungen gespeichert.');v8AccountSaved();
   }catch(e){message('Konto bearbeiten: '+e.message,true)}
   finally{busy=false;$('saveAccountEdit').disabled=false}
 };
@@ -1661,11 +1661,11 @@ $('deactivateAccount').onclick=async()=>{
     const {data,error}=await client.from('trading_accounts').update({active:next,updated_at:new Date().toISOString()}).eq('id',editingAccountId).select('id').single();
     if(error)throw error;
     if(!data)throw new Error('Keine Änderung bestätigt.');
-    closeAccountEditor();await loadAccounts();message(next?'Konto wieder aktiviert.':'Konto deaktiviert. Bestehende Trades bleiben erhalten.');
+    closeAccountEditor();await loadAccounts();message(next?'Konto wieder aktiviert.':'Konto deaktiviert. Bestehende Trades bleiben erhalten.');v8AccountSaved();
   }catch(e){message('Kontostatus ändern: '+e.message,true)}
   finally{busy=false;$('deactivateAccount').disabled=false}
 };
-$('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isSafeInteger(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();};
+$('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isSafeInteger(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();v8AccountSaved();};
 
 const EMOTION_DEFAULTS={
  entryEmotion:{plan:'Nach Plan',fomo:'FOMO',revenge:'Revenge',impulsive:'Impulsiv'},
