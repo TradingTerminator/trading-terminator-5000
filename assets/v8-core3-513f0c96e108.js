@@ -86,11 +86,11 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const match=html.match(/Version\s+(8\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
  inform(match[1]===TT_VERSION?'Veröffentlicht: '+TT_VERSION+' · gleicher Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.02. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.03. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');
- const {data:snapshot,error}=await client.rpc('export_journal_snapshot_v735');if(error)throw error;
+ const {data:snapshot,error}=await client.rpc('export_journal_snapshot_v803');if(error)throw error;
  if(!snapshot||snapshot.owner_id!==user.id)throw new Error('Ungültiger Snapshot');
  const zip=new JSZip(),images=[];let total=0;
  for(const image of snapshot.images){
@@ -100,7 +100,7 @@ byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=
   const bytes=await blob.arrayBuffer();const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join('');
   const path='images/'+image.name;zip.file(path,bytes,{createFolders:false});images.push({path,storage_path:image.name,size:blob.size,sha256:hash});
  }
- const {data:verify,error:verifyError}=await client.rpc('export_journal_snapshot_v735');if(verifyError)throw verifyError;
+ const {data:verify,error:verifyError}=await client.rpc('export_journal_snapshot_v803');if(verifyError)throw verifyError;
  if(JSON.stringify(verify)!==JSON.stringify(snapshot))throw new Error('Daten wurden während der Sicherung geändert. Bitte erneut sichern');
  if((await ensureUser()).id!==user.id)throw new Error('Benutzer gewechselt');
  draftFlush();zip.file('journal.json',JSON.stringify({format:'trading-terminator-backup',format_version:2,app_version:TT_VERSION,created_at:new Date().toISOString(),...snapshot,images,local_drafts:collectLocalDrafts(user.id)},null,2));
@@ -135,6 +135,6 @@ byId('ttServerHealth')?.addEventListener('click',()=>run('Live-Systemprüfung',a
  const same=(await client.auth.getUser()).data?.user?.id===user.id;
  if(!same)throw new Error('Benutzer während der Prüfung gewechselt');
  inform('Supabase erreichbar · '+Object.entries(counts).map(([k,v])=>`${k}: ${v}`).join(' · ')+
-  ` · Offene Sessions: ${open.length}${open.length>1?' (Achtung: mehr als eine!)':''}. Read-only; kein Beweis für vollständige RLS-Sicherheit.`);
+  ` · Offene Handelssessions: ${open.length}${open.length>1?' (Achtung: mehr als eine!)':''}. Read-only; kein Beweis für vollständige RLS-Sicherheit.`);
 }));
 })();

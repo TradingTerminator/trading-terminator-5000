@@ -30,7 +30,7 @@ function initSlimWorkspace742(){
 }
 initSlimWorkspace742();
 function foldSecondary742(id,title){const panel=$(id);if(!panel)return;const details=document.createElement('details');details.className='card secondary-workspace';const sum=document.createElement('summary');sum.textContent=title;details.append(sum);panel.before(details);details.append(panel);return details;}
-foldSecondary742('sessionSummary','Session im Detail auswerten');const ideasFold742=foldSecondary742('ideaLearningPanel','Ideen & Teilnahme prüfen');foldSecondary742('progressPanel','Entwicklung der letzten 50 Trades');const casesPanel742=$('trainingList')?.closest('.card');if(casesPanel742){const details=document.createElement('details');details.className='card';const sum=document.createElement('summary');sum.textContent='Fehlerfälle und Gegenmaßnahmen prüfen';details.append(sum);casesPanel742.before(details);details.append(casesPanel742);}
+foldSecondary742('sessionSummary','Handelssession im Detail auswerten');const ideasFold742=foldSecondary742('ideaLearningPanel','Ideen & Teilnahme prüfen');foldSecondary742('progressPanel','Entwicklung der letzten 50 Trades');const casesPanel742=$('trainingList')?.closest('.card');if(casesPanel742){const details=document.createElement('details');details.className='card';const sum=document.createElement('summary');sum.textContent='Fehlerfälle und Gegenmaßnahmen prüfen';details.append(sum);casesPanel742.before(details);details.append(casesPanel742);}
 document.addEventListener('click',e=>{if(e.target.closest('button')?.textContent.trim()==='Ideen prüfen'&&ideasFold742)ideasFold742.open=true;},true);
 
 
