@@ -60,3 +60,15 @@ body[data-tt-text=large] :is(label,button,.setup-guide-check){font-size:16px}bod
 #v8PauseTimer{font-size:clamp(54px,14vw,86px);font-variant-numeric:tabular-nums;line-height:1.2;letter-spacing:2px;margin:30px 0;color:var(--accent)}#v8PauseState,#v8PauseEndTime{font-size:13px;color:var(--muted)}body.v8-voluntary-pause{overflow:hidden}body.v8-voluntary-pause #backToTop,body.v8-voluntary-pause #ttToast{visibility:hidden}
 @media(max-width:680px){.v8-news-fields{grid-template-columns:1fr}.v8-news-fields label{margin:6px 0!important}.v8-direction-summary{top:68px;padding:9px 10px}.v8-direction-summary dd{font-size:13px}.v8-pause-card{padding:24px 18px}}
 .v8-macro-calendar{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:12px 0;background:var(--panel)}.v8-macro-calendar summary{font-size:13px}.v8-macro-calendar p,.v8-calendar-row,.v8-calendar-selection{font-size:12px;line-height:1.5}.v8-calendar-row,.v8-calendar-selection{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0}.v8-calendar-row span,.v8-calendar-selection span{min-width:0;overflow-wrap:anywhere}.v8-calendar-row button,.v8-calendar-selection button{flex-shrink:0;font-size:12px;padding:8px 10px}.v8-macro-calendar a{color:var(--accent)}
+
+/* V8.06: comfortable touch targets and stable, legible feedback. */
+:is(.account-pick,.setup-guide-check,details>summary,.review-progress .missing-link){min-height:44px}
+input[type=range]{min-height:44px;cursor:pointer;touch-action:pan-y}
+button{touch-action:manipulation}button:active:not(:disabled){filter:brightness(.92)}
+button[aria-busy=true]{cursor:progress;opacity:.7}button[aria-busy=true]::after{content:' …'}
+.stop-reason-buttons .selected{color:var(--button-text,#fff)}
+:is(section,h2,h3,.trade-identity,.review-editor,[data-entry-stage]){scroll-margin-top:100px}
+.v8-book-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 18px;align-items:center;margin:16px 0;padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.v8-book-toolbar>label:first-child{grid-column:1/-1}.v8-book-toolbar input[type=search]{width:100%;margin:6px 0}.v8-book-toolbar p{grid-column:1/-1;margin:0;font-size:13px;color:var(--muted)}
+.book-entry[hidden]{display:none!important}.book-entry>summary{align-items:center}.v8-hero{padding-block:22px}.v8-hero h2{font-size:30px}.v8-hero p{margin-bottom:0}
+@media(max-width:680px){.trade-panes button,.review-steps button{font-size:13px;min-height:48px;padding:10px 5px}.v8-book-toolbar{grid-template-columns:1fr}.v8-book-toolbar>label:first-child,.v8-book-toolbar p{grid-column:auto}.v8-hero h2{font-size:26px}#v8BackButton{width:100%}}
