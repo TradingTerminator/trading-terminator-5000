@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.01</title>
+<title>Trading Terminator 5000 · V8.02</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="v8.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.01 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.02 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -89,7 +89,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.01';
+const TT_VERSION='8.02';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -1709,7 +1709,7 @@ $('saveAccountEdit').onclick=async()=>{
     }).eq('id',editingAccountId).select('id').single();
     if(error)throw error;
     if(!data)throw new Error('Keine Kontoänderung bestätigt.');
-    closeAccountEditor();await loadAccounts();message('Kontoänderungen gespeichert.');
+    closeAccountEditor();await loadAccounts();message('Kontoänderungen gespeichert.');v8AccountSaved();
   }catch(e){message('Konto bearbeiten: '+e.message,true)}
   finally{busy=false;$('saveAccountEdit').disabled=false}
 };
@@ -1724,11 +1724,11 @@ $('deactivateAccount').onclick=async()=>{
     const {data,error}=await client.from('trading_accounts').update({active:next,updated_at:new Date().toISOString()}).eq('id',editingAccountId).select('id').single();
     if(error)throw error;
     if(!data)throw new Error('Keine Änderung bestätigt.');
-    closeAccountEditor();await loadAccounts();message(next?'Konto wieder aktiviert.':'Konto deaktiviert. Bestehende Trades bleiben erhalten.');
+    closeAccountEditor();await loadAccounts();message(next?'Konto wieder aktiviert.':'Konto deaktiviert. Bestehende Trades bleiben erhalten.');v8AccountSaved();
   }catch(e){message('Kontostatus ändern: '+e.message,true)}
   finally{busy=false;$('deactivateAccount').disabled=false}
 };
-$('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isSafeInteger(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();};
+$('addAccount').onclick=async()=>{const name=$('accountName').value.trim(),qty=Number($('defaultQty').value);if(!name||!Number.isSafeInteger(qty)||qty<=0){message('Bitte Kontoname und gültige Kontraktzahl eingeben.',true);return}const {error}=await client.from('trading_accounts').insert({account_name:name,account_type:$('accountType').value,broker:$('broker').value.trim()||null,default_instrument:$('defaultInstrument').value,default_quantity:qty});if(error){message('Konto speichern: '+error.message,true);return}$('accountName').value='';message('Konto gespeichert.');await loadAccounts();v8AccountSaved();};
 
 const EMOTION_DEFAULTS={
  entryEmotion:{plan:'Nach Plan',fomo:'FOMO',revenge:'Revenge',impulsive:'Impulsiv'},
@@ -2244,7 +2244,7 @@ initTrainingFocus();
 <script id="tt-diagnostics-module">
 (function(){
  'use strict';
- const TT_VERSION='8.01';
+ const TT_VERSION='8.02';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -2362,7 +2362,7 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const match=html.match(/Version\s+(8\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
  inform(match[1]===TT_VERSION?'Veröffentlicht: '+TT_VERSION+' · gleicher Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.01. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.02. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');
@@ -2496,7 +2496,7 @@ function initSlimWorkspace742(){
  const jump=document.createElement('button');jump.id='trainingCasesJump';jump.type='button';jump.className='ghost';jump.textContent='Dokumentierte Fälle ansehen →';jump.onclick=()=>{const d=$('trainingList').closest('details');if(d)d.open=true;$('trainingList').scrollIntoView({block:'start'});};guide.append(jump);
  const practiceStatus=document.createElement('p');practiceStatus.id='trainingEmpty742';practiceStatus.className='compact-help';practiceStatus.textContent='Noch keine aktive Regel. Prüfe unten einen dokumentierten Fehler und seine Gegenmaßnahme.';$('trainingGoal').closest('label').before(practiceStatus);
  const draw741=drawTrainingFocus;drawTrainingFocus=function(){draw741();practiceStatus.hidden=!!trainingFocusActive;if($('editTrainingGoal'))$('editTrainingGoal').hidden=!trainingFocusActive;};drawTrainingFocus();
- const accountsBack=document.createElement('button');accountsBack.type='button';accountsBack.className='ghost';accountsBack.textContent='← Einstellungen';accountsBack.onclick=()=>showView('settings');$('accountsView').prepend(accountsBack);
+
  $('playbookView').querySelector('h2').textContent='Dein Playbook';$('playbookLexicon').closest('.card').querySelector('h3').hidden=true;
  const bookCases=$('playbookPanel');const folded=document.createElement('details');folded.className='card';const summary=document.createElement('summary');summary.textContent='Alle gemerkten Lernbeispiele';folded.append(summary);bookCases.before(folded);folded.append(bookCases);
  // Current-session heading must never label a historical review as active.
