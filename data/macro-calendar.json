@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "checked_at": "2026-11-15T01:24:41.194529Z",
+  "checked_at": "2026-11-15T07:22:35.025624Z",
   "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-15T01:24:41.194529Z",
+      "fetched_at": "2026-11-15T07:22:35.025624Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-15T01:24:41.194529Z",
+      "fetched_at": "2026-11-15T07:22:35.025624Z",
       "ok": true
     }
   },
