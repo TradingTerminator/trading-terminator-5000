@@ -1,20 +1,188 @@
 {
   "version": 1,
-  "checked_at": "2026-11-15T18:59:59.075193Z",
-  "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values.",
+  "checked_at": "2026-11-15T19:37:38.996617Z",
+  "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values. Manuell geprüfte ISM-PMI-Termine 2026 und FOMC November/Dezember 2026. Keine Fed-Reden, ISM-Prognoseberichte oder ungeplanten Ereignisse. Keine automatische Aktualisierung dieser beiden Quellen.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-15T18:59:59.075193Z",
+      "fetched_at": "2026-11-15T19:37:38.996617Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-15T18:59:59.075193Z",
+      "fetched_at": "2026-11-15T19:37:38.996617Z",
       "ok": true
+    },
+    "FED": {
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "ok": false,
+      "mode": "manual",
+      "fetched_at": "2026-11-15T19:37:38.912850Z",
+      "error": "Manuell geprüft; Änderungen bei der Quelle separat prüfen"
+    },
+    "ISM": {
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/",
+      "ok": false,
+      "mode": "manual",
+      "fetched_at": "2026-11-15T19:37:38.912850Z",
+      "error": "Manuell geprüft; Änderungen bei der Quelle separat prüfen"
     }
   },
   "events": [
+    {
+      "id": "f776d39d7c9911632c71627d",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-01-05T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "fe24beac86f6014ec22ba690",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-01-07T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "909b6a05adefc680379f30aa",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-02-02T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "138f325ed08518857e5267d6",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-02-04T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "a8bbe3a27454e0d84b88e55d",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-03-02T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "e0e5c115ec321ccbaa3ab165",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-03-04T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "a334c23715a429bfe4ee4ce9",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-04-01T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "d6e8c03b79bb42be66eba2b5",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-04-06T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "4972d5f80821b932b3c8eec4",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-05-01T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "a188ff78a23a65e857272d45",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-05-05T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "5857b0742e2ad5c349f6ae49",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-06-01T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "ea29e704eb3cd60f0ed8597e",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-06-03T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "af9dd4d401d29e5da98e715c",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-07-01T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "ead61dc0cc0e9b4f1087729d",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-07-06T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "d936a9bae389147a435dcd08",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-08-03T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "497b1f1f9e8bbf24f8cb1a08",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-08-05T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "72f2a024174003326a30b9d0",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-09-01T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "fa86e312321d60b0b5271ae0",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-09-03T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "dc81ea163b95842a11e97155",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-10-01T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "fd373905e014f6dfaac2e534",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-10-05T14:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "95d201e3ddf4e36a78cf5837",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-11-02T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
+      "id": "8f18490e70a2d5c8febb4bcd",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-11-04T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
     {
       "id": "10ec4d436b92c4f84fdd25cc",
       "source": "BLS",
@@ -56,6 +224,13 @@
       "title": "Employer-Reported Workplace Injuries and Illnesses (Annual)",
       "at": "2026-11-18T15:00:00Z",
       "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "6263ff1a76449ce155b03a01",
+      "source": "FED",
+      "title": "FOMC Minutes",
+      "at": "2026-11-18T19:00:00Z",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     },
     {
       "id": "9d827f04dde0a7e68eeb49dd",
@@ -100,6 +275,13 @@
       "url": "https://www.bls.gov/schedule/"
     },
     {
+      "id": "469cb636fe6543c69c5a1787",
+      "source": "ISM",
+      "title": "ISM Manufacturing PMI",
+      "at": "2026-12-01T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
       "id": "671faae8a254d20fcde6743e",
       "source": "BEA",
       "title": "GDP by County and Personal Income by County",
@@ -121,6 +303,13 @@
       "url": "https://www.bls.gov/schedule/"
     },
     {
+      "id": "6a0b15eb5dfcef1c808dea88",
+      "source": "ISM",
+      "title": "ISM Services PMI",
+      "at": "2026-12-03T15:00:00Z",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    {
       "id": "4b14936df3abc6c06f692eac",
       "source": "BLS",
       "title": "Employment Situation",
@@ -140,6 +329,20 @@
       "title": "Productivity and Costs",
       "at": "2026-12-08T13:30:00Z",
       "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "85611c754996f0010a9d58c3",
+      "source": "FED",
+      "title": "FOMC Zinsentscheidung",
+      "at": "2026-12-09T19:00:00Z",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    },
+    {
+      "id": "cb5eed7817112b928d4382a1",
+      "source": "FED",
+      "title": "FOMC Pressekonferenz",
+      "at": "2026-12-09T19:30:00Z",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     },
     {
       "id": "71e14e5ac4cf7979a6669134",
@@ -245,6 +448,13 @@
       "title": "Metropolitan Area Employment and Unemployment (Monthly)",
       "at": "2026-12-30T15:00:00Z",
       "url": "https://www.bls.gov/schedule/"
+    },
+    {
+      "id": "a7bf35c2ccaeac2a4b06a6c3",
+      "source": "FED",
+      "title": "FOMC Minutes",
+      "at": "2026-12-30T19:00:00Z",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     },
     {
       "id": "53882ac35f983bb05ce0137e",

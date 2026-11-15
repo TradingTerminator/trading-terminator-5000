@@ -77,6 +77,11 @@ if __name__=='__main__':
  target=Path(__file__).resolve().parent.parent/'data/macro-calendar.json'
  try:previous=json.loads(target.read_text())
  except (FileNotFoundError,json.JSONDecodeError):previous={}
- data=update(previous);target.parent.mkdir(exist_ok=True);temp=target.with_suffix('.tmp');temp.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');temp.replace(target)
+ data=update(previous)
+ reviewed_path=Path(__file__).resolve().parent.parent/'data/macro-reviewed.json'
+ if reviewed_path.exists():
+  reviewed=json.loads(reviewed_path.read_text());data['sources'].update(reviewed['sources']);data['events'].extend(reviewed['events']);data['coverage']+=' '+reviewed['coverage']
+ data['events']=sorted({r['id']:r for r in data['events']}.values(),key=lambda r:r['at'])
+ target.parent.mkdir(exist_ok=True);temp=target.with_suffix('.tmp');temp.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');temp.replace(target)
  print(json.dumps({'events':len(data['events']),'sources':data['sources']}))
  if not any(state['ok'] for state in data['sources'].values()):raise SystemExit('No calendar source refreshed; retained data marked stale')

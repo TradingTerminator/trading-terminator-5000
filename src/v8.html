@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.07</title>
+<title>Trading Terminator 5000 · V8.08</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="v8.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.07 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.08 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -89,7 +89,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.07';
+const TT_VERSION='8.08';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -372,7 +372,7 @@ async function renderSessionSummary(trades,target=$('sessionSummaryBody'),title=
      }
    }
  }
- if(target.id==='sessionSummaryBody'&&typeof v8ObserveSessionTotals==='function')v8ObserveSessionTotals({owner:currentUser?.id,session:currentSession?.id,net:total-totalFees,complete:(!closed.length||resultsComplete)&&trades.length<100});
+ if(target.id==='sessionSummaryBody'&&typeof v8PollSessionLimits==='function')void v8PollSessionLimits();
  target.innerHTML=`${title?'<p><strong>'+escapeHtml(title)+'</strong></p>':''}<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Brutto-P&amp;L (USD)</small><strong>${closed.length?(resultsComplete?usd(total):'unvollständig'):'–'}</strong></div><div class="stat"><small>Brutto-P&amp;L / Gesamtrisiko</small><strong>${closed.length&&resultsComplete&&riskComplete&&risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Geprüft ohne Regelbruch: ${withoutMarkedDeviation} / ${reviewedTrades.length} geprüfte Trades (${trades.length-reviewedTrades.length} ungeprüft). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${learningSummaryHtml(trades)}${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<details><summary>Berechnungsgrundlage</summary><p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Handelssession-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L-Eingabe ist brutto vor Gebühren; Netto = Brutto minus Gebühren. Keine Broker-Synchronisation.</p></details>`;
 }
 $('reloadTrades').onclick=loadSessionTrades;
@@ -543,7 +543,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 function snapshotExitDraft(){
   const editor=document.querySelector('#tradeDetails .exit-editor');
   if(!editor)return null;
-  return {scales:readScales(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),reason:editor.querySelector('.exit-reason')?.value||'',emotion:selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),emotions:[...editor.querySelectorAll('[data-emotion-group="exitCommitEmotion"] button[aria-pressed="true"]')].map(b=>b.dataset.value),
+  return {deferred:!!editor.querySelector('.v8-defer-results')?.checked,scales:readScales(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),reason:editor.querySelector('.exit-reason')?.value||'',emotion:selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]')),emotions:[...editor.querySelectorAll('[data-emotion-group="exitCommitEmotion"] button[aria-pressed="true"]')].map(b=>b.dataset.value),
     accounts:[...editor.querySelectorAll('.exit-account')].map(c=>({
       id:c.dataset.id,unit:c.querySelector('.exit-unit')?.value||'ticks',
       amount:c.querySelector('.exit-amount')?.value||'',fees:c.querySelector('.exit-fees')?.value||''
@@ -553,7 +553,7 @@ function restoreExitDraft(draft){
   if(!draft)return;
   const editor=document.querySelector('#tradeDetails .exit-editor');
   if(!editor)return;
-  editor.querySelector('.exit-reason').value=draft.reason||'';
+  editor.querySelector('.exit-reason').value=draft.reason||'';const deferred=editor.querySelector('.v8-defer-results');if(deferred){deferred.checked=!!draft.deferred;deferred.onchange?.();}
   const exitGroup=editor.querySelector('[data-emotion-group="exitCommitEmotion"]');if(draft.scales)buildScaleGroup(exitGroup,'exitCommitEmotion',draft.scales);
   const restored=(Array.isArray(draft.emotions)?draft.emotions:(draft.emotion?[draft.emotion]:[])).filter(v=>typeof v==='string');
   exitGroup?.querySelectorAll('button[data-value]').forEach(b=>{const on=restored.includes(b.dataset.value);b.setAttribute('aria-pressed',String(on));b.classList.toggle('emotion-selected',on);});
@@ -620,7 +620,7 @@ async function openTradeDetails(trade){
     const initialRisk=totals.risk,pnlTotal=totals.pnl,feesTotal=totals.fees;
     const exitSection=trade.exit_at?
       `<div class="account exit-summary"><h3>Abgeschlossen · ${escapeHtml(trade.exit_reason||'Exit')}</h3><p>Exit: ${escapeHtml(berlinTime(trade.exit_at))}</p>${(data||[]).map(a=>{const r=resultByAllocation.get(a.id);return `<div class="row"><span>${escapeHtml(names.get(a.account_id)||'Konto')}</span><strong>${r?usd(r.realized_pnl_usd)+' USD · '+(a.initial_risk_usd?(Number(r.realized_pnl_usd)/Number(a.initial_risk_usd)).toFixed(2)+' R':'R offen'):'Ergebnis fehlt'}</strong><small>${r&&r.tp_ticks!=null?' · TP '+r.tp_ticks+' Ticks ('+(r.tp_ticks*.25).toFixed(2)+' Punkte)':''}</small></div>`}).join('')}<p><strong>Summe brutto${totals.completeResults?'':' (Ergebnisse unvollständig)'}: ${usd(pnlTotal)} USD · ${totals.rMultiple!==null?totals.rMultiple.toFixed(2)+' R':'R offen – Initialrisiken oder Ergebnisse unvollständig'}</strong><br><small>Brutto: ${usd(pnlTotal)} USD · Gebühren: ${usd(feesTotal)} USD · Netto: ${usd(pnlTotal-feesTotal)} USD. Brutto-R vor Gebühren.</small></p></div>`:
-      `<div class="account exit-editor"><h3>Trade abschließen · alle Konten gemeinsam</h3><p class="muted">Ergebnis je Konto: brutto vor Gebühren. Gebühren separat.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD, optional)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<h4>Empfindungen beim Exit · 1–10</h4><div class="emotion-options" data-emotion-group="exitCommitEmotion"><button type="button" data-value="disciplined">Nach Plan</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button><button type="button" data-value="stress">Stress</button></div><p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade abschließen</button></div>`;
+      `<div class="account exit-editor"><h3>Trade abschließen · alle Konten gemeinsam</h3><p class="muted">Ergebnis je Konto: brutto vor Gebühren. Gebühren separat.</p><label>Exit-Grund<select class="exit-reason"><option value="">Bitte auswählen</option><option value="TP">Take Profit</option><option value="SL">Stop-Loss</option><option value="BE">Break-even</option><option value="extended_tp">Erweitertes TP</option><option value="daily_target">Tagesziel</option><option value="manual">Manuell</option><option value="other">Sonstiges</option></select></label>${(data||[]).map(a=>`<div class="account exit-account" data-instrument="${escapeHtml(a.instrument)}" data-quantity="${escapeHtml(a.planned_quantity)}" data-id="${escapeHtml(a.id)}" data-risk="${a.initial_risk_usd==null?'':escapeHtml(a.initial_risk_usd)}"><strong>${escapeHtml(names.get(a.account_id)||'Konto')} · ${escapeHtml(a.instrument)} × ${escapeHtml(a.planned_quantity)}</strong><label>Realisierter P&L · Einheit<select class="exit-unit"><option value="ticks">Ticks</option><option value="usd">USD</option></select></label><label>Ergebnis<input class="exit-amount" type="text" inputmode="decimal" placeholder="z. B. 100 oder -40" autocomplete="off"></label><button type="button" class="ghost exit-negate" aria-label="Vorzeichen wechseln">+/−</button><div class="muted exit-equivalent">Entspricht: –</div><label>Gebühren (USD · 0 ausdrücklich angeben)<input class="exit-fees" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label><div class="muted exit-r">R: –</div></div>`).join('')}<h4>Empfindungen beim Exit · 1–10</h4><div class="emotion-options" data-emotion-group="exitCommitEmotion"><button type="button" data-value="disciplined">Nach Plan</button><button type="button" data-value="fear">Angst</button><button type="button" data-value="greed">Gier</button><button type="button" data-value="frustration">Frust</button><button type="button" data-value="relief">Erleichterung</button><button type="button" data-value="uncertainty">Unsicherheit</button><button type="button" data-value="stress">Stress</button></div><p class="muted exit-preview">Gesamtergebnis: –</p><div class="exit-feedback" role="status" aria-live="polite"></div><button type="button" class="wide close-trade-action">Trade abschließen</button></div>`;
     panel.innerHTML=`<div class="account"><h3>Trade-Details</h3><div class="draft-status muted" role="status">Lokaler Entwurf aktiv (nur dieses Gerät)</div><p><strong>${escapeHtml(trade.setup_type)} · ${escapeHtml(trade.direction.toUpperCase())} ${escapeHtml(trade.instrument)}</strong></p><p class="muted">${trade.observations?.entry_context_v736?'Ausführung: '+(trade.observations.entry_context_v736.execution_mode==='copy'?'Copy-Modus':'Einzelkonto')+'<br>'+Object.entries(trade.observations.entry_context_v736.emotion_scales||{}).map(([k,v])=>escapeHtml(SCALE_DEFS.entryEmotion.find(d=>d[0]===k)?.[1]||k)+': '+escapeHtml(v)+'/10').join(' · ')+'<br>':''}Erfasst: ${escapeHtml(berlinTime(trade.entry_at))}<br>Status: ${trade.exit_at?'Abgeschlossen':'Offen'}<br>Trade-ID: <small>${escapeHtml(trade.id)}</small></p><div class="account ltf-analysis"><h3>Beobachtete Signale</h3><p class="muted">Beobachtete Signale markieren. Automatisch gespeichert; rückblickend erfasst.</p>
 <div class="analysis-grid">
 <label><input type="checkbox" data-analysis="structure"> Struktur / Bruch</label>
@@ -1367,7 +1367,7 @@ function updateExitPreview(editor){
     if(!result||!card.dataset.risk||initial<=0)complete=false;
     else {total+=result.dollars;risk+=initial;}
     const feesInput=card.querySelector('.exit-fees').value;
-    const fee=feesInput.trim()===''?0:parseMoney(feesInput);
+    const fee=feesInput.trim()===''?null:parseMoney(feesInput);
     const net=result&&fee!==null&&fee>=0?result.dollars-fee:null;
     if(fee===null||fee<0)complete=false;else totalFees+=fee;
     card.querySelector('.exit-r').textContent=result&&initial>0
@@ -1424,11 +1424,11 @@ $('tradeDetails').addEventListener('click',async e=>{
   if(!reason){fail('Bitte Exit-Grund auswählen.',editor.querySelector('.exit-reason'));return;}
   const exitEmotion=selectedEmotion(editor.querySelector('[data-emotion-group="exitCommitEmotion"]'));const exitEmotions=[...editor.querySelectorAll('[data-emotion-group="exitCommitEmotion"] button[aria-pressed="true"]')].map(b=>b.dataset.value);
   const exitScales=readScales(editor.querySelector('[data-emotion-group="exitCommitEmotion"]'));if(missingScales(editor.querySelector('[data-emotion-group="exitCommitEmotion"]'),'exitCommitEmotion').length){fail('Bitte alle Empfindungen beim Exit bewerten.',editor.querySelector('[data-rated="false"]'));return;}
-  const results=[];
-  for(const card of editor.querySelectorAll('.exit-account')){
+  const deferred=!!editor.querySelector('.v8-defer-results')?.checked,results=[];
+  for(const card of deferred?[]:editor.querySelectorAll('.exit-account')){
     const result=exitResult(card);
     const feesRaw=card.querySelector('.exit-fees').value;
-    const fees=feesRaw.trim()===''?0:parseMoney(feesRaw);
+    const fees=feesRaw.trim()===''?null:parseMoney(feesRaw);
     if(!result){fail('Bitte gültiges Ergebnis eingeben: Ticks als ganze Zahl oder USD mit maximal zwei Nachkommastellen.',card.querySelector('.exit-amount'));return;}
     if(fees===null||fees<0){fail('Gebühren dürfen nicht negativ oder ungültig sein.',card.querySelector('.exit-fees'));return;}
     if(!card.dataset.risk||Number(card.dataset.risk)<=0){
@@ -1446,10 +1446,10 @@ $('tradeDetails').addEventListener('click',async e=>{
   busy=true;btn.disabled=true;btn.textContent='Wird abgeschlossen …';feedback.textContent='Abschluss wird gespeichert …';feedback.style.color='';
   try{
     const tradeId=$('tradeDetails').dataset.tradeId;
-    const {data,error}=await client.rpc('close_trade_with_scales_v736',{p_trade_id:tradeId,p_exit_reason:reason,p_results:results,p_scales:exitScales});
+    const {data,error}=await client.rpc(deferred?'close_trade_pending_v808':'close_trade_with_scales_v736',{p_trade_id:tradeId,p_exit_reason:reason,...(deferred?{}:{p_results:results}),p_scales:exitScales});
     if(error)throw error;
     if(!data||data.trade_id!==tradeId)throw new Error('Abschluss nicht eindeutig bestätigt. Bitte zuerst Trade-Liste aktualisieren.');
-    message('Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
+    message(data.pending?'Exit und Emotionen gespeichert · P&L und Gebühren später ergänzen.':'Trade in Supabase abgeschlossen: '+usd(data.total_pnl_usd)+' USD · '+Number(data.r_multiple).toFixed(2)+' R.');
     draftMarkSaved(tradeId,'exit');
     editor.remove(); // The committed exit form must not be saved again.
     draftDirty=false;clearTimeout(draftTimer);
@@ -2220,7 +2220,7 @@ initTrainingFocus();
 <script id="tt-diagnostics-module">
 (function(){
  'use strict';
- const TT_VERSION='8.07';
+ const TT_VERSION='8.08';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -2338,7 +2338,7 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const match=html.match(/Version\s+(8\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
  inform(match[1]===TT_VERSION?'Veröffentlicht: '+TT_VERSION+' · gleicher Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.07. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.08. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');

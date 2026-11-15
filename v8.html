@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://hogrdcqblpcrqgdtsvjv.supabase.co; connect-src 'self' https://hogrdcqblpcrqgdtsvjv.supabase.co wss://hogrdcqblpcrqgdtsvjv.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.07</title>
+<title>Trading Terminator 5000 · V8.08</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="assets/v8-ui-973b58e3c368.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.07 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.08 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -63,14 +63,14 @@ Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</tex
 
 <script src="vendor/supabase-2.119.0.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
 <script src="vendor/jszip-3.10.1.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
-<script src="assets/v8-core1-2c81edb49bdd.js" integrity="sha384-E5Vf1ah5LTh4cq6gi/NEDyaVuyjnPpxbV0cQW5ihVpd1KerO0meRbj9zS2YC7NRH" crossorigin="anonymous"></script>
-<script src="assets/v8-core2-26bc1b784885.js" integrity="sha384-Gtq5egwkzGH/uL7+M5UYqWhK+6acI4/sFYLuVhgkX7rDy3wh/0ZlbgVF7SzAhIHd" crossorigin="anonymous"></script>
+<script src="assets/v8-core1-cedd23f706fd.js" integrity="sha384-zHtljlbdNwtsSHBgWQbeeU38zbFfNoX21Br+uTp+QQ9zm3D9fEaYPaTMuy1Im0he" crossorigin="anonymous"></script>
+<script src="assets/v8-core2-b4536b68bd86.js" integrity="sha384-c64oblEwrAMc3t932wrXHvR6RJYEw3rAZArTnLTzkb+yOcWTKu52XKZSS46/PZ8/" crossorigin="anonymous"></script>
 
-<script src="assets/v8-core3-a740221ebaba.js" integrity="sha384-n5DPg1AExaLpw0w8X1QFwzT9bjNhJqzacGWgAngd/MM1cJ/wKhbU82RGA+g+PZ2w" crossorigin="anonymous"></script>
+<script src="assets/v8-core3-a0be14ca0e09.js" integrity="sha384-rjd5PLmWxzmww+Te2GEK9efadxjTCLwY8s/Oz1CRu6de1xnrxkYs5WhDKw3U5118" crossorigin="anonymous"></script>
 <script src="assets/v8-core4-17fa87e94743.js" integrity="sha384-BXgIA0BspQqy9QXx/ZiuVK3uCMQXzk98pKRjKi+xLYsiVfvtTWe5NTvI+vp5HZui" crossorigin="anonymous"></script><script src="assets/v8-core5-dabd08119397.js" integrity="sha384-tt3nAwaAA3VCgrORPEYS/yfj/NL3qrU591f5aXJ/KU51/L1GxCFLMHB0OhkEId9g" crossorigin="anonymous"></script>
-<script src="assets/v8-workflow-04bdf5cd2335.js" integrity="sha384-nyyTFGY5tk93cnGhXRci1Fn5S1e/nuy8jQaIFJFrNcDpTBWpHH8Szc8jVCP60BNV" crossorigin="anonymous"></script>
-<script src="assets/v8-htf-b9f03fd12c33.js" integrity="sha384-QfPWO4UV7mM4r2KhVw45hLjm+75NAqdTEeSAI4WwsmurkIcFCkWcVRwd2ZbO1xjW" crossorigin="anonymous"></script>
-<script src="assets/v8-pause-257209a88471.js" integrity="sha384-poQRftJjOQiCcdGGKoriFfWzcc2bA8g0I+4PmQfkPpvujfyeiXVG5/yPRN3JVyMT" crossorigin="anonymous"></script>
-<script src="assets/v8-calendar-4636f8ba97ac.js" integrity="sha384-JlBEOrmqAWzaN5OGgdXL30sjDS/OQSgE5vIu0vxqkuV8hNaYanOYLGbyAmvWGXKQ" crossorigin="anonymous"></script>
+<script src="assets/v8-workflow-7a2c7eeb2c3d.js" integrity="sha384-gGnJ7h26geZjWGOaqLnJyOQGNt7/+92n5zrBv3RrFbauE3t/lSZrHcWPyx/qR0OT" crossorigin="anonymous"></script>
+<script src="assets/v8-htf-210908c07fab.js" integrity="sha384-Z4sGeEiSR7vnNe2MOGzRoNA/4ZJ8XmVfs72KPhhzyUxXcUzE8Ypz6rTvYwZFZS+9" crossorigin="anonymous"></script>
+<script src="assets/v8-pause-42ea9c296a1b.js" integrity="sha384-HZXjA4brzaM5b36uyew5EN+RrsVb91u/GnIr1+CLsYFxsEwDRTl9FGugMjFH/2l8" crossorigin="anonymous"></script>
+<script src="assets/v8-calendar-e6dee94e4463.js" integrity="sha384-xGRwyQJDP9qKx+IYJV6S/2m9qhHZ9bFY6MR+6g8SaD/fxEkvIr5M4P2u5XvDwQRr" crossorigin="anonymous"></script>
 <script src="assets/v8-ergonomics-5660429e0bf9.js" integrity="sha384-hm4JefqyvZBaWKrrUd1QShsQL1/ZRTgonzL4lPJfrKKKa1Orx4+dQrWdy2H/MhTN" crossorigin="anonymous"></script>
-<script src="assets/v8-preparation-4e7401e54f51.js" integrity="sha384-N/02+9elJ+0JXgXk4kMlEj02/nRClh5Sz3fe/QxiwTft04WO42PpXy/b7E65uCXO" crossorigin="anonymous"></script></body></html>
+<script src="assets/v8-preparation-9274011640df.js" integrity="sha384-G4woCLmGjr+tPS3frSRflT6tE6eWWw4RDlM4WVf8OEgM1j9hr6jjA+pKbAOz8je3" crossorigin="anonymous"></script></body></html>
