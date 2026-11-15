@@ -10,7 +10,7 @@ function v8PersistPause(){const key=v8PauseKey();if(!key)return;try{v8PauseStora
 function v8PauseVisible(){return !v8PauseScreen.hidden;}
 function v8SetPauseOpen(open){v8PauseScreen.hidden=!open;document.body.classList.toggle('v8-voluntary-pause',open);$('tabs').inert=open;document.querySelector('header').inert=open;for(const node of $('app').children)if(node!==v8PauseScreen)node.inert=open;}
 function v8ChoosePause(){
- if(!currentUser||!currentSession)return;V8P.returnFocus=document.activeElement;V8P.owner=currentUser.id;V8P.session=currentSession.id;V8P.until=null;
+ if(!currentUser)return;V8P.returnFocus=document.activeElement;V8P.owner=currentUser.id;V8P.session=currentSession?.id||null;V8P.until=null;
  $('v8PauseTitle').textContent='Wie lange möchtest du pausieren?';$('v8PauseChoice').hidden=false;$('v8PauseRunning').hidden=true;$('v8PauseExit').textContent='Zurück ohne Pause';$('v8PauseError').textContent='';v8SetPauseOpen(true);$('v8PauseMinutes').focus();
 }
 function v8PauseRemaining(until=V8P.until,now=Date.now()){return Number.isFinite(until)?Math.max(0,Math.ceil((until-now)/1000)):0;}
@@ -24,7 +24,7 @@ function v8ShowRunningPause(){
 }
 function v8StartPause(){
  const minutes=Number($('v8PauseMinutes').value);if(!Number.isInteger(minutes)||minutes<1||minutes>180){$('v8PauseError').textContent='Bitte 1 bis 180 ganze Minuten wählen.';return;}
- if(V8P.owner!==currentUser?.id||V8P.session!==currentSession?.id){v8EndPause();return;}
+ if(V8P.owner!==currentUser?.id||V8P.session!==(currentSession?.id||null)){v8EndPause();return;}
  V8P.until=Date.now()+minutes*60000;V8H.paused=true;V8H.ack='';V8H.request=null;v8UpdateMental();saveWorkspace();v8PersistPause();v8ShowRunningPause();
 }
 function v8EndPause(){
@@ -32,8 +32,8 @@ function v8EndPause(){
  V8P.until=null;V8H.paused=false;v8SetPauseOpen(false);v8UpdateMental();saveWorkspace();if(wasRunning){showView('session');v8FocusPreparation('sessionMoodOptions');}else if(V8P.returnFocus?.isConnected)V8P.returnFocus.focus();
 }
 function v8RestorePause(){
- if(!currentUser||!currentSession)return;const key=v8PauseKey();let item;try{item=JSON.parse(v8PauseStorage().getItem(key)||'null');}catch(_){return;}
- if(!item||item.owner!==currentUser.id||item.session!==currentSession.id||!Number.isFinite(item.until)||item.until<Date.now()-86400000||item.until>Date.now()+10800000)return;
+ if(!currentUser)return;const key=v8PauseKey();let item;try{item=JSON.parse(v8PauseStorage().getItem(key)||'null');}catch(_){return;}
+ if(!item||item.owner!==currentUser.id||item.session!==(currentSession?.id||null)||!Number.isFinite(item.until)||item.until<Date.now()-86400000||item.until>Date.now()+10800000)return;
  V8P.owner=item.owner;V8P.session=item.session;V8P.until=item.until;V8H.paused=true;V8H.ack='';v8ShowRunningPause();v8UpdateMental();
 }
 $('v8PauseStart').onclick=v8StartPause;$('v8PauseExit').onclick=v8EndPause;
