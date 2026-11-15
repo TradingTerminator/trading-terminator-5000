@@ -1,12 +1,12 @@
 /* A voluntary break: always dismissible, never a trading lock. */
-const V8P={owner:null,session:null,until:null,returnFocus:null};
+const V8P={owner:null,session:null,until:null,started:null,returnFocus:null};
 const v8PauseScreen=document.createElement('div');
 v8PauseScreen.id='v8PauseScreen';v8PauseScreen.hidden=true;v8PauseScreen.setAttribute('role','dialog');v8PauseScreen.setAttribute('aria-modal','true');v8PauseScreen.setAttribute('aria-labelledby','v8PauseTitle');
-v8PauseScreen.innerHTML='<div class="v8-pause-card"><span class="v8-kicker">Zeit für dich · freiwillig</span><h2 id="v8PauseTitle">Wie lange möchtest du pausieren?</h2><div id="v8PauseChoice"><div class="v8-pause-presets" role="group" aria-label="Pausendauer"><button type="button" data-pause-minutes="5">5 Minuten</button><button type="button" data-pause-minutes="10">10 Minuten</button><button type="button" data-pause-minutes="15">15 Minuten</button></div><label>Eigene Dauer in Minuten<input id="v8PauseMinutes" type="number" min="1" max="180" step="1" value="5" inputmode="numeric"></label><p id="v8PauseError" role="status"></p><button id="v8PauseStart" type="button">Pause starten</button></div><div id="v8PauseRunning" hidden><p id="v8PauseTimer" role="timer" aria-label="Verbleibende Pausenzeit">05:00</p><p id="v8PauseEndTime"></p><p id="v8PauseState" role="status"></p></div><p class="compact-help">Deine Eingaben bleiben erhalten. Du kannst jederzeit zurück.</p><button type="button" id="v8PauseExit" class="secondary">Zurück ohne Pause</button></div>';
+v8PauseScreen.innerHTML='<div class="v8-pause-card"><span class="v8-kicker">Zeit für dich · freiwillig</span><h2 id="v8PauseTitle">Wie lange möchtest du pausieren?</h2><div id="v8PauseChoice"><div class="v8-pause-presets" role="group" aria-label="Pausendauer"><button type="button" data-pause-minutes="5">5 Minuten</button><button type="button" data-pause-minutes="10">10 Minuten</button><button type="button" data-pause-minutes="15">15 Minuten</button></div><label>Eigene Dauer in Minuten<input id="v8PauseMinutes" type="number" min="1" max="180" step="1" value="5" inputmode="numeric"></label><p id="v8PauseError" role="status"></p><button id="v8PauseStart" type="button">Pause starten</button></div><div id="v8PauseRunning" hidden><p id="v8PauseTimer" role="timer" aria-label="Verbleibende Pausenzeit">05:00</p><p id="v8PauseEndTime"></p><p id="v8PauseExercise"></p><p class="compact-help">Atme sanft, ohne Luft anzuhalten. Bei Unwohlsein abbrechen.</p><p id="v8PauseState" role="status"></p></div><p class="compact-help">Deine Eingaben bleiben erhalten. Du kannst jederzeit zurück.</p><button type="button" id="v8PauseExit" class="secondary">Zurück ohne Pause</button></div>';
 $('app').append(v8PauseScreen);
 function v8PauseKey(){return currentUser?.id?'tt8_voluntary_pause_'+currentUser.id:null;}
 function v8PauseStorage(){return ttRemember?localStorage:sessionStorage;}
-function v8PersistPause(){const key=v8PauseKey();if(!key)return;try{v8PauseStorage().setItem(key,JSON.stringify({owner:V8P.owner,session:V8P.session,until:V8P.until}));(ttRemember?sessionStorage:localStorage).removeItem(key);}catch(_){}}
+function v8PersistPause(){const key=v8PauseKey();if(!key)return;try{v8PauseStorage().setItem(key,JSON.stringify({owner:V8P.owner,session:V8P.session,until:V8P.until,started:V8P.started}));(ttRemember?sessionStorage:localStorage).removeItem(key);}catch(_){}}
 function v8PauseVisible(){return !v8PauseScreen.hidden;}
 function v8SetPauseOpen(open){v8PauseScreen.hidden=!open;document.body.classList.toggle('v8-voluntary-pause',open);$('tabs').inert=open;document.querySelector('header').inert=open;for(const node of $('app').children)if(node!==v8PauseScreen)node.inert=open;}
 function v8ChoosePause(){
@@ -16,6 +16,7 @@ function v8ChoosePause(){
 function v8PauseRemaining(until=V8P.until,now=Date.now()){return Number.isFinite(until)?Math.max(0,Math.ceil((until-now)/1000)):0;}
 function v8TickPause(){
  if(!v8PauseVisible()||!V8P.until)return;const left=v8PauseRemaining();$('v8PauseTimer').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+ $('v8PauseExercise').textContent=left?v8PauseExercise(V8P.started):'Spüre kurz nach: Wie sind Anspannung und Fokus jetzt?';
  const state=left?'Du kannst die Pause jederzeit vorzeitig beenden.':'Pause beendet. Prüfe kurz, wie du dich jetzt fühlst.';if($('v8PauseState').textContent!==state)$('v8PauseState').textContent=state;
  $('v8PauseExit').textContent=left?'Pause vorzeitig beenden':'Zur Vorbereitung';
 }
@@ -25,7 +26,7 @@ function v8ShowRunningPause(){
 function v8StartPause(){
  const minutes=Number($('v8PauseMinutes').value);if(!Number.isInteger(minutes)||minutes<1||minutes>180){$('v8PauseError').textContent='Bitte 1 bis 180 ganze Minuten wählen.';return;}
  if(V8P.owner!==currentUser?.id||V8P.session!==(currentSession?.id||null)){v8EndPause();return;}
- V8P.until=Date.now()+minutes*60000;V8H.paused=true;V8H.ack='';V8H.request=null;v8UpdateMental();saveWorkspace();v8PersistPause();v8ShowRunningPause();
+ V8P.started=Date.now();V8P.until=V8P.started+minutes*60000;V8H.paused=true;V8H.ack='';V8H.request=null;v8UpdateMental();saveWorkspace();v8PersistPause();v8ShowRunningPause();
 }
 function v8EndPause(){
  const wasRunning=!!V8P.until,key=v8PauseKey();if(key)try{localStorage.removeItem(key);sessionStorage.removeItem(key);}catch(_){}
@@ -34,7 +35,7 @@ function v8EndPause(){
 function v8RestorePause(){
  if(!currentUser)return;const key=v8PauseKey();let item;try{item=JSON.parse(v8PauseStorage().getItem(key)||'null');}catch(_){return;}
  if(!item||item.owner!==currentUser.id||item.session!==(currentSession?.id||null)||!Number.isFinite(item.until)||item.until<Date.now()-86400000||item.until>Date.now()+10800000)return;
- V8P.owner=item.owner;V8P.session=item.session;V8P.until=item.until;V8H.paused=true;V8H.ack='';v8ShowRunningPause();v8UpdateMental();
+ V8P.owner=item.owner;V8P.session=item.session;V8P.until=item.until;V8P.started=Number.isFinite(item.started)&&item.started<=item.until?item.started:item.until-5*60000;V8H.paused=true;V8H.ack='';v8ShowRunningPause();v8UpdateMental();
 }
 $('v8PauseStart').onclick=v8StartPause;$('v8PauseExit').onclick=v8EndPause;
 for(const button of v8PauseScreen.querySelectorAll('[data-pause-minutes]'))button.onclick=()=>{$('v8PauseMinutes').value=button.dataset.pauseMinutes;for(const pick of v8PauseScreen.querySelectorAll('[data-pause-minutes]'))pick.setAttribute('aria-pressed',String(pick===button));};
@@ -43,3 +44,6 @@ setInterval(v8TickPause,1000);document.addEventListener('visibilitychange',v8Tic
 const pauseSessionRender=renderSession;renderSession=function(...args){pauseSessionRender(...args);v8RestorePause();};
 const pauseRestoreWorkspace=restoreWorkspace;restoreWorkspace=function(...args){pauseRestoreWorkspace(...args);v8RestorePause();};
 const pauseReset=resetPrivateState;resetPrivateState=function(...args){v8SetPauseOpen(false);V8P.owner=null;V8P.session=null;V8P.until=null;V8P.returnFocus=null;pauseReset(...args);};
+
+const V8_PAUSE_EXERCISES=['Atmung: Atme ruhig ein und etwas länger aus. Lass den Rhythmus angenehm bleiben.','Schultern: Hebe sie sanft an und lass sie locker sinken. Entspanne den Kiefer.','Orientierung: Benenne fünf Dinge, die du siehst. Spüre deine Füße am Boden.','Abstand: Schau in die Ferne. Lass die Augen weich werden und blinzle entspannt.','Gedanken: Benenne einen belastenden Gedanken und lass ihn für diesen Moment stehen.','Körper: Lockere die Hände. Spüre die Auflage von Rücken und Füßen.','Fokus: Sage dir: Ich muss keinen Trade erzwingen. Ich warte auf meinen Trigger.','Bewegung: Strecke dich sanft oder gehe ein paar ruhige Schritte.'];
+function v8PauseExercise(start,now=Date.now()){return V8_PAUSE_EXERCISES[Math.max(0,Math.floor((now-start)/60000))%V8_PAUSE_EXERCISES.length];}
