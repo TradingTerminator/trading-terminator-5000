@@ -35,7 +35,7 @@ Primärquellen:
 
 ## Datenbankänderung und Rollout
 
-`db/v8_08_preparation.sql` ist eine separate, noch nicht produktiv ausgeführte Migration:
+`db/v8_08_preparation.sql` wurde am 15.11.2026 nach freigegebener Datensicherung produktiv angewandt und anschließend erfolgreich geprüft:
 
 - Neue V808-HTF-RPC statt Änderung der bisherigen V803-RPC. Eigentümerprüfung, Session-Sperre, optimistischer Kontextvergleich, Wiederholschutz und Bildzuordnung bleiben erhalten. Acht Bewertungen, individuelle Warnbestätigungen, Dauer, Geldgrenzen und Chart-Arbeit werden serverseitig geprüft.
 - Zwei neue SECURITY INVOKER RPCs für einen Exit mit unbekanntem Ergebnis und die spätere Vervollständigung. Bestehende RLS und Berechtigungen gelten. Ursprüngliches Risiko bleibt unverändert.
@@ -44,7 +44,7 @@ Primärquellen:
 
 Produktionsreihenfolge: verfügbares Datenbackup bestätigen → Migration als eine Transaktion anwenden → SQL-Prüfung ausführen → Frontend nach grüner CI veröffentlichen → Version und Deployment prüfen. Bei Rücknahme zuerst zurück auf den vorherigen Frontendstand; neue Pending-Exits vor Wiederherstellung der alten Constraint vollständig abschließen. Kein blindes Löschen von Nutzerdaten und kein ungeprüfter Constraint-Rollback.
 
-Der angefragte Export eines Datenbackups wurde von der automatischen Freigabeprüfung abgelehnt, weil vollständige private Handelsdaten übertragen würden. Es wurde kein Datenbackup erstellt, kein Produktions-Rollout vorgenommen und keine Migration dauerhaft angewandt.
+Der Benutzer hat die private Sicherung der fiktiven Handelsdaten ausdrücklich freigegeben. Das Backup der betroffenen Tabellen und der bisherigen Exit-Constraint wurde vor der Migration erstellt und privat gespeichert. Danach wurde die Migration angewandt; sämtliche SQL-Prüfungen liefen mit anschließend zurückgerollten synthetischen Testdaten erfolgreich. Die Bestandsdatensätze blieben erhalten. Der aktuelle Frontend- und Deployment-Nachweis steht in PR #20: https://github.com/TradingTerminator/trading-terminator-5000/pull/20 .
 
 ## Verifikation und Grenzen
 
