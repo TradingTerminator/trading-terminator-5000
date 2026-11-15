@@ -26,7 +26,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.06';
+const TT_VERSION='8.07';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -284,7 +284,7 @@ async function loadSessionTrades(){
 async function renderSessionSummary(trades,target=$('sessionSummaryBody'),title=currentSession?'Aktive Handelssession · '+currentSession.session_date+' · seit '+berlinTime(currentSession.created_at):'',isCurrent=()=>true){
  const seq=target.id==='sessionSummaryBody'?++summarySeq:null;const valid=()=>isCurrent()&&(seq===null||seq===summarySeq);
  const closed=trades.filter(t=>t.exit_at),open=trades.length-closed.length;
- let total=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0);
+ let total=closed.reduce((n,t)=>n+Number(t.realized_pnl_usd||0),0),totalFees=0;
  let risk=closed.reduce((n,t)=>n+Number(t.initial_risk_usd||0),0);
  let riskComplete=closed.length>0&&closed.every(t=>t.initial_risk_usd!=null&&Number(t.initial_risk_usd)>0);
  const reviewedTrades=trades.filter(t=>t.observations?.compliance_reviewed);
@@ -300,7 +300,7 @@ async function renderSessionSummary(trades,target=$('sessionSummaryBody'),title=
    if(allocations.length){
      let results=[],resultsError=null;try{const aid=allocations.map(a=>a.id);for(let i=0;i<aid.length;i+=100)results.push(...await readAllRows('account_trade_results','id,allocation_id,realized_pnl_usd,fees_usd,result_status',q=>q.in('allocation_id',aid.slice(i,i+100)).order('id')));}catch(e){resultsError=e;}
      if(!valid())return;if(resultsError){target.textContent='Kontoergebnisse nicht verfügbar: '+resultsError.message;return;}
-     const totals=allocationSummary(allocations,results||[]);total=totals.pnl;risk=totals.risk;riskComplete=totals.completeRisk;resultsComplete=resultsComplete&&totals.completeResults;
+     const totals=allocationSummary(allocations,results||[]);total=totals.pnl;totalFees=totals.fees;risk=totals.risk;riskComplete=totals.completeRisk;resultsComplete=resultsComplete&&totals.completeResults;
      const byAccount=new Map();
      for(const a of allocations){const rows=byAccount.get(a.account_id)||[];rows.push(a);byAccount.set(a.account_id,rows);}
      for(const [id,rows] of byAccount){
@@ -309,6 +309,7 @@ async function renderSessionSummary(trades,target=$('sessionSummaryBody'),title=
      }
    }
  }
+ if(target.id==='sessionSummaryBody'&&typeof v8ObserveSessionTotals==='function')v8ObserveSessionTotals({owner:currentUser?.id,session:currentSession?.id,net:total-totalFees,complete:(!closed.length||resultsComplete)&&trades.length<100});
  target.innerHTML=`${title?'<p><strong>'+escapeHtml(title)+'</strong></p>':''}<div class="grid"><div class="stat"><small>Entscheidungen</small><strong>${trades.length}</strong></div><div class="stat"><small>Offen / abgeschlossen</small><strong>${open} / ${closed.length}</strong></div><div class="stat"><small>Brutto-P&amp;L (USD)</small><strong>${closed.length?(resultsComplete?usd(total):'unvollständig'):'–'}</strong></div><div class="stat"><small>Brutto-P&amp;L / Gesamtrisiko</small><strong>${closed.length&&resultsComplete&&riskComplete&&risk>0?(total/risk).toFixed(2):'–'}</strong></div></div><p class="muted">Geprüft ohne Regelbruch: ${withoutMarkedDeviation} / ${reviewedTrades.length} geprüfte Trades (${trades.length-reviewedTrades.length} ungeprüft). A+: ${aPlus} / ${graded.length} bewerteten Trades. Nicht bewertete Trades zählen nicht zur A+-Quote.</p>${learningSummaryHtml(trades)}${accountRows.length?'<h3>Ergebnisse je Konto</h3>'+accountRows.join(''):''}<details><summary>Berechnungsgrundlage</summary><p class="muted">Nur abgeschlossene Trades zählen zum P&L und R. Handelssession-R = Summe der eingegebenen P&L / Summe ursprünglicher Risiken; kein Durchschnitt einzelner R-Werte. Gebühren werden separat gespeichert und nicht zusätzlich abgezogen. P&L-Eingabe ist brutto vor Gebühren; Netto = Brutto minus Gebühren. Keine Broker-Synchronisation.</p></details>`;
 }
 $('reloadTrades').onclick=loadSessionTrades;
