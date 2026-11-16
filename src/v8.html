@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.08</title>
+<title>Trading Terminator 5000 · V8.09</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="v8.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.08 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.09 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -56,7 +56,7 @@ Gib diesen Code in der Trading Terminator App ein. Teile ihn mit niemandem.</tex
 <button type="button" id="ttServerHealth" class="secondary wide">Supabase-Verbindung und Daten prüfen</button>
 <button type="button" id="ttVersionCheck" class="secondary wide">GitHub-Version prüfen (ohne Update)</button>
 <p id="ttDataToolsStatus" class="muted" role="status" aria-live="polite">Noch keine Prüfung durchgeführt.</p>
-</details><details class="card" open><summary><strong>Darstellung</strong></summary><label>Farbschema<select id="ttThemeSelect"><option value="original">Petrol (Standard)</option><option value="graphite">Graphit</option><option value="contrast">Kontrast</option><option value="ocean">Ozean</option><option value="forest">Wald</option><option value="light">Hell</option></select></label><label>Layout<select id="ttLayoutSelect"><option value="comfortable">Komfortabel</option><option value="compact">Kompakt</option></select></label><small>Darstellung wird lokal auf diesem Gerät gespeichert.</small></details><p class="muted">Verwaltung außerhalb des Trading-Ablaufs. Hier kannst du Setups und ihre Beispielbilder pflegen, ohne den schnellen Entry zu unterbrechen.</p><details class="card"><summary><strong>Emotionen verwalten</strong></summary><div class="account" id="emotionManager"><h3>Emotionen verwalten</h3><p class="muted">Bezeichnungen für vor, während und nach dem Trade ändern. Die gespeicherten Auswertungs-Codes bleiben unverändert. Synchronisierung über dein Benutzerprofil.</p><div id="emotionManagerFields"></div><button type="button" id="saveEmotionLabels" class="wide secondary">Emotionen speichern</button><p id="emotionManagerStatus" class="muted" role="status"></p></div></details><details class="card"><summary><strong>Setups & Playbook-Kriterien</strong></summary><div id="setupManager" class="account"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p></div></details></section><section id="globalStatus"><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
+</details><details class="card" open><summary><strong>Darstellung</strong></summary><label>Farbschema<select id="ttThemeSelect"><option value="original">Petrol / Türkis</option><option value="graphite">Graphit / Mint</option><option value="contrast">Dunkel / hoher Kontrast</option><option value="ocean">Navy / Blau</option><option value="forest">Sand / Anthrazit</option><option value="light">Hell / Indigo</option></select></label><label>Layout<select id="ttLayoutSelect"><option value="comfortable">Komfortabel</option><option value="compact">Kompakt</option></select></label><small>Darstellung wird lokal auf diesem Gerät gespeichert.</small></details><p class="muted">Verwaltung außerhalb des Trading-Ablaufs. Hier kannst du Setups und ihre Beispielbilder pflegen, ohne den schnellen Entry zu unterbrechen.</p><details class="card"><summary><strong>Emotionen verwalten</strong></summary><div class="account" id="emotionManager"><h3>Emotionen verwalten</h3><p class="muted">Bezeichnungen für vor, während und nach dem Trade ändern. Die gespeicherten Auswertungs-Codes bleiben unverändert. Synchronisierung über dein Benutzerprofil.</p><div id="emotionManagerFields"></div><button type="button" id="saveEmotionLabels" class="wide secondary">Emotionen speichern</button><p id="emotionManagerStatus" class="muted" role="status"></p></div></details><details class="card"><summary><strong>Setups & Playbook-Kriterien</strong></summary><div id="setupManager" class="account"><h3>Setups verwalten</h3><p class="muted">Namen und Beschreibungen werden zwischen PC und iPhone synchronisiert. Entfernen blendet ein Setup für neue Trades aus; ältere Trades bleiben unverändert.</p><div id="setupManagerList"></div><div class="account"><h4>Neues Setup</h4><label>Name<input id="newSetupName" maxlength="80" placeholder="z. B. Liquidity Sweep"></label><label>Beschreibung (optional)<textarea id="newSetupDescription" rows="2" maxlength="1000" placeholder="Einstiegskriterien, Kontext ..."></textarea></label><button id="createSetup" type="button" class="wide">Setup hinzufügen</button></div><p id="setupManagerStatus" role="status" class="muted"></p></div></details></section><section id="globalStatus"><h2>Status</h2><div id="message" aria-live="polite">Bitte anmelden.</div></section>
 </div></main>
 
 <script src="vendor/supabase-2.119.0.js"></script>
@@ -89,7 +89,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.08';
+const TT_VERSION='8.09';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -1758,7 +1758,7 @@ let setupCatalog=[],setupCatalogReady=false,setupCatalogBusy=false;
 const setupNotice=(msg,error=false)=>{const el=$('setupManagerStatus');el.textContent=msg;el.className=error?'error':'ok';};
 async function loadSetupCatalog(){
  if(!currentUser)return;
- const {data,error}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+ const {data,error}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,media_views,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
  if(error){setupCatalogReady=false;$('setupCards').textContent='Setups konnten nicht geladen werden: '+error.message;return;}
  setupCatalog=data||[];setupCatalogReady=true;
  // Seed default setups once, only if this account has never had a catalog.
@@ -1767,7 +1767,7 @@ async function loadSetupCatalog(){
   const {error:seedError}=await client.from('trading_setup_catalog').insert(rows);
   if(seedError){setupNotice('Standard-Setups konnten nicht angelegt werden: '+seedError.message,true);}
   else{
-   const {data:seeded,error:reloadError}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+   const {data:seeded,error:reloadError}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,media_views,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
    if(!reloadError)setupCatalog=seeded||[];
   }
  }
@@ -1817,13 +1817,13 @@ function renderSetupManager(){
    let uploaded=null;
    try{
     uploaded=chartPath('setup',item.id,crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_'));await uploadChart(file,uploaded);
-    const {error}=await client.from('trading_setup_catalog').update({image_path:uploaded,updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({image_path:uploaded,updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     const old=item.image_path;await loadSetupCatalog();
     setupNotice('Setup-Bild gespeichert.');
-    if(old&&old!==uploaded){const {error:cleanupError}=await client.storage.from(CHART_BUCKET).remove([old]);if(cleanupError)setupNotice('Neues Bild gespeichert, altes Bild konnte nicht bereinigt werden: '+cleanupError.message,true);}
+    // Historical snapshots may reference the previous original. Keep it.
    }catch(e){
-    if(uploaded){await client.storage.from(CHART_BUCKET).remove([uploaded]).catch(()=>{});}
+    // Ambiguous responses may have committed. Preserve potentially referenced uploads.
     setupNotice('Bild konnte nicht gespeichert werden: '+e.message,true);
    }finally{setupCatalogBusy=false;imageSave.disabled=false;}
   });
@@ -1832,11 +1832,10 @@ function renderSetupManager(){
    if(!confirm('Bild von Setup „'+item.name+'“ entfernen?'))return;
    setupCatalogBusy=true;imageRemove.disabled=true;
    try{
-    const {error}=await client.from('trading_setup_catalog').update({image_path:null,updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({image_path:null,updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     const old=item.image_path;await loadSetupCatalog();
-    const {error:storageError}=await client.storage.from(CHART_BUCKET).remove([old]);
-    setupNotice(storageError?'Bildzuordnung entfernt; Dateibereinigung fehlgeschlagen: '+storageError.message:'Setup-Bild entfernt.',!!storageError);
+    setupNotice('Musterbild aus Auswahl entfernt. Historisches Original bleibt erhalten.');
    }catch(e){setupNotice('Bild entfernen fehlgeschlagen: '+e.message,true);}
    finally{setupCatalogBusy=false;imageRemove.disabled=false;}
   });
@@ -1845,7 +1844,7 @@ function renderSetupManager(){
    if(!next){setupNotice('Setup-Name darf nicht leer sein.',true);return;}
    if(setupCatalogBusy)return;setupCatalogBusy=true;save.disabled=true;
    try{
-    const {error}=await client.from('trading_setup_catalog').update({name:next,description:description.value.trim(),updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({name:next,description:description.value.trim(),updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     const prior=item.name;await loadSetupCatalog();
     if($('setup').value===prior){$('setup').value=next;renderSetupCards();}
@@ -1858,7 +1857,7 @@ function renderSetupManager(){
    if(item.active&&!confirm('Setup „'+item.name+'“ für neue Trades ausblenden? Alte Trades bleiben erhalten.'))return;
    setupCatalogBusy=true;toggle.disabled=true;
    try{
-    const {error}=await client.from('trading_setup_catalog').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     if(item.active&&$('setup').value===item.name)$('setup').value='';
     await loadSetupCatalog();setupNotice(item.active?'Setup ausgeblendet.':'Setup wieder aktiviert.');
@@ -1882,13 +1881,14 @@ $('createSetup').addEventListener('click',async()=>{
  finally{setupCatalogBusy=false;$('createSetup').disabled=false;}
 });
 
-let ttIdeas=[],ttAttempts=[];
-async function ttLoadIdeas(){
+let ttIdeas=[],ttAttempts=[],ttIdeaSeq809=0;
+async function ttLoadIdeas(){const owner=currentUser?.id,session=currentSession?.id,seq=++ttIdeaSeq809;
  if(!currentSession){ttIdeas=[];ttAttempts=[];ttRenderIdeaSelect();return;}
  const [ideas,attempts]=await Promise.all([
   client.from('trade_ideas_v733').select('id,session_id,setup_type,instrument,direction,thesis,trigger_condition,invalidation,created_at,status,target_zone').eq('session_id',currentSession.id).order('created_at',{ascending:false}),
   client.from('trade_attempts_v733').select('id,idea_id,attempt_number,classification,trade_id,created_at').order('created_at',{ascending:false}).limit(500)
  ]);
+ if(owner!==currentUser?.id||session!==currentSession?.id||seq!==ttIdeaSeq809)return;
  if(ideas.error||attempts.error){message('Handelsideen konnten nicht geladen werden: '+(ideas.error||attempts.error).message,true);return;}
  ttIdeas=ideas.data||[];ttAttempts=attempts.data||[];ttRenderIdeaSelect();
 }
@@ -1996,7 +1996,7 @@ $('recordEntry').onclick=async()=>{
     entryWarningAnswers={thesis:$('ttCheckThesis').value==='yes',trigger:$('ttCheckTrigger').value==='yes',risk:$('ttCheckRisk').value==='yes',motivation:$('ttCheckMotivation').value==='yes'};
     if(!confirm('WARNUNG: Einstiegsversuch '+attemptNo+' derselben Idee.\nThese: '+(entryWarningAnswers.thesis?'Ja':'Nein')+' | Trigger: '+(entryWarningAnswers.trigger?'Ja':'Nein')+' | Risiko: '+(entryWarningAnswers.risk?'Ja':'Nein')+' | Motivation: '+(entryWarningAnswers.motivation?'Ja':'Nein')+'\nTrotzdem als weiteren Versuch dokumentieren?'))return;
   }
-  if(missingScales($('entryEmotionOptions'),'entryEmotion').length){entryFeedback('Bitte alle Empfindungen vor dem Entry bewerten; 1 bedeutet keine bzw. geringe Ausprägung.',$('entryEmotionOptions').querySelector('[data-rated="false"]'));return;}const entryEmotion=selectedEmotion($('entryEmotionOptions'));
+  if(!$('tt9Executed')?.checked&&missingScales($('entryEmotionOptions'),'entryEmotion').length){entryFeedback('Bitte alle Empfindungen vor dem Entry bewerten; 1 bedeutet keine bzw. geringe Ausprägung.',$('entryEmotionOptions').querySelector('[data-rated="false"]'));return;}const entryEmotion=selectedEmotion($('entryEmotionOptions'));
    // Emotionale Warnung bleibt sichtbar im Formular; keine zusätzlichen Bestätigungsdialoge.
   busy=true;
   $('recordEntry').disabled=true;
@@ -2009,7 +2009,7 @@ $('recordEntry').onclick=async()=>{
       p_idea_id:entryIdeaId,
       p_warning_answers:entryWarningAnswers,
       p_new_idea:newIdea,
-      p_entry_context:{capture_version:737,htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
+      p_entry_context:{capture_version:$('tt9Executed')?.checked?736:737,documented_after_execution:!!$('tt9Executed')?.checked,warning_acknowledgements:typeof T9!=='undefined'?{...T9.acks}:{},htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,
@@ -2150,11 +2150,11 @@ async function loadTrainingFocus(){
  const seq=++trainingFocusSeq,owner=currentUser?.id;
  if(!owner){trainingFocusActive=null;trainingFocusGoals=[];trainingFocusReady=false;drawTrainingFocus();return;}
  try{
-  const {data,error}=await client.from('training_goals_v7').select('id,goal,status,created_at,updated_at,practiced_at,source_trade_id,source_error_id,error_type,revised_from_id').order('created_at',{ascending:false}).limit(100);
+  const {data,error}=await client.from('training_goals_v7').select('id,goal,status,created_at,updated_at,practiced_at,source_trade_id,source_error_id,error_type,source_htf_id,revised_from_id').order('created_at',{ascending:false}).limit(100);
   if(seq!==trainingFocusSeq||currentUser?.id!==owner)return;if(error)throw error;
   trainingFocusGoals=data||[];
   // Active query is separate so an older active goal cannot disappear behind history limits.
-  const {data:active,error:activeError}=await client.from('training_goals_v7').select('id,goal,status,updated_at,source_trade_id,source_error_id,error_type').eq('status','active').maybeSingle();
+  const {data:active,error:activeError}=await client.from('training_goals_v7').select('id,goal,status,updated_at,source_trade_id,source_error_id,error_type,source_htf_id').eq('status','active').maybeSingle();
   if(seq!==trainingFocusSeq||currentUser?.id!==owner)return;if(activeError)throw activeError;
   trainingFocusActive=active;trainingFocusReady=true;drawTrainingFocus();await loadPracticeSummary();
  }catch(err){if(seq!==trainingFocusSeq||currentUser?.id!==owner)return;trainingFocusActive=null;trainingFocusReady=false;drawTrainingFocus();trainingFocusMessage('Trainingsschwerpunkt nicht geladen: '+err.message,true);}
@@ -2220,7 +2220,7 @@ initTrainingFocus();
 <script id="tt-diagnostics-module">
 (function(){
  'use strict';
- const TT_VERSION='8.08';
+ const TT_VERSION='8.09';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -2338,7 +2338,7 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const match=html.match(/Version\s+(8\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
  inform(match[1]===TT_VERSION?'Veröffentlicht: '+TT_VERSION+' · gleicher Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.08. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.09. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');
@@ -2401,7 +2401,7 @@ function metricCards(items){return '<div class="metric-grid">'+items.map(([k,v])
 async function loadSessionIndex(force=false){const owner=currentUser?.id;if(!owner)return;if(!force&&sessionIndexOwner===owner&&Date.now()-sessionIndexLoaded<15000)return;const rows=await readAllRows('trading_sessions','id,session_date,created_at,closed_at,status,htf_context',q=>q.order('created_at',{ascending:false}).order('id'));if(currentUser?.id!==owner)return;sessionIndex=new Map(rows.map(x=>[x.id,x]));sessionIndexOwner=owner;sessionIndexLoaded=Date.now();}
 function renderReviewGroups(host,rows,compact=false){const groups=new Map();for(const t of rows){const key=t.session_id||'unknown';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(t);}for(const [id,trades] of [...groups].sort((a,b)=>String(sessionIndex.get(b[0])?.created_at||'').localeCompare(String(sessionIndex.get(a[0])?.created_at||'')))){const box=document.createElement('details');box.className='session-group';box.open=!compact||id===currentSession?.id;const label=document.createElement('summary');label.textContent=sessionLabel(sessionIndex.get(id))+' · '+trades.length+' Reviews fehlen';box.append(label);for(const t of trades.sort((a,b)=>String(a.entry_at).localeCompare(String(b.entry_at)))){const btn=document.createElement('button');btn.type='button';btn.className='training-trade state-pending';btn.textContent=tradeLabel(t)+' · '+t.setup_type+' · '+t.direction.toUpperCase()+' '+t.instrument;const line=document.createElement('small');line.textContent=berlinTime(t.entry_at)+' · '+reviewStatusText(t);btn.append(line);btn.onclick=async()=>{journalScope='reviews';$('sessionFinishPanel').classList.add('hidden');await openJournalTradeById(t.id);selectTradePane('review');};box.append(btn);}host.append(box);}}
 function syncAccountLocks(){for(const card of $('allocationList').querySelectorAll('.account')){const unlock=card.querySelector('.acct-unlock');const incomplete=!card.querySelector('.acct-sl-ticks')?.value;for(const field of card.querySelectorAll('.acct-instrument,.acct-qty,.acct-sl-ticks'))field.disabled=!unlock?.checked&&!incomplete;}}
-function setupSnapshot(){const setup=setupCatalog.find(x=>x.name===$('setup').value);return setup?{id:setup.id,name:setup.name,description:setup.description||'',rules:setup.rules||{},checks:[...$('setupGuide')?.querySelectorAll('input:checked')||[]].map(x=>x.value)}:null;}
+function setupSnapshot(){const setup=setupCatalog.find(x=>x.name===$('setup').value);return setup?{id:setup.id,name:setup.name,description:setup.description||'',rules:setup.rules||{},image_path:setup.image_path||null,version:setup.updated_at||null,checks:[...$('setupGuide')?.querySelectorAll('input:checked')||[]].map(x=>x.value)}:null;}
 function renderSetupGuide(){let host=$('setupGuide');if(!host){host=document.createElement('div');host.id='setupGuide';$('setupSelectionStatus').after(host);}const saved=null;const item=saved?.name?saved:setupCatalog.find(x=>x.name===$('setup').value);host.replaceChildren();if(!item)return;const title=document.createElement('strong');title.textContent=item.name+(saved?.name?' · Kriterien der gespeicherten Idee':' · Setup prüfen');host.append(title);for(const [key,label] of Object.entries(BOOK_FIELDS)){const value=item.rules?.[key];if(!value)continue;const l=document.createElement('label');l.className='setup-guide-check';const c=document.createElement('input');c.type='checkbox';c.value=key;l.append(c,document.createTextNode(label+': '+value));host.append(l);}const desc=document.createElement('p');desc.className='compact-help';desc.textContent=item.description||'Für dieses Setup sind noch keine eigenen Kriterien hinterlegt.';host.append(desc);const open=document.createElement('button');open.type='button';open.className='ghost';open.textContent='Setup im Playbook öffnen';open.onclick=()=>{showView('playbook');void renderBook(item.id);};host.append(open);const chips=document.createElement('div');chips.className='choice-chips';for(const [key,id,label] of [['context','ttIdeaThesis','Kontext übernehmen'],['trigger','ttIdeaTrigger','Trigger übernehmen'],['target','ttIdeaTarget','Zielregel übernehmen'],['invalidation','ttIdeaInvalidation','Invalidation übernehmen']]){if(!item.rules?.[key])continue;const b=document.createElement('button');b.type='button';b.className='ghost';b.textContent=label;b.onclick=()=>{const field=$(id);if(field.value.trim()&&!confirm('Vorhandenen Text durch die Setup-Regel ersetzen?'))return;field.value=item.rules[key];field.dispatchEvent(new Event('input',{bubbles:true}));};chips.append(b);}host.append(chips);}
 const BOOK_FIELDS={context:'Marktkontext',trigger:'Entry-Trigger',target:'Zielregel',invalidation:'Ungültig wenn',avoid:'Nicht handeln wenn'};
 function addTradeOverview(host,t,allocations,names){host.insertAdjacentHTML('beforeend',metricCards([['Status',t.exit_at?'Geschlossen':'Läuft'],['Review',reviewIsComplete(t)?'Erledigt':'Offen'],['Brutto-P&L',t.exit_at&&t.realized_pnl_usd!=null?usd(t.realized_pnl_usd)+' USD':'Noch offen'],['Initialrisiko',t.initial_risk_usd==null?'Nicht erfasst':usd(t.initial_risk_usd)+' USD']]));const entry=t.observations?.entry_context_v736;const snapshot=entry?.setup_snapshot;const plan=document.createElement('div');plan.className='account';const title=document.createElement('h4');title.textContent='Setup & ursprüngliche Idee';plan.append(title);const idea=ttIdeas.find(i=>i.id===t.idea_id)||ideaLearningRows.find(i=>i.id===t.idea_id);if(idea){for(const [k,v] of [['These',idea.thesis],['Trigger',idea.trigger_condition],['Ziel',idea.target_zone],['Invalidation',idea.invalidation]]){const p=document.createElement('p');p.textContent=k+': '+(v||'nicht erfasst');plan.append(p);}}else{const p=document.createElement('p');p.textContent=snapshot?.description||'Setup: '+t.setup_type+(t.idea_id?' · Idee laden …':' · Kein vorheriger Plan verknüpft');plan.append(p);if(t.idea_id){const owner=currentUser?.id;void client.from('trade_ideas_v733').select('thesis,trigger_condition,target_zone,invalidation').eq('id',t.idea_id).maybeSingle().then(({data,error})=>{if(owner!==currentUser?.id||!plan.isConnected)return;p.textContent=error?'Idee konnte nicht geladen werden':data?['These: '+data.thesis,'Trigger: '+data.trigger_condition,'Ziel: '+(data.target_zone||'nicht erfasst'),'Invalidation: '+data.invalidation].join(' · '):'Idee nicht verfügbar';});}}host.append(plan);for(const a of allocations){const p=document.createElement('p');p.className='compact-help';p.textContent=(names.get(a.account_id)||'Konto')+' · '+a.instrument+' × '+a.planned_quantity+' · Initialrisiko '+usd(a.initial_risk_usd)+' USD';host.append(p);}}
@@ -2492,4 +2492,4 @@ document.addEventListener('click',e=>{if(e.target.closest('button')?.textContent
 <script src="v8-pause.js"></script>
 <script src="v8-calendar.js"></script>
 <script src="v8-ergonomics.js"></script>
-<script src="v8-preparation.js"></script></body></html>
+<script src="v8-preparation.js"></script><script src="v8-09-model.js"></script><script src="v8-09.js"></script></body></html>

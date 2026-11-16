@@ -1,0 +1,69 @@
+name: V8.09 recovery validation
+on:
+  push:
+    branches: [v8-09-recovery]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+concurrency:
+  group: v809-recovery
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: tt809
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build && npm run check && npm test && npm run test:v8
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Isolated PostgreSQL migration and owner checks
+        env:
+          PGPASSWORD: test-only-password
+        run: |
+          psql -h 127.0.0.1 -U postgres -d tt809 -v ON_ERROR_STOP=1 -f tests/sql/bootstrap_v809.sql
+          psql -h 127.0.0.1 -U postgres -d tt809 -v ON_ERROR_STOP=1 -f db/v8_09_learning.sql
+          psql -h 127.0.0.1 -U postgres -d tt809 -v ON_ERROR_STOP=1 -f tests/sql/verify_v809.sql
+      - run: npx playwright install --with-deps chromium
+      - name: Desktop and mobile end to end
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/tt-http.log 2>&1 &
+          node scripts/test-v809-browser.cjs
+      - name: Preserve verified generated build on recovery branch
+        if: github.event_name == 'push'
+        run: |
+          git add assets v8.html index.html release-integrity.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Build verified V8.09 release assets'
+            git push origin HEAD:refs/heads/v8-09-recovery
+          fi
+      - name: Package built V8.09
+        run: |
+          cp db/v8_09_learning.sql dist/V8_09_MIGRATION.sql
+          cp docs/V8_09_RELEASE.md dist/V8_09_RELEASE.md
+          cd dist
+          zip -r ../TradingTerminator_V8.09.zip .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: TradingTerminator-V8.09
+          path: |
+            TradingTerminator_V8.09.zip
+            evidence/
