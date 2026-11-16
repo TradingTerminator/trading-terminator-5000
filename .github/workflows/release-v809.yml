@@ -1,0 +1,37 @@
+name: Publish verified V8.09 download
+on:
+  push:
+    branches: [main]
+    paths: ['src/v8-09.js', '.github/workflows/release-v809.yml']
+permissions:
+  contents: write
+concurrency:
+  group: release-v809
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build && npm run check && npm test && npm run test:v8
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/tt-http.log 2>&1 &
+          node scripts/test-v809-browser.cjs
+      - name: Create versioned download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(node -p "require('./package.json').version")" = "8.0.9"
+          cp db/v8_09_learning.sql dist/V8_09_MIGRATION.sql
+          cp docs/V8_09_RELEASE.md dist/V8_09_RELEASE.md
+          (cd dist && zip -r ../TradingTerminator_V8.09.zip .)
+          sha256sum TradingTerminator_V8.09.zip > TradingTerminator_V8.09.sha256
+          gh release create v8.09 TradingTerminator_V8.09.zip TradingTerminator_V8.09.sha256 --target "$GITHUB_SHA" --title 'TradingTerminator V8.09' --notes-file docs/V8_09_RELEASE.md
