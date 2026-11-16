@@ -26,7 +26,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.08';
+const TT_VERSION='8.09';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -1695,7 +1695,7 @@ let setupCatalog=[],setupCatalogReady=false,setupCatalogBusy=false;
 const setupNotice=(msg,error=false)=>{const el=$('setupManagerStatus');el.textContent=msg;el.className=error?'error':'ok';};
 async function loadSetupCatalog(){
  if(!currentUser)return;
- const {data,error}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+ const {data,error}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,media_views,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
  if(error){setupCatalogReady=false;$('setupCards').textContent='Setups konnten nicht geladen werden: '+error.message;return;}
  setupCatalog=data||[];setupCatalogReady=true;
  // Seed default setups once, only if this account has never had a catalog.
@@ -1704,7 +1704,7 @@ async function loadSetupCatalog(){
   const {error:seedError}=await client.from('trading_setup_catalog').insert(rows);
   if(seedError){setupNotice('Standard-Setups konnten nicht angelegt werden: '+seedError.message,true);}
   else{
-   const {data:seeded,error:reloadError}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+   const {data:seeded,error:reloadError}=await client.from('trading_setup_catalog').select('id,name,description,rules,active,sort_order,image_path,media_views,updated_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
    if(!reloadError)setupCatalog=seeded||[];
   }
  }
@@ -1754,13 +1754,13 @@ function renderSetupManager(){
    let uploaded=null;
    try{
     uploaded=chartPath('setup',item.id,crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_'));await uploadChart(file,uploaded);
-    const {error}=await client.from('trading_setup_catalog').update({image_path:uploaded,updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({image_path:uploaded,updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     const old=item.image_path;await loadSetupCatalog();
     setupNotice('Setup-Bild gespeichert.');
-    if(old&&old!==uploaded){const {error:cleanupError}=await client.storage.from(CHART_BUCKET).remove([old]);if(cleanupError)setupNotice('Neues Bild gespeichert, altes Bild konnte nicht bereinigt werden: '+cleanupError.message,true);}
+    // Historical snapshots may reference the previous original. Keep it.
    }catch(e){
-    if(uploaded){await client.storage.from(CHART_BUCKET).remove([uploaded]).catch(()=>{});}
+    // Ambiguous responses may have committed. Preserve potentially referenced uploads.
     setupNotice('Bild konnte nicht gespeichert werden: '+e.message,true);
    }finally{setupCatalogBusy=false;imageSave.disabled=false;}
   });
@@ -1769,11 +1769,10 @@ function renderSetupManager(){
    if(!confirm('Bild von Setup „'+item.name+'“ entfernen?'))return;
    setupCatalogBusy=true;imageRemove.disabled=true;
    try{
-    const {error}=await client.from('trading_setup_catalog').update({image_path:null,updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({image_path:null,updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     const old=item.image_path;await loadSetupCatalog();
-    const {error:storageError}=await client.storage.from(CHART_BUCKET).remove([old]);
-    setupNotice(storageError?'Bildzuordnung entfernt; Dateibereinigung fehlgeschlagen: '+storageError.message:'Setup-Bild entfernt.',!!storageError);
+    setupNotice('Musterbild aus Auswahl entfernt. Historisches Original bleibt erhalten.');
    }catch(e){setupNotice('Bild entfernen fehlgeschlagen: '+e.message,true);}
    finally{setupCatalogBusy=false;imageRemove.disabled=false;}
   });
@@ -1782,7 +1781,7 @@ function renderSetupManager(){
    if(!next){setupNotice('Setup-Name darf nicht leer sein.',true);return;}
    if(setupCatalogBusy)return;setupCatalogBusy=true;save.disabled=true;
    try{
-    const {error}=await client.from('trading_setup_catalog').update({name:next,description:description.value.trim(),updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({name:next,description:description.value.trim(),updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     const prior=item.name;await loadSetupCatalog();
     if($('setup').value===prior){$('setup').value=next;renderSetupCards();}
@@ -1795,7 +1794,7 @@ function renderSetupManager(){
    if(item.active&&!confirm('Setup „'+item.name+'“ für neue Trades ausblenden? Alte Trades bleiben erhalten.'))return;
    setupCatalogBusy=true;toggle.disabled=true;
    try{
-    const {error}=await client.from('trading_setup_catalog').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',item.id);
+    const {data:written,error}=await client.from('trading_setup_catalog').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',item.id).eq('updated_at',item.updated_at).select('id').maybeSingle();if(!error&&!written)throw Error('Setup inzwischen geändert. Neu laden.');
     if(error)throw error;
     if(item.active&&$('setup').value===item.name)$('setup').value='';
     await loadSetupCatalog();setupNotice(item.active?'Setup ausgeblendet.':'Setup wieder aktiviert.');
@@ -1819,13 +1818,14 @@ $('createSetup').addEventListener('click',async()=>{
  finally{setupCatalogBusy=false;$('createSetup').disabled=false;}
 });
 
-let ttIdeas=[],ttAttempts=[];
-async function ttLoadIdeas(){
+let ttIdeas=[],ttAttempts=[],ttIdeaSeq809=0;
+async function ttLoadIdeas(){const owner=currentUser?.id,session=currentSession?.id,seq=++ttIdeaSeq809;
  if(!currentSession){ttIdeas=[];ttAttempts=[];ttRenderIdeaSelect();return;}
  const [ideas,attempts]=await Promise.all([
   client.from('trade_ideas_v733').select('id,session_id,setup_type,instrument,direction,thesis,trigger_condition,invalidation,created_at,status,target_zone').eq('session_id',currentSession.id).order('created_at',{ascending:false}),
   client.from('trade_attempts_v733').select('id,idea_id,attempt_number,classification,trade_id,created_at').order('created_at',{ascending:false}).limit(500)
  ]);
+ if(owner!==currentUser?.id||session!==currentSession?.id||seq!==ttIdeaSeq809)return;
  if(ideas.error||attempts.error){message('Handelsideen konnten nicht geladen werden: '+(ideas.error||attempts.error).message,true);return;}
  ttIdeas=ideas.data||[];ttAttempts=attempts.data||[];ttRenderIdeaSelect();
 }
@@ -1933,7 +1933,7 @@ $('recordEntry').onclick=async()=>{
     entryWarningAnswers={thesis:$('ttCheckThesis').value==='yes',trigger:$('ttCheckTrigger').value==='yes',risk:$('ttCheckRisk').value==='yes',motivation:$('ttCheckMotivation').value==='yes'};
     if(!confirm('WARNUNG: Einstiegsversuch '+attemptNo+' derselben Idee.\nThese: '+(entryWarningAnswers.thesis?'Ja':'Nein')+' | Trigger: '+(entryWarningAnswers.trigger?'Ja':'Nein')+' | Risiko: '+(entryWarningAnswers.risk?'Ja':'Nein')+' | Motivation: '+(entryWarningAnswers.motivation?'Ja':'Nein')+'\nTrotzdem als weiteren Versuch dokumentieren?'))return;
   }
-  if(missingScales($('entryEmotionOptions'),'entryEmotion').length){entryFeedback('Bitte alle Empfindungen vor dem Entry bewerten; 1 bedeutet keine bzw. geringe Ausprägung.',$('entryEmotionOptions').querySelector('[data-rated="false"]'));return;}const entryEmotion=selectedEmotion($('entryEmotionOptions'));
+  if(!$('tt9Executed')?.checked&&missingScales($('entryEmotionOptions'),'entryEmotion').length){entryFeedback('Bitte alle Empfindungen vor dem Entry bewerten; 1 bedeutet keine bzw. geringe Ausprägung.',$('entryEmotionOptions').querySelector('[data-rated="false"]'));return;}const entryEmotion=selectedEmotion($('entryEmotionOptions'));
    // Emotionale Warnung bleibt sichtbar im Formular; keine zusätzlichen Bestätigungsdialoge.
   busy=true;
   $('recordEntry').disabled=true;
@@ -1946,7 +1946,7 @@ $('recordEntry').onclick=async()=>{
       p_idea_id:entryIdeaId,
       p_warning_answers:entryWarningAnswers,
       p_new_idea:newIdea,
-      p_entry_context:{capture_version:737,htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
+      p_entry_context:{capture_version:$('tt9Executed')?.checked?736:737,documented_after_execution:!!$('tt9Executed')?.checked,warning_acknowledgements:typeof T9!=='undefined'?{...T9.acks}:{},htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,
@@ -2087,11 +2087,11 @@ async function loadTrainingFocus(){
  const seq=++trainingFocusSeq,owner=currentUser?.id;
  if(!owner){trainingFocusActive=null;trainingFocusGoals=[];trainingFocusReady=false;drawTrainingFocus();return;}
  try{
-  const {data,error}=await client.from('training_goals_v7').select('id,goal,status,created_at,updated_at,practiced_at,source_trade_id,source_error_id,error_type,revised_from_id').order('created_at',{ascending:false}).limit(100);
+  const {data,error}=await client.from('training_goals_v7').select('id,goal,status,created_at,updated_at,practiced_at,source_trade_id,source_error_id,error_type,source_htf_id,revised_from_id').order('created_at',{ascending:false}).limit(100);
   if(seq!==trainingFocusSeq||currentUser?.id!==owner)return;if(error)throw error;
   trainingFocusGoals=data||[];
   // Active query is separate so an older active goal cannot disappear behind history limits.
-  const {data:active,error:activeError}=await client.from('training_goals_v7').select('id,goal,status,updated_at,source_trade_id,source_error_id,error_type').eq('status','active').maybeSingle();
+  const {data:active,error:activeError}=await client.from('training_goals_v7').select('id,goal,status,updated_at,source_trade_id,source_error_id,error_type,source_htf_id').eq('status','active').maybeSingle();
   if(seq!==trainingFocusSeq||currentUser?.id!==owner)return;if(activeError)throw activeError;
   trainingFocusActive=active;trainingFocusReady=true;drawTrainingFocus();await loadPracticeSummary();
  }catch(err){if(seq!==trainingFocusSeq||currentUser?.id!==owner)return;trainingFocusActive=null;trainingFocusReady=false;drawTrainingFocus();trainingFocusMessage('Trainingsschwerpunkt nicht geladen: '+err.message,true);}
