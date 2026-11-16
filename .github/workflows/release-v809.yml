@@ -35,3 +35,6 @@ jobs:
           (cd dist && zip -r ../TradingTerminator_V8.09.zip .)
           sha256sum TradingTerminator_V8.09.zip > TradingTerminator_V8.09.sha256
           gh release create v8.09 TradingTerminator_V8.09.zip TradingTerminator_V8.09.sha256 --target "$GITHUB_SHA" --title 'TradingTerminator V8.09' --notes-file docs/V8_09_RELEASE.md
+
+      - name: Verify live V8.09 and asset checksums
+        run: node scripts/verify-v809-live.cjs
