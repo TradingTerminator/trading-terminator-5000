@@ -90,3 +90,5 @@ html{scroll-padding-top:calc(86px + env(safe-area-inset-top,0px))}main{padding-t
 @media(max-width:680px){#v8Navigation button{font-size:11px}#v8Navigation{grid-template-columns:repeat(4,minmax(0,1fr)) 34px}.book-entry>summary{grid-template-columns:110px 1fr}.book-entry>summary .tt9-image{width:110px;height:90px}.tt9-trade{flex-direction:column}.tt9-trade .tt9-image{width:100%;height:150px}#v8BackBar button{font-size:12px}.tt9-filters label{font-size:12px}#liveView>.v8-columns{gap:10px}}
 
 #v8TradingOverview{position:static!important;width:100%;max-height:none;margin:12px 0;box-shadow:none}body.v8-has-context main{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}#v8TradingOverview .v8-direction-summary{margin:4px 0}#v8TradingOverview .flow-actions{max-width:500px}#v8BackBar #recordEntry{width:auto;margin:0}#v8BackBar #entryStageNext{margin:0}#v8BackBar{z-index:50}
+
+@media(max-width:680px){#v8Navigation{grid-template-columns:minmax(0,.75fr) minmax(0,.75fr) minmax(0,1.55fr) minmax(0,1.15fr) 32px}#v8Navigation button[data-v8-nav=after]{font-size:11px;white-space:normal;overflow-wrap:anywhere;letter-spacing:normal}}
