@@ -45,7 +45,6 @@ jobs:
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/tt-http.log 2>&1 &
           node scripts/test-v809-browser.cjs
       - name: Preserve verified generated build on recovery branch
-        if: github.event_name == 'push'
         run: |
           git add assets v8.html index.html release-integrity.json
           if ! git diff --cached --quiet; then
