@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "checked_at": "2026-11-17T13:27:29.031903Z",
+  "checked_at": "2026-11-17T19:17:15.435521Z",
   "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values. Manuell geprüfte ISM-PMI-Termine 2026 und FOMC November/Dezember 2026. Keine Fed-Reden, ISM-Prognoseberichte oder ungeplanten Ereignisse. Keine automatische Aktualisierung dieser beiden Quellen.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-17T13:27:29.031903Z",
+      "fetched_at": "2026-11-17T19:17:15.435521Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-17T13:27:29.031903Z",
+      "fetched_at": "2026-11-17T19:17:15.435521Z",
       "ok": true
     },
     "FED": {
@@ -182,20 +182,6 @@
       "title": "ISM Services PMI",
       "at": "2026-11-04T15:00:00Z",
       "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
-    },
-    {
-      "id": "10ec4d436b92c4f84fdd25cc",
-      "source": "BLS",
-      "title": "Consumer Price Index",
-      "at": "2026-11-10T13:30:00Z",
-      "url": "https://www.bls.gov/schedule/"
-    },
-    {
-      "id": "588147195eaec08166115929",
-      "source": "BLS",
-      "title": "Real Earnings",
-      "at": "2026-11-10T13:30:00Z",
-      "url": "https://www.bls.gov/schedule/"
     },
     {
       "id": "e88c61797261a6956004e05d",
