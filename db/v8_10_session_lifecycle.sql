@@ -121,9 +121,10 @@ CREATE FUNCTION public.record_trade_attempt_v810(
 RETURNS uuid LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
 DECLARE t uuid;s public.trading_sessions;goal jsonb;issues jsonb:='[]';r record;net numeric;complete boolean;retrospective boolean:=coalesce(p_entry_context->>'documented_after_execution','false')='true';classification text;
 BEGIN
- SELECT * INTO s FROM public.trading_sessions WHERE id=p_session_id AND owner_id=auth.uid() FOR UPDATE;
+ SELECT * INTO s FROM public.trading_sessions WHERE id=p_session_id AND owner_id=auth.uid();
  IF NOT FOUND THEN RAISE EXCEPTION 'Session unavailable';END IF;
  t:=public.record_trade_attempt_v736(p_session_id,p_setup_type,p_instrument,p_direction,p_allocations,p_entry_emotion,p_client_request_id,p_limit_reason,p_idea_id,p_warning_answers,p_entry_context,p_new_idea);
+ SELECT * INTO s FROM public.trading_sessions WHERE id=p_session_id AND owner_id=auth.uid() FOR UPDATE;
  IF EXISTS(SELECT 1 FROM public.trades WHERE id=t AND observations?'session_rules_v810') THEN RETURN t;END IF;
  IF jsonb_array_length(public.session_missing_v810(s.htf_context))>0 THEN issues:=issues||jsonb_build_array(jsonb_build_object('type','preparation_missing','classification','rule_breach'));END IF;
  classification:=CASE WHEN retrospective OR nullif(btrim(p_limit_reason),'') IS NOT NULL THEN 'review_required' ELSE 'rule_breach' END;

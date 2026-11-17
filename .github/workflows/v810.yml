@@ -42,6 +42,15 @@ jobs:
           psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -f /tmp/tt810-baseline.sql
           psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -c 'GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO authenticated;'
           for file in sql/security_v735.sql sql/review_types_v735.sql sql/training_focus_v735.sql sql/flow_v736.sql sql/ratings_v737.sql sql/idea_learning_v740.sql sql/guided_flow_v741.sql db/v8_htf_learning.sql db/v8_08_preparation.sql db/v8_09_learning.sql db/v8_10_session_lifecycle.sql tests/sql/verify_v810.sql; do psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -f "$file"; done
+      - name: Concurrent PostgreSQL connections
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGDATABASE: tt810
+          PGPASSWORD: isolated-test-only
+          TT810_ISOLATED_DATABASE: '1'
+        run: node scripts/test-v810-concurrency.cjs
       - run: npx playwright install --with-deps chromium
       - name: Desktop and mobile real browser acceptance
         run: |
