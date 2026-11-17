@@ -17,7 +17,7 @@ Automatische Freigabe nur bei bestandenem Verify- und V8.11-Acceptance-Workflow 
 | RLS/Eigentümer, fehlgeschlagener Batch vollständig zurückgerollt | isolierte PostgreSQL-Abnahme | Bestanden · CI |
 | Backup neuer Tabellen und Bilder, Integrität | SQL-Exporttest, bestehende Backup-/Python-Validatoren | Bestanden · CI |
 | Desktop 1440, mobile 390/320, alle sechs Themes, Zentrierung/Overflow | native V809/V811 und Screenshots als CI-Artefakt | Bestanden · CI |
-| Release-Paket und veröffentlichte Dateien | SHA256, Release-Integrität, Live-Asset-Prüfung | Main-Bestanden · CI |
+| Release-Paket und veröffentlichte Dateien | SHA256, Release-Integrität, Live-Asset-Prüfung | Bestanden · Main-CI |
 | Physisches iPhone, echte Anmeldung auf zwei Geräten | benötigt Praxistest mit Nutzerkonto | Nicht ausführbar in dieser Umgebung |
 | Vollständige Wiederherstellung in eigenem zweiten Supabase-Projekt | Restore-Anleitung und Validator vorhanden, kein zweites Ziel bereitgestellt | Nicht ausführbar; kein Restore in Produktion |
 
@@ -32,3 +32,7 @@ Testadapter ersetzen keine echte Supabase-Authentifizierung oder Broker-Daten. N
 Die neue SL-Batch-RPC ist absichtlich `SECURITY DEFINER`, weil direkte Schreibrechte auf die unveränderlichen Ereignistabellen entzogen sind. Sie verlangt Authentifizierung, prüft jedes Konto und dieselbe Trade-Zuordnung, sperrt alle betroffenen eigenen Allokationen vor jeder Mutation und erzwingt exakten Request-Replay. Der neue Ledger erlaubt dem Client ausschließlich SELECT eigener Zeilen. Die anderen neuen RPCs laufen als INVOKER. Supabase markiert solche bewusst ausführbaren Definer-RPCs als prüfbedürftig; die Empfehlung ist hier durch explizite Eigentums-/Berechtigungstests abgesichert: https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
 
 Vorhandener Auth-Hinweis: Leaked-Password-Protection ist projektseitig deaktiviert. Der gegenwärtige Client nutzt E-Mail-Einmalcodes; eine kommerzielle Passwortanmeldung benötigt eine eigene Auth-Abnahme. Anbieterhinweis: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+
+## Angewandte Datenbankmigration
+
+`v8_11_execution` wurde am 17.11.2026 im verbundenen Supabase-Projekt angewandt. Anschließend bestand dieselbe synthetische SQL-Abnahme mit tatsächlichen Produktionsberechtigungen innerhalb von BEGIN/ROLLBACK; die ausschließlich isoliert getesteten Storage-Testeinträge wurden dabei ausgelassen. Es wurden keine Testdaten in die Nutzerhistorie übernommen. Nachgeprüft: neuer Ledger mit RLS, eigener SELECT-Zugriff, keine direkten Client-INSERTs und kein anonymer Zugriff auf die neuen RPCs. Der Security-Advisor meldet acht bewusst zugängliche Definer-RPCs einschließlich des geprüften SL-Batches sowie den bereits vorhandenen Hinweis zur Passwortschutz-Einstellung.
