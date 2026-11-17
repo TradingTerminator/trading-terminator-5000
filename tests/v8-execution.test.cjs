@@ -24,7 +24,7 @@ test('V811 news uses only the explicitly chosen interval, including exact bounda
 test('V811 fresh session clears subjective choices and consciously confirms midpoint',async()=>{
  const b=boot('v8.html');try{await tick();const d=b.w.document;b.w.eval("currentUser={id:'owner'};currentSession=null;renderSession()");
  for(const id of ['v8MacroDirection','v8HtfSentiment','v8HtfDirection','v8NewsBehaviour','v811ScenarioDecision'])assert.equal(d.getElementById(id).value,'',id);
- assert.equal(d.getElementById('v811LimitsEnabled').checked,false);
+ assert.equal(d.getElementById('v811LimitsEnabled').checked,false);d.getElementById('v8TradingMinutes').value='90';assert.equal(b.w.v8GoalMissing().length,0,'No inaccessible scope requirement while money limits are disabled');
  const slider=d.querySelector('#sessionMoodOptions input[data-scale]');assert.equal(slider.value,'5');assert.equal(slider.dataset.rated,'false');slider.dispatchEvent(new b.w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));assert.equal(slider.dataset.rated,'true');
  b.w.eval("currentSession={id:'old',status:'closed',htf_context:{}};renderSession();currentSession=null;renderSession()");assert.equal(d.querySelector('#sessionMoodOptions input[data-scale]').dataset.rated,'false');assert.deepEqual(b.issues,[]);
  }finally{b.close();}
