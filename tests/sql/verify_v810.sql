@@ -1,0 +1,49 @@
+BEGIN;
+DO $$
+DECLARE u uuid:=gen_random_uuid();v uuid:=gen_random_uuid();sid uuid:=gen_random_uuid();aid uuid:=gen_random_uuid();req uuid:=gen_random_uuid();tid uuid;result jsonb;again jsonb;ctx jsonb;plan jsonb;payload jsonb;stamp text;denied boolean;
+BEGIN
+ INSERT INTO auth.users(id,aud,role) VALUES(u,'authenticated','authenticated'),(v,'authenticated','authenticated');
+ INSERT INTO public.trading_accounts(id,owner_id,account_name,account_type,default_instrument,default_quantity) VALUES(aid,u,'V810 synthetic','demo','MNQ',1);
+ PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ EXECUTE 'SET LOCAL ROLE authenticated';
+ payload:=jsonb_build_object('selected_accounts',jsonb_build_array(jsonb_build_object('account_id',aid,'instrument','MNQ','planned_quantity',2,'initial_sl_ticks',40)));
+ result:=public.session_action_v810(sid,req,'start',payload,NULL);
+ IF result#>>'{session,id}'<>sid::text THEN RAISE EXCEPTION 'Start failed';END IF;
+ again:=public.session_action_v810(gen_random_uuid(),gen_random_uuid(),'start',payload,NULL);
+ IF again#>>'{session,id}'<>sid::text THEN RAISE EXCEPTION 'Concurrent start created duplicate';END IF;
+ result:=public.session_action_v810(sid,gen_random_uuid(),'preview','{}',NULL);
+ IF jsonb_array_length(result->'missing')=0 THEN RAISE EXCEPTION 'Incomplete preparation not shown';END IF;
+ -- No fabricated feelings: retrospective entry can use empty emotion scales.
+ tid:=public.record_trade_attempt_v810(sid,'Momentum','MNQ','long',jsonb_build_array(jsonb_build_object('account_id',aid,'instrument','MNQ','planned_quantity',2,'initial_sl_ticks',40,'role','leader')),'unreported',gen_random_uuid(),NULL,NULL,NULL,'{"capture_version":736,"documented_after_execution":true,"execution_mode":"independent","emotion_scales":{}}',NULL);
+ IF NOT EXISTS(SELECT 1 FROM public.trades WHERE id=tid AND rule_deviation AND observations#>>'{session_rules_v810,issues,0,type}'='preparation_missing') THEN RAISE EXCEPTION 'Missing preparation not recorded';END IF;
+ result:=public.session_action_v810(sid,req,'close','{}',NULL);stamp:=result#>>'{session,closed_at}';
+ IF result#>>'{session,status}'<>'closed' OR stamp IS NULL THEN RAISE EXCEPTION 'Closure failed';END IF;
+ IF NOT EXISTS(SELECT 1 FROM public.trades WHERE id=tid AND exit_at IS NULL AND realized_pnl_usd IS NULL) THEN RAISE EXCEPTION 'Exit or PnL invented';END IF;
+ again:=public.session_action_v810(sid,gen_random_uuid(),'close','{}',NULL);
+ IF again#>>'{session,closed_at}'<>stamp OR (SELECT count(*) FROM public.session_events_v810 ev WHERE session_id=sid AND kind='closed')<>1 THEN RAISE EXCEPTION 'Closure replay duplicated';END IF;
+ result:=public.session_action_v810(sid,req,'supplement','{"note":"Tatsächliche Beobachtung erst nach Session-Ende ergänzt."}',NULL);
+ again:=public.session_action_v810(sid,req,'supplement','{"note":"Tatsächliche Beobachtung erst nach Session-Ende ergänzt."}',NULL);
+ IF (SELECT count(*) FROM public.session_events_v810 ev WHERE session_id=sid AND kind='supplement')<>1 OR NOT EXISTS(SELECT 1 FROM public.session_events_v810 ev WHERE session_id=sid AND kind='closed' AND ev.payload->>'rule_breach'='true') THEN RAISE EXCEPTION 'History changed';END IF;
+ -- Existing open trade remains editable after session closure.
+ PERFORM public.close_trade_pending_v808(tid,'manual','{"fear":1,"stress":1,"greed":1,"frustration":1,"relief":1,"uncertain":1}');
+ IF NOT EXISTS(SELECT 1 FROM public.trades WHERE id=tid AND exit_at IS NOT NULL AND realized_pnl_usd IS NULL) THEN RAISE EXCEPTION 'Exit after session close failed';END IF;
+ denied:=false;BEGIN UPDATE public.session_events_v810 SET payload='{}' WHERE session_id=sid;EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;IF NOT denied THEN RAISE EXCEPTION 'Audit mutable';END IF;
+ PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',v,'role','authenticated')::text,true);
+ IF EXISTS(SELECT 1 FROM public.session_events_v810 ev WHERE session_id=sid) THEN RAISE EXCEPTION 'Foreign event visible';END IF;
+ denied:=false;BEGIN PERFORM public.session_action_v810(sid,req,'preview','{}',NULL);EXCEPTION WHEN raise_exception THEN denied:=true;END;IF NOT denied THEN RAISE EXCEPTION 'Foreign session accessible';END IF;
+ PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ sid:=gen_random_uuid();result:=public.session_action_v810(sid,gen_random_uuid(),'start',payload,NULL);ctx:=result#>'{session,htf_context}';
+ plan:='{"schema_version":808,"news":"Keine relevanten News","sentiment":"neutral","direction":"long","setup_state":"no","technical":[{"key":"extremes","label":"Extrempunkte","checked":true,"assessment":"marked","note":""},{"key":"zones","label":"Zonen","checked":true,"assessment":"marked","note":""},{"key":"options","label":"Optionslevels","checked":true,"assessment":"marked","note":""}],"images":[],"warning_acknowledgements":{},"personal_plan":{"duration_minutes":90,"scope":"total","profit_goal":100,"loss_limit":120}}';
+ payload:=jsonb_build_object('plan',plan,'context','{"mental_check":{"scales":{"focus":8,"pressure":1,"fatigue":1,"urge":1,"fear":1,"greed":1,"revenge":1,"frustration":1},"conscious_continue":false}}'::jsonb);req:=gen_random_uuid();
+ result:=public.session_action_v810(sid,req,'confirm',payload,ctx);stamp:=result#>>'{session,htf_context,htf_v8,plan,personal_plan,started_at}';
+ IF stamp IS NULL OR abs(extract(epoch FROM(clock_timestamp()-stamp::timestamptz)))>10 THEN RAISE EXCEPTION 'First confirmation did not anchor time on server';END IF;
+ again:=public.session_action_v810(sid,req,'confirm',payload,ctx);IF again#>>'{session,htf_context,htf_v8,plan,personal_plan,started_at}'<>stamp THEN RAISE EXCEPTION 'Replay restarted trading time';END IF;
+ denied:=false;BEGIN PERFORM public.session_action_v810(sid,gen_random_uuid(),'confirm',payload,ctx);EXCEPTION WHEN raise_exception THEN denied:=true;END;IF NOT denied THEN RAISE EXCEPTION 'Stale second device overwrote context';END IF;
+ ctx:=result#>'{session,htf_context}';result:=public.session_action_v810(sid,gen_random_uuid(),'confirm',payload,ctx);
+ IF result#>>'{session,htf_context,htf_v8,plan,personal_plan,started_at}'<>stamp THEN RAISE EXCEPTION 'Reconfirmation restarted time';END IF;
+ result:=public.session_action_v810(sid,gen_random_uuid(),'close','{}',NULL);
+ IF NOT EXISTS(SELECT 1 FROM public.session_events_v810 ev WHERE session_id=sid AND kind='closed' AND ev.payload->>'rule_breach'='false') THEN RAISE EXCEPTION 'Unjustified rule breach';END IF;
+ EXECUTE 'RESET ROLE';
+END $$;
+ROLLBACK;
+SELECT 'PASS V810 lifecycle: start dedupe, incomplete/complete closure, open trades, supplements, immutability, owner isolation, server time, CAS and replay' AS result;

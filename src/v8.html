@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Trading Terminator 5000 · V8.09</title>
+<title>Trading Terminator 5000 · V8.10</title>
 <meta name="theme-color" content="#08111d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="v8.css">
 </head>
 <body><main>
-<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.09 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
+<header><div><h1>⚡ Trading Terminator 5000</h1><small>Version 8.10 · Trading & Training · keine Brokerorders</small></div><button id="logout" class="ghost hidden">Abmelden</button></header>
 <div id="homeBar" class="home-bar hidden"><button type="button" data-view="live" class="home-button active"><span class="home-symbol">⌂</span><span><strong>Dashboard</strong><small>Schnellübersicht</small></span><span class="home-arrow">›</span></button></div>
 <nav id="tabs" class="tabs hidden" aria-label="Hauptnavigation"><div><button data-view="live" aria-label="Dashboard">⌂ Start</button><button data-view="decision" class="nav-primary">＋ Trade</button><button data-view="playbook">▧ Playbook</button><button data-view="analytics">▥ Analyse</button><button data-view="settings" aria-label="Einstellungen">⚙ Menü</button></div></nav>
 <section id="loginView"><h2>Anmelden</h2><label>E-Mail<input id="email" type="email" autocomplete="email" placeholder="E-Mail-Adresse"></label><label>Passwort<input id="password" type="password" autocomplete="current-password" placeholder="Passwort"></label><label class="tt-remember"><input id="rememberLogin" type="checkbox" checked> Angemeldet bleiben</label><p id="rememberHint" class="muted">Anmeldung auf diesem Gerät speichern. Auf gemeinsam genutzten Geräten deaktivieren.</p><button id="login" class="wide">Mit Passwort anmelden</button><button id="magic" class="secondary wide">Anmeldecode per E-Mail anfordern</button><div id="otpPanel" class="card hidden"><label>Anmeldecode aus der E-Mail (6–10 Ziffern)<input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" autocomplete="one-time-code" placeholder="Code aus E-Mail"></label><button id="verifyOtp" type="button" class="wide">Code bestätigen und in dieser App anmelden</button><p class="muted">iPhone: Codevorschlag über der Tastatur antippen. Bitte den vollständigen Code eingeben und einmal auf „Code bestätigen“ tippen. Die App bleibt geöffnet.</p></div><div id="emailNotice" class="notice hidden" role="status" aria-live="polite"></div><small>Alternativ zur Passwortanmeldung kannst du einen E-Mail-Code anfordern. Ob das iPhone einen Code vorschlägt, hängt vom Gerät und Mail-Anbieter ab.</small></section>
@@ -89,7 +89,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.09';
+const TT_VERSION='8.10';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -1959,7 +1959,7 @@ let entryRequestId=null;
 $('recordEntry').onclick=async()=>{
   if(busy)return;
   $('entryFeedback').textContent='';
-  if(!currentSession){message('Bitte zuerst eine Handelssession starten.',true);return}if(currentSession.session_date!==localDate()){message('Die offene Handelssession stammt vom '+currentSession.session_date+'. Bitte zuerst abschließen und eine aktuelle Handelssession erstellen.',true);showSessionHub();return}
+  if(!currentSession){message('Bitte zuerst eine Handelssession starten.',true);return}if(!sessionReady()&&!v810Retrospective()){message('Vorbereitung bestätigen oder bereits ausgeführten Trade dokumentieren.',true);return}
   if(!(currentSession.htf_context?.selected_accounts||[]).length){message('Bitte zuerst die Konten für diese Handelssession auswählen.',true);return}
   const setup=$('setup').value;
   if(!setupCatalogReady){message('Setup-Katalog noch nicht geladen. Bitte aktualisieren.',true);return;}
@@ -2001,9 +2001,9 @@ $('recordEntry').onclick=async()=>{
   busy=true;
   $('recordEntry').disabled=true;
   try{
-    if(!currentSession || currentSession.session_date!==localDate() || !sessionReady())throw new Error('Nur die heutige vorbereitete Handelssession darf Trades eröffnen.');
+    if(!currentSession || (!sessionReady()&&!v810Retrospective()))throw new Error('Vorbereitung bestätigen oder bereits ausgeführten Trade ausdrücklich dokumentieren.');
     entryRequestId=entryRequestId||crypto.randomUUID();saveWorkspace();
-    const {data,error}=await client.rpc('record_trade_attempt_v736',{
+    const {data,error}=await client.rpc('record_trade_attempt_v810',{
       p_client_request_id:entryRequestId||(entryRequestId=crypto.randomUUID()),
       p_limit_reason:$('ttLimitReason').value.trim()||null,
       p_idea_id:entryIdeaId,
@@ -2220,7 +2220,7 @@ initTrainingFocus();
 <script id="tt-diagnostics-module">
 (function(){
  'use strict';
- const TT_VERSION='8.09';
+ const TT_VERSION='8.10';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -2338,7 +2338,7 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
  const match=html.match(/Version\s+(8\.\d+)\s*·\s*Trading\s*&\s*Training/);
  if(!match)throw new Error('Versionsangabe in der veröffentlichten Datei nicht gefunden');
  inform(match[1]===TT_VERSION?'Veröffentlicht: '+TT_VERSION+' · gleicher Stand.':
-  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.09. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
+  'GitHub liefert Version '+match[1]+'. Diese App-Datei ist Version 8.10. Vor einem Neuladen bitte Trade-Entwürfe speichern.');
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');
@@ -2492,4 +2492,4 @@ document.addEventListener('click',e=>{if(e.target.closest('button')?.textContent
 <script src="v8-pause.js"></script>
 <script src="v8-calendar.js"></script>
 <script src="v8-ergonomics.js"></script>
-<script src="v8-preparation.js"></script><script src="v8-09-model.js"></script><script src="v8-09.js"></script></body></html>
+<script src="v8-preparation.js"></script><script src="v8-09-model.js"></script><script src="v8-09.js"></script><script src="v8-session-model.js"></script><script src="v8-session.js"></script></body></html>
