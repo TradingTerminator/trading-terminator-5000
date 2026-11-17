@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   acceptance:
+    if: github.ref == 'refs/heads/v8-10-session-flow' || github.head_ref == 'v8-10-session-flow'
     runs-on: ubuntu-latest
     services:
       postgres:

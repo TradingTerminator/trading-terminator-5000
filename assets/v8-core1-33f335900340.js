@@ -26,7 +26,7 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.10';
+const TT_VERSION='8.11';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
@@ -1499,7 +1499,7 @@ async function loadCount(){
 }
 
 function openSessionSetup(mode){showSessionHub();sessionDraftMode=mode;renderSessionAccounts();$('sessionSetup').classList.remove('hidden');$('noSession').classList.add('hidden');$('activeSession').classList.add('hidden');$('sessionSetup').scrollIntoView({behavior:'smooth',block:'start'});}
-function renderSessionAccounts(){const selected=sessionDraftMode==='change'?(currentSession?.htf_context?.selected_accounts||[]):[];const host=$('sessionAccountList');host.innerHTML=accounts.map(a=>{const v=selected.find(x=>x.account_id===a.id)||{};return `<div class="account"><label class="account-pick"><input class="sess-check" data-id="${escapeHtml(a.id)}" type="checkbox" ${v.account_id?'checked':''}>${escapeHtml(a.account_name)}</label><div class="grid"><label>Instrument<select class="sess-instrument" data-id="${escapeHtml(a.id)}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label><label>Kontrakte<input class="sess-qty" data-id="${escapeHtml(a.id)}" type="number" min="1" step="1" value="${Number(v.planned_quantity||a.default_quantity)}"></label></div><label>Standard-SL (Ticks)<input class="sess-sl" data-id="${escapeHtml(a.id)}" type="number" min="1" max="100000" step="1" value="${Number(v.initial_sl_ticks)||''}" placeholder="z. B. 40"></label></div>`;}).join('');const manage=document.createElement('button');manage.type='button';manage.className='ghost wide';manage.textContent='＋ Konto hinzufügen / Konten verwalten';manage.onclick=()=>{showView('accounts');$('accountsView').scrollIntoView({block:'start'});};host.append(manage);host.onchange=()=>{$('sessionSetupFeedback').textContent=host.querySelectorAll('.sess-check:checked').length+' Konten ausgewählt';};$('sessionSetupFeedback').textContent=selected.length?'Vorgaben prüfen und speichern':'Konten auswählen und Vorgaben festlegen';}
+function renderSessionAccounts(){const selected=sessionDraftMode==='change'?(currentSession?.htf_context?.selected_accounts||[]):[];const host=$('sessionAccountList');host.innerHTML=accounts.map(a=>{const v=selected.find(x=>x.account_id===a.id)||{};return `<div class="account"><label class="account-pick"><input class="sess-check" data-id="${escapeHtml(a.id)}" type="checkbox" ${v.account_id?'checked':''}>${escapeHtml(a.account_name)}</label><div class="grid"><label>Instrument<select class="sess-instrument" data-id="${escapeHtml(a.id)}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label><label>Kontrakte<input class="sess-qty" data-id="${escapeHtml(a.id)}" type="number" min="1" step="1" value="${Number(v.planned_quantity||a.default_quantity)}"></label></div><label>Standard-SL (Ticks)<input class="sess-sl" data-id="${escapeHtml(a.id)}" type="number" min="1" max="100000" step="1" value="${Number(v.initial_sl_ticks||a.default_sl_ticks)||''}" placeholder="z. B. 40"></label></div>`;}).join('');const manage=document.createElement('button');manage.type='button';manage.className='ghost wide';manage.textContent='＋ Konto hinzufügen / Konten verwalten';manage.onclick=()=>{showView('accounts');$('accountsView').scrollIntoView({block:'start'});};host.append(manage);host.onchange=()=>{$('sessionSetupFeedback').textContent=host.querySelectorAll('.sess-check:checked').length+' Konten ausgewählt';};$('sessionSetupFeedback').textContent=selected.length?'Vorgaben prüfen und speichern':'Konten auswählen und Vorgaben festlegen';}
 
 function sessionFeedback(text){$('sessionSetupFeedback').textContent=text;message(text,true)}
 function getSessionSelection(){return [...document.querySelectorAll('.sess-check:checked')].map(c=>{const card=c.closest('.account');return {account_id:c.dataset.id,instrument:card.querySelector('.sess-instrument').value,planned_quantity:Number(card.querySelector('.sess-qty').value),initial_sl_ticks:Number(card.querySelector('.sess-sl').value)};});}
@@ -1583,7 +1583,7 @@ $('closeSession').onclick=async()=>{
  finally{busy=false;if(currentSession)await refreshSessionFinishChecklist();}
 };
 async function loadAccounts(){
-  const {data,error}=await client.from('trading_accounts').select('id,account_name,account_type,broker,default_instrument,default_quantity,active').order('created_at',{ascending:true});
+  const {data,error}=await client.from('trading_accounts').select('id,account_name,account_type,broker,default_instrument,default_quantity,default_sl_ticks,active').order('created_at',{ascending:true});
   if(error)throw new Error('Konten laden: '+error.message);
   allAccounts=data??[];
   accounts=allAccounts.filter(a=>a.active);
@@ -1601,7 +1601,7 @@ $('accountList').addEventListener('click',e=>{
   $('editAccountType').value=a.account_type;
   $('editBroker').value=a.broker||'';
   $('editInstrument').value=a.default_instrument;
-  $('editQty').value=a.default_quantity;
+  $('editQty').value=a.default_quantity;$('editDefaultSl').value=a.default_sl_ticks??'';
   $('deactivateAccount').textContent=a.active?'Konto deaktivieren':'Konto wieder aktivieren';
   $('accountEditor').classList.remove('hidden');
   $('accountEditor').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -1618,7 +1618,7 @@ $('saveAccountEdit').onclick=async()=>{
       account_name:name,account_type:$('editAccountType').value,
       broker:$('editBroker').value.trim()||null,
       default_instrument:$('editInstrument').value,
-      default_quantity:qty,updated_at:new Date().toISOString()
+      default_quantity:qty,default_sl_ticks:$('editDefaultSl').value?Number($('editDefaultSl').value):null,updated_at:new Date().toISOString()
     }).eq('id',editingAccountId).select('id').single();
     if(error)throw error;
     if(!data)throw new Error('Keine Kontoänderung bestätigt.');
@@ -1822,8 +1822,8 @@ let ttIdeas=[],ttAttempts=[],ttIdeaSeq809=0;
 async function ttLoadIdeas(){const owner=currentUser?.id,session=currentSession?.id,seq=++ttIdeaSeq809;
  if(!currentSession){ttIdeas=[];ttAttempts=[];ttRenderIdeaSelect();return;}
  const [ideas,attempts]=await Promise.all([
-  client.from('trade_ideas_v733').select('id,session_id,setup_type,instrument,direction,thesis,trigger_condition,invalidation,created_at,status,target_zone').eq('session_id',currentSession.id).order('created_at',{ascending:false}),
-  client.from('trade_attempts_v733').select('id,idea_id,attempt_number,classification,trade_id,created_at').order('created_at',{ascending:false}).limit(500)
+  readAllRows('trade_ideas_v733','id,session_id,setup_type,instrument,direction,thesis,trigger_condition,invalidation,created_at,status,target_zone,current_plan_v811,revision_v811',q=>q.eq('session_id',currentSession.id).order('created_at',{ascending:false}).order('id')).then(data=>({data,error:null}),error=>({data:[],error})),
+  readAllRows('trade_attempts_v733','id,idea_id,attempt_number,classification,trade_id,created_at',q=>q.order('created_at',{ascending:false}).order('id')).then(data=>({data,error:null}),error=>({data:[],error}))
  ]);
  if(owner!==currentUser?.id||session!==currentSession?.id||seq!==ttIdeaSeq809)return;
  if(ideas.error||attempts.error){message('Handelsideen konnten nicht geladen werden: '+(ideas.error||attempts.error).message,true);return;}
@@ -1868,8 +1868,8 @@ $('ttSaveIdea').onclick=async()=>{
 };
 function renderDecision(){
  const before=captureFields($('allocationList'));const chosen=currentSession?.htf_context?.selected_accounts||[];
- $('allocationList').innerHTML=chosen.map((v,i)=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label class="account-pick"><input type="checkbox" class="acct-check" data-id="${escapeHtml(a.id)}" ${i===0?'checked':''}>${escapeHtml(a.account_name)}</label><label class="acct-copy-role hidden"><input type="radio" name="copyLeader" class="acct-leader" data-id="${escapeHtml(a.id)}" ${i===0?'checked':''}>Quellkonto (Leader)</label><input type="hidden" class="acct-role" data-id="${escapeHtml(a.id)}" value="${i===0?'leader':'follower'}"><div class="account-fields"><label class="account-pick"><input type="checkbox" class="acct-unlock" data-id="${escapeHtml(a.id)}"> Vorgaben für diesen Trade ändern</label><div class="grid"><label>Instrument<select class="acct-instrument" data-id="${escapeHtml(a.id)}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label><label>Kontrakte<input class="acct-qty" data-id="${escapeHtml(a.id)}" type="number" min="1" step="1" value="${Number(v.planned_quantity||a.default_quantity)}"></label></div><label>Ursprünglicher SL (Ticks)<input class="acct-sl-ticks" data-id="${escapeHtml(a.id)}" type="number" inputmode="numeric" min="1" max="100000" step="1" value="${Number(v.initial_sl_ticks)||''}" placeholder="SL aus Handelssession-Vorbereitung" required></label><p class="muted acct-risk-preview" data-id="${escapeHtml(a.id)}"></p></div></div>`;}).join('')||'<p>Wähle zuerst verfügbare Konten der Handelssession.</p>';
- applyFields($('allocationList'),before.filter(row=>{if(!['acct-instrument','acct-qty','acct-sl-ticks'].includes(row.cls))return true;const unlocked=before.some(x=>x.cls==='acct-unlock'&&x.account===row.account&&x.checked),defaults=chosen.find(x=>x.account_id===row.account);return unlocked||!defaults?.initial_sl_ticks;}));syncAccountLocks();updateEntryAccountMode();updateEntryRiskPreview();$('entryLimitField').classList.toggle('hidden',tradeCount<5);
+ $('allocationList').innerHTML=chosen.map((v,i)=>{const a=accounts.find(x=>x.id===v.account_id);if(!a)return '';return `<div class="account"><label class="account-pick"><input type="checkbox" class="acct-check" data-id="${escapeHtml(a.id)}" ${i===0?'checked':''}>${escapeHtml(a.account_name)}</label><label class="acct-copy-role hidden"><input type="radio" name="copyLeader" class="acct-leader" data-id="${escapeHtml(a.id)}" ${i===0?'checked':''}>Quellkonto (Leader)</label><input type="hidden" class="acct-role" data-id="${escapeHtml(a.id)}" value="${i===0?'leader':'follower'}"><div class="account-fields"><label class="account-pick"><input type="checkbox" class="acct-unlock" data-id="${escapeHtml(a.id)}"> Vorgaben für diesen Trade ändern</label><div class="grid"><label>Instrument<select class="acct-instrument" data-id="${escapeHtml(a.id)}">${['NQ','MNQ','ES','MES'].map(x=>`<option ${x===(v.instrument||a.default_instrument)?'selected':''}>${x}</option>`).join('')}</select></label><label>Kontrakte<input class="acct-qty" data-id="${escapeHtml(a.id)}" type="number" min="1" step="1" value="${Number(v.planned_quantity||a.default_quantity)}"></label></div><label>Ursprünglicher SL (Ticks)<input class="acct-sl-ticks" data-id="${escapeHtml(a.id)}" type="number" inputmode="numeric" min="1" max="100000" step="1" value="${Number(v.initial_sl_ticks||a.default_sl_ticks)||''}" placeholder="SL aus Handelssession-Vorbereitung" required></label><p class="muted acct-risk-preview" data-id="${escapeHtml(a.id)}"></p></div></div>`;}).join('')||'<p>Wähle zuerst verfügbare Konten der Handelssession.</p>';
+ applyFields($('allocationList'),before.filter(row=>{if(!['acct-instrument','acct-qty','acct-sl-ticks'].includes(row.cls))return true;const unlocked=before.some(x=>x.cls==='acct-unlock'&&x.account===row.account&&x.checked),defaults=chosen.find(x=>x.account_id===row.account);return true;}));syncAccountLocks();updateEntryAccountMode();updateEntryRiskPreview();$('entryLimitField').classList.toggle('hidden',tradeCount<5);
 }
 function updateEntryAccountMode(changed){const copy=$('entryCopy').checked,checks=[...$('allocationList').querySelectorAll('.acct-check')];if(!copy){const winner=changed?.checked?changed:checks.find(c=>c.checked);checks.forEach(c=>c.checked=c===winner);}const selected=checks.filter(c=>c.checked);let leader=$('allocationList').querySelector('.acct-leader:checked');if(!leader||!selected.some(c=>c.dataset.id===leader.dataset.id)){leader=$('allocationList').querySelector('.acct-leader[data-id="'+selected[0]?.dataset.id+'"]');if(leader)leader.checked=true;}
  for(const c of checks){const panel=c.closest('.account');panel.querySelector('.account-fields').classList.toggle('hidden',!c.checked);panel.querySelector('.acct-copy-role').classList.toggle('hidden',!copy||!c.checked);panel.querySelector('.acct-role').value=c.checked&&(!copy||leader?.dataset.id===c.dataset.id)?'leader':'follower';}
@@ -1940,13 +1940,13 @@ $('recordEntry').onclick=async()=>{
   try{
     if(!currentSession || (!sessionReady()&&!v810Retrospective()))throw new Error('Vorbereitung bestätigen oder bereits ausgeführten Trade ausdrücklich dokumentieren.');
     entryRequestId=entryRequestId||crypto.randomUUID();saveWorkspace();
-    const {data,error}=await client.rpc('record_trade_attempt_v810',{
+    const {data,error}=await client.rpc('record_trade_attempt_v811',{
       p_client_request_id:entryRequestId||(entryRequestId=crypto.randomUUID()),
       p_limit_reason:$('ttLimitReason').value.trim()||null,
       p_idea_id:entryIdeaId,
       p_warning_answers:entryWarningAnswers,
       p_new_idea:newIdea,
-      p_entry_context:{capture_version:$('tt9Executed')?.checked?736:737,documented_after_execution:!!$('tt9Executed')?.checked,warning_acknowledgements:typeof T9!=='undefined'?{...T9.acks}:{},htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
+      p_entry_context:{...v811EntryContext(),capture_version:$('tt9Executed')?.checked?736:737,documented_after_execution:!!$('tt9Executed')?.checked,warning_acknowledgements:typeof T9!=='undefined'?{...T9.acks}:{},htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,

@@ -90,7 +90,7 @@ byId('ttVersionCheck')?.addEventListener('click',()=>run('Versionsprüfung',asyn
 }));
 byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=>{
  const user=await ensureUser();inform('Erstelle konsistenten Datenbank-Snapshot …');
- const {data:snapshot,error}=await client.rpc('export_journal_snapshot_v803');if(error)throw error;
+ const {data:snapshot,error}=await client.rpc('export_journal_snapshot_v811');if(error)throw error;
  if(!snapshot||snapshot.owner_id!==user.id)throw new Error('Ungültiger Snapshot');
  const zip=new JSZip(),images=[];let total=0;
  for(const image of snapshot.images){
@@ -100,7 +100,7 @@ byId('ttBackupJson')?.addEventListener('click',()=>run('Datensicherung',async()=
   const bytes=await blob.arrayBuffer();const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join('');
   const path='images/'+image.name;zip.file(path,bytes,{createFolders:false});images.push({path,storage_path:image.name,size:blob.size,sha256:hash});
  }
- const {data:verify,error:verifyError}=await client.rpc('export_journal_snapshot_v803');if(verifyError)throw verifyError;
+ const {data:verify,error:verifyError}=await client.rpc('export_journal_snapshot_v811');if(verifyError)throw verifyError;
  if(JSON.stringify(verify)!==JSON.stringify(snapshot))throw new Error('Daten wurden während der Sicherung geändert. Bitte erneut sichern');
  if((await ensureUser()).id!==user.id)throw new Error('Benutzer gewechselt');
  draftFlush();zip.file('journal.json',JSON.stringify({format:'trading-terminator-backup',format_version:2,app_version:TT_VERSION,created_at:new Date().toISOString(),...snapshot,images,local_drafts:collectLocalDrafts(user.id)},null,2));
