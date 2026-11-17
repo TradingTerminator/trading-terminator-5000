@@ -24,7 +24,7 @@ fs.mkdirSync('evidence',{recursive:true});
  // Browser-native paste dispatch containing an actual PNG file.
  await page.locator('#v811LtfImages').evaluate(el=>{const canvas=document.createElement('canvas');canvas.width=4;canvas.height=4;canvas.getContext('2d').fillRect(0,0,4,4);canvas.toBlob(blob=>{const d=new DataTransfer();d.items.add(new File([blob],'chart.png',{type:'image/png'}));el.dispatchEvent(new ClipboardEvent('paste',{clipboardData:d,bubbles:true}));},'image/png');});
  await page.waitForFunction(()=>V811.ltf.images.length===1);assert.equal(await page.evaluate(()=>__uploads.length),1);assert.ok(await page.locator('#v811LtfUploadStatus').textContent());
- assert.equal(await page.evaluate(()=>TT811.validLtf(ltfSnapshot811())),true);
+ assert.equal(await page.evaluate(()=>TT811.validLtf(ltfSnapshot811())),true);assert.equal(await page.evaluate(()=>contextPanel.open),false,'HTF remains compact after refresh');
  for(const theme of ['original','graphite','contrast','ocean','forest','light']){await page.evaluate(t=>{$('ttThemeSelect').value=t;$('ttThemeSelect').dispatchEvent(new Event('change',{bubbles:true}));},theme);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,theme+' overflow '+width);const contrast=await page.locator('#v811Reference').evaluate(el=>{const s=getComputedStyle(el),lum=c=>{const rgb=c.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722},a=lum(s.color),b=lum(s.backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)});assert.ok(contrast>=4.5,theme+' input contrast '+contrast);}
  await page.screenshot({path:'evidence/v811-ltf-'+width+'.png',fullPage:false});
  await page.locator('#entryStageNext').click();await page.locator('#entryCopy').check();for(const c of await page.locator('.acct-check').all())await c.check();
@@ -45,7 +45,7 @@ fs.mkdirSync('evidence',{recursive:true});
  });
  await page.locator('#recordEntry').click();await page.waitForFunction(()=>$('tradeDetails').dataset.tradeId==='trade-811');
  assert.equal(await page.evaluate(()=>__811.trade.initial_risk_usd),900);assert.deepEqual(await page.evaluate(()=>__811.allocs.map(a=>a.initial_risk_usd)),[200,200,500]);
- assert.equal(await page.locator('.trade-panes button:visible').count(),2);assert.equal(await page.locator('.trade-identity h3').textContent(),'Trade 1 · LONG NQ · Momentum');
+ assert.equal(await page.locator('.trade-panes button:visible').count(),2);await page.locator('[data-pane-button=stop]').focus();await page.locator('[data-pane-button=stop]').press('ArrowRight');assert.equal(await page.locator('[data-pane-button=exit]').getAttribute('aria-selected'),'true');assert.equal(await page.locator('.trade-identity h3').textContent(),'Trade 1 · LONG NQ · Momentum');
  await page.locator('[data-pane-button=exit]').click();await page.locator('.exit-amount').first().fill('12');await page.locator('[data-pane-button=stop]').click();
  const stop=page.locator('.stop-panel').first();await stop.locator('.stop-reason').selectOption('profit_protection');await stop.locator('.save-stop').click();assert.equal(await page.evaluate(()=>__811.stops.length),0,'Empty is not BE');
  await stop.locator('.stop-new').fill('0');await stop.locator('.save-stop').click();await page.waitForFunction(()=>__811.stops.length===1);assert.equal(await stop.locator('.save-stop').getAttribute('data-previous'),'0');
