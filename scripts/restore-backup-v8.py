@@ -10,7 +10,7 @@ V811_TABLES=V8_TABLES|{'session_events_v810','stop_requests_v811'}
 def normalize_restore_rows(table,rows):
  # Older backups predate the additive V7.40 fields. Explicit recordset inserts
  # bypass column defaults, so supply only absent defaults, never overwrite history.
- defaults={'trade_ideas_v733':{'learning_review':{},'learning_revision':0},'trading_setup_catalog':{'rules':{}}}.get(table,{})
+ defaults={'trade_ideas_v733':{'learning_review':{},'learning_revision':0,'revision_v811':0},'trading_setup_catalog':{'rules':{}}}.get(table,{})
  return [{**defaults,**row} for row in rows]
 def validate(path):
  with zipfile.ZipFile(path) as z:
