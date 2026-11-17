@@ -1,7 +1,7 @@
 name: Publish verified V8.09 download
 on:
   push:
-    branches: [main]
+    branches: [v8-09-recovery]
     paths: ['src/v8-09.js', '.github/workflows/release-v809.yml']
 permissions:
   contents: write
