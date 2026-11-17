@@ -1,0 +1,4 @@
+// Existing HTF field regressions retain their V808 response fixtures. Adapt only that
+// fixture shape to the V810 transaction; v8-session.test.cjs tests its native protocol.
+function legacyPreparation(b){const set=b.setRpc.bind(b);b.setRpc=function(handler){if(typeof handler!=='function')return set(handler);set(async(name,args)=>{if(name!=='session_action_v810'||args.p_action!=='confirm')return handler(name,args);const result=await handler('save_htf_assessment_v808',{p_id:args.p_request_id,p_plan:args.p_payload.plan,p_context:args.p_payload.context,p_session_id:args.p_session_id,p_expected_context:args.p_expected_context});if(result?.data?.assessment&&result.data.context){const s=JSON.parse(b.w.eval('JSON.stringify(currentSession)'));return {data:{session:{...s,htf_context:result.data.context}},error:null};}return result;});};return b;}
+module.exports={legacyPreparation};

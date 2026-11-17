@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify:
+    if: github.ref == 'refs/heads/v8-09-recovery' || github.head_ref == 'v8-09-recovery'
     runs-on: ubuntu-latest
     services:
       postgres:

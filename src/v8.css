@@ -92,3 +92,11 @@ html{scroll-padding-top:calc(86px + env(safe-area-inset-top,0px))}main{padding-t
 #v8TradingOverview{position:static!important;width:100%;max-height:none;margin:12px 0;box-shadow:none}body.v8-has-context main{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}#v8TradingOverview .v8-direction-summary{margin:4px 0}#v8TradingOverview .flow-actions{max-width:500px}#v8BackBar #recordEntry{width:auto;margin:0}#v8BackBar #entryStageNext{margin:0}#v8BackBar{z-index:50}
 
 @media(max-width:680px){#v8Navigation{grid-template-columns:minmax(0,.75fr) minmax(0,.75fr) minmax(0,1.55fr) minmax(0,1.15fr) 32px}#v8Navigation button[data-v8-nav=after]{font-size:11px;white-space:normal;overflow-wrap:anywhere;letter-spacing:normal}}
+
+/* V8.10: four preparation steps and independently reachable session closure. */
+#v810Close{width:min(540px,calc(100vw - 28px));max-height:85dvh;overflow:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:22px}#v810Close::backdrop{background:#000b}#v810Close button{min-height:44px}#v810CloseStatus{overflow-wrap:anywhere}#v8SessionView>[data-end-session]{float:right;margin:0 0 12px 12px}#v8PreparationSteps{clear:both}#v8PauseRunning:only-child{padding:0}#v8PauseExercise{font-size:18px;line-height:1.5}#v810SessionHistory textarea{width:100%}#v810SessionHistory details{border-top:1px solid var(--line);padding:12px 0}#v8BackBar.v8-prep-footer{display:flex;flex-wrap:wrap}#v8BackBar.v8-prep-footer button{flex:1 1 130px;min-height:44px}
+@media(max-width:680px){#v8PreparationSteps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}#v8PreparationSteps button{min-width:0;white-space:normal;min-height:48px}#v8SessionView>[data-end-session]{float:none;width:100%;margin:0 0 12px}#v8SessionGoals{padding:14px}#v8PrepAccounts .account{padding:14px}#v810Close{padding:16px}}
+
+#v8PauseState:empty,#v8PauseEndTime:empty{display:none}#v810OtherOpenTrades button{display:block;width:100%;margin-top:8px}
+
+@media(max-width:360px){#v8Navigation{grid-template-columns:36px 40px minmax(0,1fr) 60px 28px;gap:2px}#v8Navigation button[data-v8-nav]{font-size:11px;padding:10px 2px;white-space:nowrap;letter-spacing:0;overflow-wrap:normal}#v8Navigation button[data-v8-nav=settings]{font-size:18px}}
