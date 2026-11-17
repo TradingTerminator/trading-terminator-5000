@@ -55,9 +55,11 @@ jobs:
       - name: Desktop and mobile real browser acceptance
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/tt810-http.log 2>&1 &
-          node scripts/test-v809-browser.cjs
-          node scripts/test-v810-browser.cjs
-          node scripts/test-v811-browser.cjs
+          status=0
+          node scripts/test-v809-browser.cjs || status=1
+          node scripts/test-v810-browser.cjs || status=1
+          node scripts/test-v811-browser.cjs || status=1
+          exit "$status"
       - name: Package complete versioned source
         run: |
           git archive --format=zip --prefix=TradingTerminator_V8.11/ --output=TradingTerminator_V8.11.zip HEAD

@@ -19,7 +19,7 @@ test('V811 news uses only the explicitly chosen interval, including exact bounda
  for(const at of ['13:25','13:30','13:40'])assert.equal(M.activeNews([row],Date.parse('2026-11-17T'+at+'Z')).length,1);
  assert.equal(M.activeNews([row],Date.parse('2026-11-17T13:41Z')).length,0);
  assert.equal(M.activeNews([{...row,from:null}],Date.parse('2026-11-17T13:30Z')).length,0);
- assert.notEqual(M.newsKey(row),M.newsKey({...row,to:'2026-11-17T14:00Z'}));
+ assert.notEqual(M.newsKey(row),M.newsKey({...row,to:'2026-11-17T14:00Z'}));assert.notEqual(M.newsKey(row),M.newsKey({...row,title:'Neuer Termin'}));
 });
 test('V811 fresh session clears subjective choices and consciously confirms midpoint',async()=>{
  const b=boot('v8.html');try{await tick();const d=b.w.document;b.w.eval("currentUser={id:'owner'};currentSession=null;renderSession()");
