@@ -13,7 +13,7 @@ v8OpenTrade=async function(){if(!currentSession){showSessionHub();return;}const 
 $('v8Next').onclick=()=>currentSession?v8OpenTrade():showSessionHub();
 const actualEntry810=v8Button('Bereits ausgeführten Trade dokumentieren',()=>v810OpenEntry(true),'secondary');actualEntry810.id='v810ExecutedEntry';$('v8Next').after(actualEntry810);
 // The same closure action is reachable in every preparation step and from the dashboard.
-for(const host of [$('v8SessionView'),$('v8SessionManage').parentElement]){const b=v8Button('Handelssession beenden',()=>v810OpenClose(),'secondary');b.dataset.endSession='true';host.prepend(b);}
+for(const host of [$('v8SessionManage').parentElement]){const b=v8Button('Handelssession beenden',()=>v810OpenClose(),'secondary');b.dataset.endSession='true';host.prepend(b);}
 $('closeSession').textContent='Handelssession beenden';$('closeSession').onclick=()=>v810OpenClose();
 const closure=document.createElement('dialog');closure.id='v810Close';closure.setAttribute('aria-labelledby','v810CloseTitle');closure.innerHTML='<h2 id="v810CloseTitle">Handelssession beenden</h2><div id="v810ClosePreview"></div><p>Trade-Exits und Ergebnisse bleiben unverändert. Fehlende Vorbereitung wird mit Zeitstempel als Regelverletzung dokumentiert; Reviews dürfen später folgen.</p><label class="account-pick"><input type="checkbox" id="v810CloseAck">Abschluss und angezeigte Lücken bewusst bestätigen</label><p id="v810CloseStatus" role="status"></p><div class="flow-actions"><button type="button" id="v810CloseSave">Jetzt beenden</button><button type="button" id="v810CloseCancel" class="secondary">Zurück</button></div>';$('app').append(closure);
 $('v810CloseCancel').onclick=()=>closure.close();
@@ -59,3 +59,5 @@ const resetOpen810=resetPrivateState;resetPrivateState=function(...args){otherOp
 
 // A second tap on the disappearing modal must not activate a new dashboard action beneath it.
 document.addEventListener('click',event=>{const tap=V810.closeTap;if(event.isTrusted&&tap&&Date.now()<tap.until&&Math.abs(event.clientX-tap.x)<8&&Math.abs(event.clientY-tap.y)<8){event.preventDefault();event.stopImmediatePropagation();}},true);
+
+$('v8SessionGoals').querySelector('.compact-help').textContent='Dauer ab erster Bestätigung. Pause verlängert sie nicht.';const moneyHelp810=$('v8SessionGoals').querySelectorAll('.compact-help')[1];if(moneyHelp810){const more=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Berechnung der Geldgrenzen';moneyHelp810.before(more);more.append(summary,moneyHelp810);}

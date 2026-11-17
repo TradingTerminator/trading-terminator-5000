@@ -2,6 +2,7 @@ BEGIN;
 DO $$
 DECLARE u uuid:=gen_random_uuid();v uuid:=gen_random_uuid();sid uuid:=gen_random_uuid();aid uuid:=gen_random_uuid();req uuid:=gen_random_uuid();tid uuid;alloc uuid;result jsonb;again jsonb;ctx jsonb;plan jsonb;payload jsonb;stamp text;denied boolean;
 BEGIN
+ IF jsonb_array_length(public.session_missing_v810('{"notes":"Vorbereitet","preflight_checks":{"a":true,"b":true,"c":true,"d":true},"selected_accounts":[{}]}'))<>0 THEN RAISE EXCEPTION 'Legacy preparation incorrectly classified';END IF;
  INSERT INTO auth.users(id,aud,role) VALUES(u,'authenticated','authenticated'),(v,'authenticated','authenticated');
  INSERT INTO public.trading_accounts(id,owner_id,account_name,account_type,default_instrument,default_quantity) VALUES(aid,u,'V810 synthetic','demo','MNQ',1);
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);

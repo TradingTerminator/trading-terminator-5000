@@ -13,9 +13,9 @@ CREATE INDEX session_events_owner_v810 ON public.session_events_v810(owner_id,se
 CREATE FUNCTION public.session_missing_v810(c jsonb) RETURNS jsonb LANGUAGE plpgsql IMMUTABLE SECURITY INVOKER SET search_path='' AS $$
 DECLARE missing jsonb:='[]';k text;
 BEGIN
- IF c#>>'{htf_v8,id}' IS NOT NULL THEN RETURN missing;END IF;
- missing:=missing||'"Vorbereitung nicht bestätigt"'::jsonb;
  IF coalesce(jsonb_array_length(c->'selected_accounts'),0)=0 THEN missing:=missing||'"Kontovorgaben fehlen"'::jsonb;END IF;
+ IF c#>>'{htf_v8,id}' IS NOT NULL OR (length(btrim(coalesce(c->>'notes','')))>0 AND (SELECT count(*) FROM jsonb_each(CASE WHEN jsonb_typeof(c->'preflight_checks')='object' THEN c->'preflight_checks' ELSE '{}'::jsonb END))>=4 AND NOT EXISTS(SELECT 1 FROM jsonb_each(CASE WHEN jsonb_typeof(c->'preflight_checks')='object' THEN c->'preflight_checks' ELSE '{}'::jsonb END) x WHERE x.value IS DISTINCT FROM 'true'::jsonb)) THEN RETURN missing;END IF;
+ missing:=missing||'"Vorbereitung nicht bestätigt"'::jsonb;
  FOREACH k IN ARRAY ARRAY['focus','pressure','fatigue','urge','fear','greed','revenge','frustration'] LOOP
  IF c#>ARRAY['mental_check','scales',k] IS NULL THEN missing:=missing||'"Mentale Vorbereitung nicht vollständig dokumentiert"'::jsonb;EXIT;END IF;END LOOP;
  RETURN missing;
