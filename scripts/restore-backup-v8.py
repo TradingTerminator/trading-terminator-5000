@@ -6,6 +6,7 @@ import argparse, hashlib, json, os, pathlib, uuid, zipfile, urllib.request, urll
 SOURCE_PROJECT='hogrdcqblpcrqgdtsvjv'
 TABLES={'trading_sessions','trade_ideas','trades','stop_adjustments','trade_events','screenshots','corrective_actions','trade_errors','trade_reviews','playbook_entries','trading_accounts','account_groups','account_group_members','trade_account_allocations','account_fills','account_trade_results','allocation_change_log','trading_setup_catalog','training_countermeasures','training_goals_v7','trade_ideas_v733','trade_attempts_v733','trade_entry_requests_v735'}
 V8_TABLES=TABLES|{'v8_htf_assessments','v8_htf_preferences'}
+V811_TABLES=V8_TABLES|{'session_events_v810','stop_requests_v811'}
 def normalize_restore_rows(table,rows):
  # Older backups predate the additive V7.40 fields. Explicit recordset inserts
  # bypass column defaults, so supply only absent defaults, never overwrite history.
@@ -21,7 +22,7 @@ def validate(path):
    if p.is_absolute() or '..' in p.parts or '\\' in name:raise ValueError('Unsafe archive path')
   doc=json.loads(z.read('journal.json'));owner=str(uuid.UUID(doc['owner_id']))
   if doc.get('format')!='trading-terminator-backup' or doc.get('format_version')!=2:raise ValueError('Unsupported backup format')
-  if set(doc['tables']) not in (TABLES,V8_TABLES):raise ValueError('Backup does not contain the expected complete table set')
+  if set(doc['tables']) not in (TABLES,V8_TABLES,V811_TABLES):raise ValueError('Backup does not contain the expected complete table set')
   for table,rows in doc['tables'].items():
    if not isinstance(rows,list) or len(rows)>50000:raise ValueError('Invalid table payload')
    if any(r.get('owner_id')!=owner for r in rows):raise ValueError('Mixed ownership in backup')
