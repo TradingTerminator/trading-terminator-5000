@@ -24,6 +24,7 @@ function v8ShowRunningPause(){
  $('v8PauseTitle').textContent='Pause';$('v8PauseChoice').hidden=true;$('v8PauseRunning').hidden=false;$('v8PauseEndTime').textContent='';v8SetPauseOpen(true);v8TickPause();$('v8PauseExit').focus();
 }
 function v8StartPause(){
+ if(V8P.until){v8ShowRunningPause();return;}
  const minutes=Number($('v8PauseMinutes').value);if(!Number.isInteger(minutes)||minutes<1||minutes>180){$('v8PauseError').textContent='Bitte 1 bis 180 ganze Minuten wählen.';return;}
  if(V8P.owner!==currentUser?.id||V8P.session!==(currentSession?.id||null)){v8EndPause();return;}
  V8P.started=Date.now();V8P.until=V8P.started+minutes*60000;saveWorkspace();v8PersistPause();v8ShowRunningPause();

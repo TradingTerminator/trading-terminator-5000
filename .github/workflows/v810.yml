@@ -8,7 +8,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: v810-${{ github.ref }}
+  group: v810-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
   acceptance:
