@@ -1822,8 +1822,8 @@ let ttIdeas=[],ttAttempts=[],ttIdeaSeq809=0;
 async function ttLoadIdeas(){const owner=currentUser?.id,session=currentSession?.id,seq=++ttIdeaSeq809;
  if(!currentSession){ttIdeas=[];ttAttempts=[];ttRenderIdeaSelect();return;}
  const [ideas,attempts]=await Promise.all([
-  client.from('trade_ideas_v733').select('id,session_id,setup_type,instrument,direction,thesis,trigger_condition,invalidation,created_at,status,target_zone,current_plan_v811,revision_v811').eq('session_id',currentSession.id).order('created_at',{ascending:false}),
-  client.from('trade_attempts_v733').select('id,idea_id,attempt_number,classification,trade_id,created_at').order('created_at',{ascending:false}).limit(500)
+  readAllRows('trade_ideas_v733','id,session_id,setup_type,instrument,direction,thesis,trigger_condition,invalidation,created_at,status,target_zone,current_plan_v811,revision_v811',q=>q.eq('session_id',currentSession.id).order('created_at',{ascending:false}).order('id')).then(data=>({data,error:null}),error=>({data:[],error})),
+  readAllRows('trade_attempts_v733','id,idea_id,attempt_number,classification,trade_id,created_at',q=>q.order('created_at',{ascending:false}).order('id')).then(data=>({data,error:null}),error=>({data:[],error}))
  ]);
  if(owner!==currentUser?.id||session!==currentSession?.id||seq!==ttIdeaSeq809)return;
  if(ideas.error||attempts.error){message('Handelsideen konnten nicht geladen werden: '+(ideas.error||attempts.error).message,true);return;}
