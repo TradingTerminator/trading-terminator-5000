@@ -76,7 +76,12 @@ jobs:
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create v8.11 TradingTerminator_V8.11.zip TradingTerminator_V8.11.sha256 --target "$GITHUB_SHA" --title 'TradingTerminator V8.11' --notes-file docs/V8_11_RELEASE.md
+        run: |
+          if gh release view v8.11 >/dev/null 2>&1; then
+            echo 'V8.11 already published; preserve immutable download.'
+          else
+            gh release create v8.11 TradingTerminator_V8.11.zip TradingTerminator_V8.11.sha256 --target "$GITHUB_SHA" --title 'TradingTerminator V8.11' --notes-file docs/V8_11_RELEASE.md
+          fi
       - name: Verify live version and file checksums
         if: github.ref == 'refs/heads/main'
         run: node scripts/verify-v811-live.cjs
