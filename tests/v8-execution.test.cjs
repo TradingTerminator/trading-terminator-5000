@@ -42,6 +42,6 @@ test('V811 re-entry labels count the complete paginated attempt history',async()
  const b=boot('v8.html');try{await tick();b.w.eval("currentUser={id:'owner'};currentSession={id:'s',status:'open',htf_context:{}}");
  const attempts=Array.from({length:1501},(_,n)=>({id:'attempt-'+n,idea_id:'idea',attempt_number:n+1}));let pages=0;
  b.setTableHandler((name,ops)=>{if(name==='trade_ideas_v733')return {data:[{id:'idea',thesis:'Eigene These',direction:'long',instrument:'NQ',setup_type:'Momentum',status:'active',created_at:'2026-11-17T17:00Z'}],error:null};if(name==='trade_attempts_v733'){pages++;const range=ops.find(o=>o.method==='range').args;return {data:attempts.slice(range[0],range[1]+1),error:null};}return {data:[],error:null};});
- await b.w.ttLoadIdeas();assert.equal(pages,2);assert.match(b.w.document.getElementById('ttIdeaSelect').textContent,/Eigene These.*Versuch 1502/);assert.deepEqual(b.issues,[]);
+ await b.w.ttLoadIdeas();assert.equal(pages,4);assert.match(b.w.document.getElementById('ttIdeaSelect').textContent,/Eigene These.*Versuch 1502/);assert.deepEqual(b.issues,[]);
  }finally{b.close();}
 });
