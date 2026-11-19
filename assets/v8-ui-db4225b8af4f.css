@@ -115,3 +115,10 @@ body.v8-has-context main,main{margin-left:auto!important;margin-right:auto!impor
 body.v8-has-back main,body.v8-has-back.v8-has-context main{padding-bottom:calc(var(--tt-footer-height,160px) + 24px)}
 html{scroll-padding-bottom:calc(var(--tt-footer-height,0px) + 24px)}
 body.v8-has-back #ttToast,body.v8-has-back #backToTop{bottom:calc(var(--tt-footer-height,160px) + 12px)}
+/* Intrinsic navigation widths also remain valid when zoom reduces the usable workspace. */
+#v8Navigation{display:flex;flex-wrap:wrap;gap:4px}
+#v8Navigation button[data-v8-nav]{flex:1 1 max-content;min-width:0;max-width:100%;white-space:normal;overflow-wrap:normal;word-break:normal}
+#v8Navigation button[data-v8-nav=settings]{flex:0 0 32px}
+#v8PreparationSteps{display:flex;flex-wrap:wrap}
+#v8PreparationSteps button{flex:1 1 14ch;min-inline-size:min(100%,14ch);white-space:normal;overflow-wrap:normal;word-break:normal}
+@media(max-width:420px){.grid,.metric-grid{grid-template-columns:minmax(0,1fr)}}

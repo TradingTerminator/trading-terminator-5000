@@ -14,7 +14,7 @@ renderSession=function(...args){
 };
 const saveWorkspace812=saveWorkspace;
 saveWorkspace=function(){
- saveWorkspace812();if(!currentUser||workspaceRestoring)return;
+ if(!currentUser||workspaceRestoring||$('app').classList.contains('hidden'))return;saveWorkspace812();
  try{const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
   if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)){
    item.preparation_v812={owner:currentUser.id,session:currentSession?.id||null};storage.setItem(workspaceKey(),JSON.stringify(item));
@@ -42,3 +42,11 @@ new MutationObserver(measureFooter812).observe(v8BackBar,{attributes:true,childL
 window.addEventListener('resize',measureFooter812);window.visualViewport?.addEventListener('resize',measureFooter812);
 document.fonts?.ready.then(measureFooter812);measureFooter812();
 v8UpdatePreparation();
+
+function beginSession812(){
+ if(currentSession)return;
+ clearSession811();V810.startId=null;V810.confirmRequest=null;V811.draftSession=null;V811.mode=null;
+ if(currentUser)purgeWorkspace(currentUser.id);
+}
+const startHome812=$('v8Next').onclick;$('v8Next').onclick=function(...args){if(!currentSession)beginSession812();return startHome812?.apply(this,args);};
+const startLocal812=$('startSession').onclick;$('startSession').onclick=function(...args){if(!currentSession)beginSession812();return startLocal812?.apply(this,args);};

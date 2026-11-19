@@ -4,7 +4,7 @@ Ausgangsversion V8.11. Ausschließlich Reparatur von Fußleiste, neutraler Initi
 
 ## Tatsächliche Ursachen
 
-Die auf 1180 px begrenzte Fußleiste erbte weiterhin seitliche Innenabstände aus der vollständigen Fensterbreite. Auf einem 3840-px-Bildschirm ergab das rund 1406 px Abstand je Seite innerhalb eines wesentlich schmaleren Containers. Die verbleibende Fläche für Buttons kollabierte; allgemeines `overflow-wrap:anywhere` brach Beschriftungen bis auf einzelne Buchstaben um. Frühere Tests bis 1440 px erfassten diesen Fehler nicht.
+Die auf 1180 px begrenzte Fußleiste erbte weiterhin seitliche Innenabstände aus der vollständigen Fensterbreite. Auf einem 3840-px-Bildschirm ergab das rund 1406 px Abstand je Seite innerhalb eines wesentlich schmaleren Containers. Die verbleibende Fläche für Buttons kollabierte; allgemeines `overflow-wrap:anywhere` brach Beschriftungen bis auf einzelne Buchstaben um. Frühere Tests bis 1440 px erfassten diesen Fehler nicht. Die neue Zoom-Abnahme fand zusätzlich starre Mindestspalten der oberen Navigation; auch diese verwenden jetzt verfügbare Containerbreite und kontrollierten Zeilenwechsel.
 
 „Wo steht der Markt?“ hat optionale Bilder. Eine leere Pflichtfeldliste wurde als bereits abgeschlossener Schritt behandelt. Die Logik unterschied nicht zwischen „keine blockierende Pflichtangabe“ und „bewusst bearbeitet“. Zusätzlich wurde der temporäre Bildspeicher nicht vollständig an jeder Session-Grenze geleert.
 
