@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   acceptance:
+    if: github.ref == 'refs/heads/v8-11-trade-workflow' || github.head_ref == 'v8-11-trade-workflow'
     runs-on: ubuntu-latest
     services:
       postgres:

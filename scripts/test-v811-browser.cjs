@@ -17,7 +17,7 @@ fs.mkdirSync('evidence',{recursive:true});
  });
  assert.equal(await page.locator('#v811CaptureMode input:checked').count(),0);await page.locator('#entryStageNext').click();assert.equal(await page.evaluate(()=>entryStage),1);
  await page.locator('#v811CaptureMode input[value=planned]').check();for(const key of ['focus','pressure','fomo','revenge','fear','greed']){const f=page.locator('#entryEmotionOptions [data-scale="'+key+'"]');await f.focus();await f.press('Enter');}
- assert.equal(await page.evaluate(()=>readScales($('entryEmotionOptions')).focus),5);await page.locator('#entryStageNext').click();await page.locator('#setupCards button').first().click();await page.locator('.direction-choice[data-direction=long]').click();await page.locator('[data-idea-mode=spontaneous]').click();await page.locator('#entryStageNext').click();
+ assert.equal(await page.evaluate(()=>readScales($('entryEmotionOptions')).focus),5);await page.locator('#entryStageNext').click();await page.locator('#instrument').selectOption('NQ');await page.locator('#setupCards button').first().click();await page.locator('.direction-choice[data-direction=long]').click();await page.locator('[data-idea-mode=spontaneous]').click();await page.locator('#entryStageNext').click();
  await page.locator('#v811LtfStatus').selectOption('reviewed');await page.locator('#v811Timeframe').selectOption('m1');await page.locator('#v811Reference').fill('US-Cash-Session; Delta Signal-Kerze');
  const observations={volume:'neutral',stopping:'none',cvd:'flat',delta:'neutral',vpoc:'at',vwap:'at',zone:'middle',zone_direction:'neutral',aggression:'balanced',absorption:'none',liquidity:'both'};
  for(const [key,value]of Object.entries(observations))await page.locator('#v811Ltf_'+key).selectOption(value);
