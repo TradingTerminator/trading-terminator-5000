@@ -11,7 +11,7 @@ async function client(browser,width=1440,baseline=false){
  await context.route('https://*.supabase.co/**',r=>r.abort());
  if(baseline)await context.route('**/assets/v8-ui-*.css',r=>r.fulfill({contentType:'text/css',body:fs.readFileSync('/tmp/tt812-baseline.css','utf8')}));
  const page=await context.newPage(),errors=[];activePage=page;page.on('pageerror',e=>errors.push(e.message));
- await page.goto('http://127.0.0.1:4173/v8.html');await page.evaluate(fixture);await page.evaluate(()=>{$('loginView').classList.add('hidden');$('tabs').classList.remove('hidden');});
+ await page.goto('http://127.0.0.1:4173/v8.html');await page.evaluate(fixture);await page.evaluate(()=>{$('loginView').classList.add('hidden');$('tabs').classList.remove('hidden');$('logout').classList.remove('hidden');});
  return {context,page,errors};
 }
 async function geometry(page,label){
