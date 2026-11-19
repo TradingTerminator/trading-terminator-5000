@@ -8,7 +8,7 @@ renderSession=function(...args){
   V811.mode=null;V811.draftSession=null;V811.ltf={images:[]};V811.newsAcks.clear();entryRequestId=null;T9.acks={};
   $('allocationList').replaceChildren();$('sessionAccountList').replaceChildren();
   for(const f of $('decisionView').querySelectorAll('input,textarea,select')){
-   if(f.id==='instrument')continue; // Instrument default is a saved account standard, not an assessment.
+   if(f.id==='instrument'){f.value=currentSession?.htf_context?.selected_accounts?.[0]?.instrument||accounts.find(a=>a.active!==false)?.default_instrument||'';continue;}
    if(f.type==='checkbox'||f.type==='radio')f.checked=false;
    else if(f.dataset.scale){f.value='5';f.dataset.rated='false';}
    else f.value='';
