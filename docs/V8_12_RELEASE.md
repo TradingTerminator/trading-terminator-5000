@@ -14,7 +14,7 @@ Die auf 1180 px begrenzte Fußleiste erbte weiterhin seitliche Innenabstände au
 - Die tatsächlich gemessene Footerhöhe reserviert Platz im Dokument. Sie beobachtet ausdrücklich die gesamte Border-Box einschließlich Innenabstand und reagiert auf Ansichten, Schrift, Zoom, Umbruch und Safe-Area; letzte Inhalte bleiben erreichbar.
 - Ein optionaler Abschnitt bleibt ohne Bearbeitung offen. Ein gespeichertes Bild oder bewusstes Weitergehen aus dem Marktüberblick zählt als Bearbeitung; es entsteht kein zusätzlicher Pflichtbutton.
 - Eine Session-Grenze wird über Benutzer und Session-ID erkannt. Temporäre Bewertungen, Bestätigungen und ausgewählte, noch ungespeicherte Bilder werden verworfen. Dauerhafte Standards und vorhandene gespeicherte Session-Pläne bleiben erhalten.
-- Entwürfe werden nur für denselben Benutzer und dieselbe Session wiederhergestellt. Alte Entwürfe ohne Session-Zuordnung werden beim Beginn einer neuen Session nicht als verlässliche neue Entscheidungen übernommen.
+- Entwürfe werden nur für denselben Benutzer und dieselbe Session wiederhergestellt. Alte Entwürfe ohne Session-Zuordnung werden beim Beginn einer neuen Session nicht als verlässliche neue Entscheidungen übernommen. Vor dem Ersetzen bleibt eine unveränderte, benutzergebundene lokale Sicherung bestehen.
 - Die bewusste Bearbeitung des Marktüberblicks wird beim regulären Bestätigen im bestehenden Session-Snapshot gespeichert. Dafür ist keine neue Datenbankmigration notwendig. Noch unbestätigte lokale Entwürfe bleiben gerätebezogen; bestätigte Pläne sind über Supabase verfügbar.
 
 ## Installation und Download

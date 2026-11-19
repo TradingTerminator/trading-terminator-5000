@@ -21,9 +21,21 @@ renderSession=function(...args){
  renderSession812(...args);
  v8UpdatePreparation();
 };
+// Keep older unbound drafts recoverable without reusing them as new-session decisions.
+function preserveUnbound812(includeCurrent=false){
+ if(!currentUser)return true;
+ try{for(const storage of [localStorage,sessionStorage]){
+  const raw=storage.getItem(workspaceKey());if(!raw)continue;const item=JSON.parse(raw);
+  if(item?.owner!==currentUser.id||item.session!==null||!includeCurrent&&item.preparation_v812)continue;
+  if(item.preparation_v812&&!item.sessionFields?.some(f=>f.rated==='true'||['checkbox','radio'].includes(f.type)&&f.checked&&!['v8NoProfitGoal','v8RememberStandards'].includes(f.id)||f.value?.trim()&&!['range','checkbox','radio','file'].includes(f.type)&&!f.account&&!['v8CalendarWindow','v8LimitScope','v8HtfPointTemplate'].includes(f.id)))continue;
+  const key=workspaceKey()+':unbound-backup:'+String(Number(item.at)||0);
+  const prior=storage.getItem(key);if(prior===raw)continue;
+  storage.setItem(prior?key+':'+crypto.randomUUID():key,raw);
+ }return true;}catch(e){message('Lokaler Entwurf konnte nicht gesichert werden: '+e.message+' · bisheriger Speicherstand bleibt erhalten.',true);return false;}
+}
 const saveWorkspace812=saveWorkspace;
 saveWorkspace=function(){
- if(!currentUser||workspaceRestoring||$('app').classList.contains('hidden'))return;saveWorkspace812();
+ if(!currentUser||workspaceRestoring||$('app').classList.contains('hidden')||!preserveUnbound812())return;saveWorkspace812();
  try{const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
   if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)){
    item.preparation_v812={owner:currentUser.id,session:currentSession?.id||null};storage.setItem(workspaceKey(),JSON.stringify(item));
@@ -34,7 +46,7 @@ const restoreWorkspace812=restoreWorkspace;
 restoreWorkspace=function(item){
  if(!currentUser||item?.owner!==currentUser.id||item.session!==(currentSession?.id||null))return;
  // Older unbound drafts have no session provenance. Existing identified sessions remain compatible.
- if(!currentSession&&!item.preparation_v812)return;
+ if(!currentSession&&!item.preparation_v812){preserveUnbound812();return;}
  if(item.preparation_v812&&(item.preparation_v812.owner!==currentUser.id||item.preparation_v812.session!==(currentSession?.id||null)))return;
  restoreWorkspace812(item);v8UpdatePreparation();
 };
@@ -53,9 +65,9 @@ document.fonts?.ready.then(measureFooter812);measureFooter812();
 v8UpdatePreparation();
 
 function beginSession812(){
- if(currentSession)return;
+ if(currentSession||busy||!preserveUnbound812(true))return false;
  clearSession811();V810.startId=null;V810.confirmRequest=null;V811.draftSession=null;V811.mode=null;
- if(currentUser)purgeWorkspace(currentUser.id);
+ if(currentUser)purgeWorkspace(currentUser.id);return true;
 }
-const startHome812=$('v8Next').onclick;$('v8Next').onclick=function(...args){if(!currentSession)beginSession812();return startHome812?.apply(this,args);};
-const startLocal812=$('startSession').onclick;$('startSession').onclick=function(...args){if(!currentSession)beginSession812();return startLocal812?.apply(this,args);};
+const startHome812=$('v8Next').onclick;$('v8Next').onclick=function(...args){if(!currentSession&&!beginSession812())return;return startHome812?.apply(this,args);};
+const startLocal812=$('startSession').onclick;$('startSession').onclick=function(...args){if(!currentSession&&!beginSession812())return;return startLocal812?.apply(this,args);};
