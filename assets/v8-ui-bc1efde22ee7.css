@@ -122,3 +122,6 @@ body.v8-has-back #ttToast,body.v8-has-back #backToTop{bottom:calc(var(--tt-foote
 #v8PreparationSteps{display:flex;flex-wrap:wrap}
 #v8PreparationSteps button{flex:1 1 14ch;min-inline-size:min(100%,14ch);white-space:normal;overflow-wrap:normal;word-break:normal}
 @media(max-width:420px){.grid,.metric-grid{grid-template-columns:minmax(0,1fr)}}
+h1,h2,h3,h4,.v8-kicker,label{max-inline-size:100%;overflow-wrap:break-word;word-break:normal}
+#v811Ltf{container-type:inline-size}
+@container(max-width:260px){.v811-ltf-grid{grid-template-columns:minmax(0,1fr)}}

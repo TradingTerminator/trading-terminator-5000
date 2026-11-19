@@ -6,7 +6,7 @@ Für die veröffentlichte Version müssen Verify und V8.12-Acceptance vollständ
 |---|---|---|
 | Gemeinsame Footer-Ursache reproduziert | V8.11-Originalstylesheet bei 3840 px, Screenshot und Messwerte | Bestanden im CI |
 | Alle Ansichten, Zentrierung, breite Buttons, kein Abschneiden | `test-v812-browser.cjs`, 320/390/768/1280/1920/2560/3840 px | Bestanden im CI |
-| Sechs Themes, normale/große Schrift, kompakt/komfortabel, Kanten/Animation | 567 Kombinationen einschließlich der Ansichten/Zoomprüfung | Bestanden im CI |
+| Sechs Themes, normale/große Schrift, kompakt/komfortabel, Kanten/Animation | 630 Kombinationen einschließlich der Ansichten/Zoomprüfung | Bestanden im CI |
 | Zoom 100/125/200 %, kontrollierter Umbruch | echte Chromium-Messungen; keine Assertion nur anhand CSS-Text | Bestanden im CI |
 | Safe-Area und keine verdeckten letzten Inhalte | 34 px Zusatzinset simuliert, dynamische Höhenreserve und Sentinel am Inhaltsende | Bestanden im CI |
 | Erste, regulär abgeschlossene und vorzeitig abgeschlossene Session | `v8-repair.test.cjs`, native V812, SQL V810/V812 | Bestanden im CI |
