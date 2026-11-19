@@ -5,7 +5,16 @@ renderSession=function(...args){
  const scope=JSON.stringify([currentUser?.id||null,currentSession?.id||null]);
  if(scope!==sessionScope812){
   clearSession811();
-  V811.mode=null;V811.draftSession=null;V811.ltf={images:[]};V811.newsAcks.clear();entryRequestId=null;
+  V811.mode=null;V811.draftSession=null;V811.ltf={images:[]};V811.newsAcks.clear();entryRequestId=null;T9.acks={};
+  $('allocationList').replaceChildren();$('sessionAccountList').replaceChildren();
+  for(const f of $('decisionView').querySelectorAll('input,textarea,select')){
+   if(f.id==='instrument')continue; // Instrument default is a saved account standard, not an assessment.
+   if(f.type==='checkbox'||f.type==='radio')f.checked=false;
+   else if(f.dataset.scale){f.value='5';f.dataset.rated='false';}
+   else f.value='';
+  }
+  newsReason811.value='';uploadState811.textContent='';ttIdeas=[];ttAttempts=[];
+  ttRenderIdeaSelect();syncDirectionButtons();updateScaleLabels($('entryEmotionOptions'));warn9();
   for(const r of document.querySelectorAll('#v811CaptureMode input'))r.checked=false;
   sessionScope812=scope;
  }
@@ -37,7 +46,7 @@ function measureFooter812(){
  const height=v8BackBar.hidden||getComputedStyle(v8BackBar).display==='none'?0:Math.ceil(v8BackBar.offsetHeight);
  const value=height+'px';if(document.documentElement.style.getPropertyValue('--tt-footer-height')!==value)document.documentElement.style.setProperty('--tt-footer-height',value);
 }
-if(typeof ResizeObserver!=='undefined')new ResizeObserver(measureFooter812).observe(v8BackBar);
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(measureFooter812).observe(v8BackBar,{box:'border-box'});
 new MutationObserver(measureFooter812).observe(v8BackBar,{attributes:true,childList:true,subtree:true,characterData:true});
 window.addEventListener('resize',measureFooter812);window.visualViewport?.addEventListener('resize',measureFooter812);
 document.fonts?.ready.then(measureFooter812);measureFooter812();

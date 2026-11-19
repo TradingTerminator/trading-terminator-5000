@@ -11,7 +11,7 @@ Die auf 1180 px begrenzte Fußleiste erbte weiterhin seitliche Innenabstände au
 ## Reparatur
 
 - Eine gemeinsame Fußleiste mit Innenabständen innerhalb ihres Containers, ausreichenden Buttonbreiten, kontrolliertem Wortumbruch und eindeutiger primärer Aktion. Kein individueller Button-Patch.
-- Die tatsächlich gemessene Footerhöhe reserviert Platz im Dokument. Sie reagiert auf Ansichten, Schrift, Zoom, Umbruch und Safe-Area; letzte Inhalte bleiben erreichbar.
+- Die tatsächlich gemessene Footerhöhe reserviert Platz im Dokument. Sie beobachtet ausdrücklich die gesamte Border-Box einschließlich Innenabstand und reagiert auf Ansichten, Schrift, Zoom, Umbruch und Safe-Area; letzte Inhalte bleiben erreichbar.
 - Ein optionaler Abschnitt bleibt ohne Bearbeitung offen. Ein gespeichertes Bild oder bewusstes Weitergehen aus dem Marktüberblick zählt als Bearbeitung; es entsteht kein zusätzlicher Pflichtbutton.
 - Eine Session-Grenze wird über Benutzer und Session-ID erkannt. Temporäre Bewertungen, Bestätigungen und ausgewählte, noch ungespeicherte Bilder werden verworfen. Dauerhafte Standards und vorhandene gespeicherte Session-Pläne bleiben erhalten.
 - Entwürfe werden nur für denselben Benutzer und dieselbe Session wiederhergestellt. Alte Entwürfe ohne Session-Zuordnung werden beim Beginn einer neuen Session nicht als verlässliche neue Entscheidungen übernommen.
