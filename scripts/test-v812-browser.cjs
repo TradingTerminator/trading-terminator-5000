@@ -3,7 +3,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('nod
 const fixture=fs.readFileSync('tests/v8-08.test.cjs','utf8').match(/b\.w\.eval\(`([\s\S]*?)`\);return b;/)[1];
 const stub=fs.readFileSync('scripts/test-v809-browser.cjs','utf8').match(/const stub=`([\s\S]*?)`;/)[1];
 fs.mkdirSync('evidence',{recursive:true});
-let activePage;
+let activePage;const failures=[];
 async function client(browser,width=1440,baseline=false){
  const context=await browser.newContext({viewport:{width,height:900}});
  await context.route('**/v8.html',async route=>{const r=await route.fetch();await route.fulfill({response:r,body:(await r.text()).replace(/ integrity="[^"]+"/g,'')});});
@@ -19,12 +19,12 @@ async function geometry(page,label){
  const g=await page.evaluate(()=>{
   const footer=$('v8BackBar'),r=footer.getBoundingClientRect(),main=document.querySelector('main').getBoundingClientRect();
   const visible=e=>!e.hidden&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().height>0;
-  const offenders=[...document.querySelectorAll('body *')].filter(e=>{const a=e.getBoundingClientRect();return a.width>0&&a.height>0&&a.right>innerWidth+2&&getComputedStyle(e).display!=='none'}).slice(0,12).map(e=>({id:e.id,cls:e.className,tag:e.tagName,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}));return {offenders,hidden:!visible(footer),viewport:innerWidth,scroll:document.documentElement.scrollWidth,footer:{x:r.x,right:r.right,height:r.height,top:r.top},center:Math.abs((r.left+r.right-main.left-main.right)/2),reserve:parseFloat(getComputedStyle(document.querySelector('main')).paddingBottom),cssHeight:footer.offsetHeight,buttons:[...footer.querySelectorAll('button')].filter(visible).map(b=>{const rect=b.getBoundingClientRect(),s=getComputedStyle(b),canvas=document.createElement('canvas'),c=canvas.getContext('2d');c.font=s.font;const word=Math.max(...b.textContent.trim().split(/\s+/).map(w=>c.measureText(w).width));return {text:b.textContent,w:rect.width,h:rect.height,client:b.clientWidth,needed:word+parseFloat(s.paddingLeft)+parseFloat(s.paddingRight),clip:b.scrollWidth>b.clientWidth+1};})};
+  const ink=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);while(walker.nextNode()&&ink.length<8){const n=walker.currentNode;if(!n.textContent.trim()||['SCRIPT','STYLE','OPTION'].includes(n.parentElement?.tagName))continue;const range=document.createRange();range.selectNodeContents(n);const rect=range.getBoundingClientRect();if(rect.width&&rect.height&&rect.right>innerWidth+2)ink.push({text:n.textContent.slice(0,90),tag:n.parentElement.tagName,id:n.parentElement.id,cls:n.parentElement.className,right:rect.right,wrap:getComputedStyle(n.parentElement).overflowWrap});}const offenders=[...document.querySelectorAll('body *')].filter(e=>{const a=e.getBoundingClientRect();return a.width>0&&a.height>0&&a.right>innerWidth+2&&getComputedStyle(e).display!=='none'}).slice(0,12).map(e=>({id:e.id,cls:e.className,tag:e.tagName,right:e.getBoundingClientRect().right,text:e.textContent.slice(0,60)}));return {ink,offenders,hidden:!visible(footer),viewport:innerWidth,scroll:document.documentElement.scrollWidth,footer:{x:r.x,right:r.right,height:r.height,top:r.top},center:Math.abs((r.left+r.right-main.left-main.right)/2),reserve:parseFloat(getComputedStyle(document.querySelector('main')).paddingBottom),cssHeight:footer.offsetHeight,buttons:[...footer.querySelectorAll('button')].filter(visible).map(b=>{const rect=b.getBoundingClientRect(),s=getComputedStyle(b),canvas=document.createElement('canvas'),c=canvas.getContext('2d');c.font=s.font;const word=Math.max(...b.textContent.trim().split(/\s+/).map(w=>c.measureText(w).width));return {text:b.textContent,w:rect.width,h:rect.height,client:b.clientWidth,needed:word+parseFloat(s.paddingLeft)+parseFloat(s.paddingRight),clip:b.scrollWidth>b.clientWidth+1};})};
  });
- assert.ok(g.scroll<=g.viewport+1,label+' horizontal overflow '+JSON.stringify(g));if(g.hidden)return;
+ try{assert.ok(g.scroll<=g.viewport+1,label+' horizontal overflow '+JSON.stringify(g));if(g.hidden)return;
  assert.ok(g.center<3,label+' footer centering '+g.center);assert.ok(g.reserve>=g.cssHeight,label+' reserved content space');
  for(const b of g.buttons){assert.ok(b.w>=Math.min(120,g.viewport-40),label+' narrow '+JSON.stringify(b));assert.ok(b.h>=43,label+' touch height');assert.ok(!b.clip,label+' text clipped '+JSON.stringify(b));assert.ok(b.needed<=b.client+2,label+' unbreakable word '+JSON.stringify(b));}
- return g;
+ return g;}catch(e){failures.push({label,message:e.message,metrics:g});if(failures.length<=3)console.error(e.message);return g;}
 }
 (async()=>{
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
@@ -44,7 +44,7 @@ async function geometry(page,label){
   await page.evaluate(()=>{document.documentElement.style.zoom=1;showView('settings');const button=document.createElement('button');button.id='sentinel812';button.textContent='Last setting';$('settingsView').append(button);});
   // A simulated 34 px safe-area inset must increase the reserved space as well.
   await page.addStyleTag({content:'#v8BackBar{padding-bottom:44px}'});await geometry(page,width+'/safe-area');await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
-  await page.evaluate(()=>new Promise(requestAnimationFrame));assert.ok(await page.evaluate(()=>$('sentinel812').getBoundingClientRect().bottom<=$('v8BackBar').getBoundingClientRect().top+1),'Last content is reachable above footer '+width);
+  await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.evaluate(()=>$('sentinel812').getBoundingClientRect().bottom<=$('v8BackBar').getBoundingClientRect().top+1))failures.push({label:width+'/sentinel',message:'Last content below footer'});
   if([320,390,1920,3840].includes(width))await page.screenshot({path:'evidence/v812-footer-'+width+'.png'});
   assert.deepEqual(c.errors,[]);await c.context.close();
  }
@@ -64,5 +64,5 @@ async function geometry(page,label){
  await page.reload();await page.evaluate(fixture);await page.evaluate(({session,workspace})=>{currentSession=session;renderSession();restoreWorkspace(workspace);showView('session');},saved);assert.equal(await page.evaluate(()=>v8OverviewReviewed()),true);
  const second=await client(browser,768);await second.page.evaluate(session=>{currentSession=session;renderSession();showView('session');},saved.session);assert.equal(await second.page.evaluate(()=>v8OverviewReviewed()),true);assert.deepEqual(await second.page.evaluate(()=>currentSession),saved.session);
  assert.deepEqual(c.errors,[]);assert.deepEqual(second.errors,[]);await second.context.close();await c.context.close();await browser.close();
- console.log('PASS V812 '+combinations+' footer/theme/text/layout/zoom/view combinations; baseline reproduced, safe-area reservation, neutral lifecycles, explicit optional completion, reload and independent client restore');
+ fs.writeFileSync('evidence/v812-geometry.json',JSON.stringify(failures,null,2));assert.equal(failures.length,0,'Geometry failures: '+JSON.stringify(failures.slice(0,8)));console.log('PASS V812 '+combinations+' footer/theme/text/layout/zoom/view combinations; baseline reproduced, safe-area reservation, neutral lifecycles, explicit optional completion, reload and independent client restore');
 })().catch(async e=>{if(activePage&&!activePage.isClosed())await activePage.screenshot({path:'evidence/v812-failure.png'}).catch(()=>{});console.error(e);process.exit(1)});

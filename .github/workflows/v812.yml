@@ -75,6 +75,7 @@ jobs:
             TradingTerminator_V8.12.zip
             TradingTerminator_V8.12.sha256
             evidence/*.png
+            evidence/v812-geometry.json
       - name: Publish download
         if: github.ref == 'refs/heads/main'
         env:
