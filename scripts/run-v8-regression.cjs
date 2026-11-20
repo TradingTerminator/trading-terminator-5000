@@ -1,15 +1,21 @@
 // Exercise shared business behavior against V8. V7-specific UI contracts are covered by V8's own workflow tests.
 const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
 const root=path.join(__dirname,'..'),target=path.join(root,'tests/_v8-regression.generated.cjs');
-let source=fs.readFileSync(path.join(root,'tests/app.test.cjs'),'utf8').replaceAll('tt7_','tt8_').replace('/7.42/','/8.12/').replace(/\bSession\b/g,'Handelssession');
+let source=fs.readFileSync(path.join(root,'tests/app.test.cjs'),'utf8').replaceAll('tt7_','tt8_').replace('/7.42/','/8.13/').replace(/\bSession\b/g,'Handelssession');
 for(const title of ['navigation identifies the active main area when training or journal is open','setup and idea precede account risk and emotion in the actual entry DOM','V739 session management stays in journal and shortcut does not promise open trades','guided entry has three stages and cannot advance without identifying a setup and idea']){
  const marker="test('"+title+"'";if(!source.includes(marker))throw new Error('Review V8 regression mapping: '+title);source=source.replace(marker,"test.skip('"+title+"'");
 }
-source=source.replaceAll("currentSession={","currentSession={status:'open',").replaceAll('record_trade_attempt_v736','record_trade_attempt_v811');
+source=source.replaceAll("currentSession={","currentSession={status:'open',").replaceAll('record_trade_attempt_v736','record_trade_attempt_v813');
 source=source.replace("details.open=false;await","details.open=false;b.w.eval(\"V811.mode='retrospective';V810.documenting=true;document.getElementById('tt9Executed').checked=true;document.getElementById('direction').value='long';document.getElementById('v811LtfStatus').value='not_reviewed';document.getElementById('v811ImageAbsence').value='not_captured'\");await");
 source=source.replaceAll('#playbookView #setupManager','#settingsView #setupManager');
+// Match field-level feedback and the V8 optional note contract.
+source=source.replaceAll("b.w.document.getElementById('entryFeedback').textContent","[...b.w.document.querySelectorAll('.tt-field-error')].map(e=>e.textContent).join(' ')").replaceAll("doc.getElementById('entryFeedback').textContent","[...doc.querySelectorAll('.tt-field-error')].map(e=>e.textContent).join(' ')");
+source=source.replace("assert.equal(payload.p_new_idea.thesis,'These')","assert.equal(payload.p_new_idea,null);assert.equal(payload.p_entry_context.idea_note,'These')");
+source=source.replace("doc.querySelector('.acct-sl-ticks').value='40';doc.getElementById('ttIdeaThesis').value='These'","doc.querySelector('.acct-sl-ticks').value='40';doc.getElementById('v813IdeaNote').value='These'");
+source=source.replace("await doc.getElementById('ttSaveIdea').onclick();assert.match", "b.w.showEntryStage(2);doc.getElementById('entryStageNext').click();assert.match").replace('/zuerst oben dein Setup/','/Aktives Setup/');
+source=source.replace("test('new idea and original SL travel","test('optional idea note and original SL travel");
 // Supply the new explicit pre-entry choices to shared legacy business fixtures.
-source=source.replace('entrySessionExpanded=false;syncEntrySession();',"entrySessionExpanded=false;syncEntrySession();V811.mode='planned';document.getElementById('direction').value='long';document.getElementById('v811LtfStatus').value='not_reviewed';document.getElementById('v811ImageAbsence').value='not_captured';");
+source=source.replace('entrySessionExpanded=false;syncEntrySession();',"entrySessionExpanded=false;syncEntrySession();V811.mode='planned';document.getElementById('direction').value='long';document.getElementById('v811LtfStatus').value='reviewed';document.getElementById('v811ImageAbsence').value='not_captured';");
 source=source.replace("currentSession.htf_context.selected_accounts[0].initial_sl_ticks=40;renderDecision()","accounts[0].default_sl_ticks=40;currentSession.htf_context.selected_accounts[0].initial_sl_ticks=40;document.querySelector('.acct-sl-ticks').value='40';renderDecision()");
 source=source.replace('/trade-73/','/Momentum/').replace("data:'saved-stop-id'","data:{saved:true,results:[]}");
 source=source.replace("card.querySelector('.acct-qty').disabled,true","card.querySelector('.acct-qty').disabled,false");

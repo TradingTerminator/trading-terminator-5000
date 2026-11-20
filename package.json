@@ -1,13 +1,14 @@
 {
   "name": "trading-terminator-5000",
-  "version": "8.0.12",
+  "version": "8.0.13",
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.cjs",
     "test:v8": "node scripts/run-v8-regression.cjs",
     "check": "node scripts/verify-release.cjs",
     "build": "node scripts/build-v8.cjs",
-    "test:browser:v808": "node scripts/test-v808-browser.cjs"
+    "test:browser:v808": "node scripts/test-v808-browser.cjs",
+    "test:browser:v813": "node scripts/test-v812-browser.cjs && node scripts/test-v813-browser.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0",

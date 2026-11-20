@@ -45,3 +45,23 @@ test('V811 re-entry labels count the complete paginated attempt history',async()
  await b.w.ttLoadIdeas();assert.equal(pages,4);assert.match(b.w.document.getElementById('ttIdeaSelect').textContent,/Eigene These.*Versuch 1502/);assert.deepEqual(b.issues,[]);
  }finally{b.close();}
 });
+
+test('V813 sparse LTF distinguishes missing, neutral and irrelevant without default ratings',()=>{
+ const p={schema:813,status:'reviewed',images:[],values:{delta:'neutral',cvd:'not_relevant'}};
+ assert.equal(M.validLtf(p),true);
+ assert.equal(M.validLtf({...p,values:{delta:null}}),false);
+ assert.equal(M.validLtf({...p,values:{delta:'fabricated'}}),false);
+ assert.equal(M.validLtf({...p,images:['1','2','3','4','5']}),false);
+});
+test('V813 shows intermarket observations and groups rates without voting for an entry',()=>{
+ const {marketContext}=require('../src/v8-09-model.js');
+ const row=(key,direction,implication)=>({key,label:key,direction,implication});
+ assert.equal(marketContext([]).state,'unclear');
+ assert.equal(marketContext([row('nq','neutral'),row('dxy','neutral')]).state,'neutral');
+ assert.equal(marketContext([row('nq','short'),row('dxy','long')]).state,'observed');
+ const mixed=marketContext([row('es','long'),row('vix','long'),row('dxy','long'),row('yields','long'),row('bonds','short'),row('oil','not_used')]);
+ assert.equal(mixed.state,'mixed');
+ assert.deepEqual(mixed.groups.map(g=>g.key),['indices','vix','dxy','rates']);
+ assert.equal(mixed.groups.at(-1).observations.length,2);
+ assert.equal(marketContext([row('dxy','long','risk_off')]).state,'risk_off');
+});

@@ -1,12 +1,13 @@
 // Real Chromium. Synthetic backend; production Supabase requests are always blocked.
 const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('node:assert/strict');
+const {routeBuild,browserOptions}=require('./browser-test-server.cjs');
 const fixture=fs.readFileSync('tests/v8-08.test.cjs','utf8').match(/b\.w\.eval\(`([\s\S]*?)`\);return b;/)[1];
 const stub=fs.readFileSync('scripts/test-v809-browser.cjs','utf8').match(/const stub=`([\s\S]*?)`;/)[1];
 fs.mkdirSync('evidence',{recursive:true});
 let activePage;const failures=[];
 async function client(browser,width=1440,baseline=false){
  const context=await browser.newContext({viewport:{width,height:900}});
- await context.route('**/v8.html',async route=>{const r=await route.fetch();await route.fulfill({response:r,body:(await r.text()).replace(/ integrity="[^"]+"/g,'')});});
+ await routeBuild(context);
  await context.route('**/vendor/supabase-*.js',r=>r.fulfill({contentType:'application/javascript',body:stub}));
  await context.route('https://*.supabase.co/**',r=>r.abort());
  if(baseline)await context.route('**/assets/v8-ui-*.css',r=>r.fulfill({contentType:'text/css',body:fs.readFileSync('/tmp/tt812-baseline.css','utf8')}));
@@ -27,11 +28,11 @@ async function geometry(page,label){
  return g;}catch(e){failures.push({label,message:e.message,metrics:g});if(failures.length<=3)console.error(e.message);return g;}
 }
 (async()=>{
- const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  // Same DOM against the actual prior stylesheet proves the shared CSS regression.
- if(fs.existsSync('/tmp/tt812-baseline.css')){const c=await client(browser,3840,true);await c.page.evaluate(()=>showView('settings'));const broken=await c.page.evaluate(()=>{const f=$('v8BackBar'),s=getComputedStyle(f);return {width:f.clientWidth,padding:parseFloat(s.paddingLeft)+parseFloat(s.paddingRight),button:$('v8BackButton').getBoundingClientRect().width};});assert.ok(broken.padding>1000||broken.button<120,JSON.stringify(broken));await c.page.screenshot({path:'evidence/v812-baseline-3840.png'});console.log('REPRODUCED V811 viewport-padding defect',JSON.stringify(broken));await c.context.close();}
+ if(fs.existsSync('/tmp/tt812-baseline.css')){const browser=await chromium.launch(browserOptions());const c=await client(browser,3840,true);await c.page.evaluate(()=>showView('settings'));const broken=await c.page.evaluate(()=>{const f=$('v8BackBar'),s=getComputedStyle(f);return {width:f.clientWidth,padding:parseFloat(s.paddingLeft)+parseFloat(s.paddingRight),button:$('v8BackButton').getBoundingClientRect().width};});assert.ok(broken.padding>1000||broken.button<120,JSON.stringify(broken));await c.page.screenshot({path:'evidence/v812-baseline-3840.png'});console.log('REPRODUCED V811 viewport-padding defect',JSON.stringify(broken));await browser.close();}
  let combinations=0;
  for(const width of [320,390,768,1280,1920,2560,3840]){
+  const browser=await chromium.launch(browserOptions());
   const c=await client(browser,width);const {page}=c;
   for(const theme of ['original','graphite','contrast','ocean','forest','light'])for(const text of ['normal','large'])for(const layout of ['comfortable','compact']){
    await page.evaluate(({theme,text,layout})=>{document.body.dataset.ttTheme=theme;document.body.dataset.ttText=text;document.body.dataset.ttLayout=layout;document.body.dataset.ttCorners=layout==='compact'?'square':'round';document.body.dataset.ttMotion=layout==='compact'?'reduce':'normal';showView('settings');},{theme,text,layout});
@@ -39,16 +40,20 @@ async function geometry(page,label){
    await page.evaluate(()=>{showView('session');v8ShowPrepStep(1,false);});await geometry(page,[width,theme,text,layout,'preparation'].join('/'));combinations+=2;
   }
   for(const zoom of [1,1.25,2])for(const route of ['accounts','after','reviews','playbook','training','analytics','htflearning','session','decision','journal','settings']){
-   await page.evaluate(({zoom,route})=>{document.documentElement.style.zoom=zoom;showView(route);if(route==='decision')showEntryStage(1,false);},{zoom,route});await geometry(page,[width,zoom,route].join('/'));combinations++;if(route==='decision')for(const stage of [2,3,4]){await page.evaluate(stage=>showEntryStage(stage,false),stage);await geometry(page,[width,zoom,'entry-step',stage].join('/'));combinations++;}
+   await page.evaluate(({zoom,route})=>{document.documentElement.style.zoom=zoom;showView(route);if(route==='decision'){
+    currentSession.htf_context.htf_v8??={id:'prepared',plan:{personal_plan:{end_at:new Date(Date.now()+3600000).toISOString()}}};
+    renderDecision();showView('decision');showEntryStage(1,false);
+   }},{zoom,route});await geometry(page,[width,zoom,route].join('/'));combinations++;if(route==='decision')for(const stage of [2,3,4]){await page.evaluate(stage=>showEntryStage(stage,false),stage);await geometry(page,[width,zoom,'entry-step',stage].join('/'));combinations++;}
   }
   await page.evaluate(()=>{document.documentElement.style.zoom=1;showView('settings');const button=document.createElement('button');button.id='sentinel812';button.textContent='Last setting';$('settingsView').append(button);});
   // A simulated 34 px safe-area inset must increase the reserved space as well.
   await page.addStyleTag({content:'#v8BackBar{padding-bottom:44px}'});await geometry(page,width+'/safe-area');await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
   await page.evaluate(()=>new Promise(requestAnimationFrame));if(!await page.evaluate(()=>$('sentinel812').getBoundingClientRect().bottom<=$('v8BackBar').getBoundingClientRect().top+1))failures.push({label:width+'/sentinel',message:'Last content below footer'});
   if([320,390,1920,3840].includes(width))await page.screenshot({path:'evidence/v812-footer-'+width+'.png'});
-  assert.deepEqual(c.errors,[]);await c.context.close();
+  assert.deepEqual(c.errors,[]);await browser.close();
  }
  // Every fresh lifecycle scope starts neutral, independent of previous completion.
+ const browser=await chromium.launch(browserOptions());
  const c=await client(browser,390),{page}=c;
  for(const previous of ['none','fully-completed','early-closed','second-same-day']){
   await page.evaluate(previous=>{if(previous!=='none'){$('v8MacroDirection').value='long';$('htf').value='Old note';V8H.ack='old';V8Prep.acks={fear:'old'};V8Prep.overviewReview={owner:'owner',session:currentSession.id};}currentSession=null;renderSession();showView('session');v8ShowPrepStep(1,false);},previous);
@@ -63,6 +68,6 @@ async function geometry(page,label){
  assert.equal(saved.session.htf_context.htf_v8.plan.preparation_v812.overview_reviewed,true);
  await page.reload();await page.evaluate(fixture);await page.evaluate(({session,workspace})=>{currentSession=session;renderSession();restoreWorkspace(workspace);showView('session');},saved);assert.equal(await page.evaluate(()=>v8OverviewReviewed()),true);
  const second=await client(browser,768);await second.page.evaluate(session=>{currentSession=session;renderSession();showView('session');},saved.session);assert.equal(await second.page.evaluate(()=>v8OverviewReviewed()),true);assert.deepEqual(await second.page.evaluate(()=>currentSession),saved.session);
- assert.deepEqual(c.errors,[]);assert.deepEqual(second.errors,[]);await second.context.close();await c.context.close();await browser.close();
+ assert.deepEqual(c.errors,[]);assert.deepEqual(second.errors,[]);await browser.close();
  fs.writeFileSync('evidence/v812-geometry.json',JSON.stringify(failures,null,2));assert.equal(failures.length,0,'Geometry failures: '+JSON.stringify(failures.slice(0,8)));console.log('PASS V812 '+combinations+' footer/theme/text/layout/zoom/view combinations; baseline reproduced, safe-area reservation, neutral lifecycles, explicit optional completion, reload and independent client restore');
 })().catch(async e=>{if(activePage&&!activePage.isClosed())await activePage.screenshot({path:'evidence/v812-failure.png'}).catch(()=>{});console.error(e);process.exit(1)});

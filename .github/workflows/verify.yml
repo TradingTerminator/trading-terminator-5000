@@ -21,7 +21,7 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
 
-  browser-v808:
+  browser-v813:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -35,7 +35,5 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - name: Desktop and mobile preparation through real Chromium
-        run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/tt-http.log 2>&1 &
-          npm run test:browser:v808
+      - name: Desktop and mobile acceptance through Chromium
+        run: npm run test:browser:v813
