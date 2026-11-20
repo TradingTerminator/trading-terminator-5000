@@ -1,7 +1,7 @@
 
 (function(){
  'use strict';
- const TT_VERSION='8.13';
+ const TT_VERSION='8.14';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{

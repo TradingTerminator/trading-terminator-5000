@@ -29,7 +29,7 @@ const demoClient=String.raw`
    return q;
   },
   async rpc(name,args={}){
-   if(name==='record_trade_attempt_v813'){
+   if(name==='record_trade_attempt_v814'){
     const found=trades.find(t=>t.id===args.p_client_request_id);if(found)return response(found.id);
     const id=args.p_client_request_id,values={NQ:5,MNQ:.5,ES:12.5,MES:1.25};
     const rows=args.p_allocations.map(a=>({...a,id:crypto.randomUUID(),trade_id:id,initial_sl_points:a.initial_sl_ticks/4,initial_risk_usd:a.initial_sl_ticks*a.planned_quantity*values[a.instrument]}));

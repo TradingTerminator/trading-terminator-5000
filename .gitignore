@@ -6,3 +6,5 @@ dist/
 .openai/
 __pycache__/
 *.pyc
+
+tests/_v8-regression.generated.cjs

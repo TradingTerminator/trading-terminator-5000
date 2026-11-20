@@ -1,0 +1,37 @@
+# Trading Terminator 5000 · V8.14
+
+Ausgangspunkt ist der veröffentlichte Commit `9034655e5fe18879dd32c7c2b803d0b97a4feecf`. Die Rückfallfassung ist im Branch `backup/pre-v814-9034655` gesichert. V7 gehört nicht zum Änderungssatz. Bestehender Zugang und Versionshistorie stehen unter [App](https://app.tradingterminator.com/v8.html) und [Pull Request 27](https://github.com/TradingTerminator/trading-terminator-5000/pull/27).
+
+| Auftrag | Änderung und Komponente | Prüfergebnis oder Grenze |
+|---|---|---|
+| 1–2 · Ziel, Ausgangsstand, Sicherung | V8-Shell, historische Datenformate, Release und Speicherpfade abgeglichen. Zuerst Entwurfsprotokoll, dann Workflow und Browserprüfungen. | Ausgangscommit und Rückfallbranch identifiziert. |
+| 3 · Gerätewechsel | src/v8-sync.js und db/v8_14_drafts.sql speichern Entwürfe und Einstellungen mit Benutzerkennung, Revisionsnummer und idempotenter Anfrage. Fokus, Rückkehr, Netzverbindung und Intervall lösen Abgleich aus. Lokale Änderungen bleiben bei einem Revisionskonflikt erhalten. | Zwei simulierte Clients haben 45 Minuten übertragen, offline 60 Minuten eingetragen und einen Konflikt mit 90 Minuten explizit aufgelöst. SQL-Test auf dem Zielsystem mit zwei temporären Benutzern und Rollback bestanden. Vollständige reale iPhone–Windows-Kette und Offline-Upload eines noch ungespeicherten Bildes offen. |
+| 4 · Validierung | src/v8-next.js und src/v8-review.js führen zu Feldern und HTF-Kapitel, entfernen die tägliche Terminregel aus der Pflichtprüfung und filtern doppelte Feld-IDs. | Tests für ausgeblendete Felder, Korrektur, fehlende Emotionen, Risiko und Bildnachweis. |
+| 5 · Neue Session | Bestätigungen, Richtung, Stimmung und Kapitelstatus sind an die Session gebunden. Historische Entwürfe behalten ihre Zuordnung. | Neutraler Neustart in mehreren Lebenszyklusszenarien geprüft. |
+| 6–7 · Konten | Copy-Auswahl, Quellkonto, Instrument, Anzahl und SL bei den Konten. Grundlage für neue Sessions ist die zuletzt serverseitig bestätigte Auswahl. Abweichungen je Entry sind möglich. | Konten- und Risikologik automatisiert geprüft. Geräteübergreifende Bedienung auf physischer Hardware offen. |
+| 8 · Grenzen | Bestehende Zeit- und Betragsgrenzen mit getrennten Konten und fehlenden P&L-Angaben beibehalten. | Session- und Geldgrenzentests bestanden. |
+| 9–11 · Termine | Kompakte Terminzeilen, Heute/Siebentageansicht, manuelle Ergänzung und unbekannte Uhrzeit. Terminerinnerung zentral konfigurierbar. Eigene Regeln historischer Sessions bleiben lesbar. | Kalenderparser und Auswahl mit Testdaten geprüft. Automatisch gepflegte BLS/BEA-Daten und manuell gepflegte FOMC/ISM-Termine bieten Teilabdeckung. Forex Factory ist verlinkt. Für die Übernahme seiner Daten liegt keine bestätigte Weiterverbreitungserlaubnis vor. |
+| 12–15 · HTF | Makro, Sentiment und Technik haben getrennte Ansichten und bewussten Abschluss. Szenario gehört zur Technik, Richtung steht am Kapitelende. Zusätzliche Prüfpunkte und freie Risikoregel entfallen im Tagesablauf. | Vorbereitung und Fokusführung getestet. Für Renditen und Bonds wurden alle 25 Paare aus vier Interpretationen und fehlender Angabe geprüft. Eine erschöpfende Prüfung des kartesischen Produkts aller Marktbeobachtungen steht aus. |
+| 16–17 · Verfassung und Pause | Sechs Kernskalen vor dem Entry. Weitere Zustände sind aufklappbar. Fehlende Werte bleiben offen. Bewusstes Fortfahren und Pausendauer werden mit der jeweiligen Phase festgehalten. | Positiv und negativ gerichtete Skalen, Warnung, bewusste Entscheidung und Rückkehr zur Neubewertung getestet. Warnschwellen sind Produktheuristiken. |
+| 18–19 · Playbook und Rücksprung | Setup- und Trade-Karten nutzen Originale, gekennzeichnete Musterbilder, Qualitätsstufe und Filter. Separates Referenzmerkmal mit Prüfung auf konkurrierende Änderung. Der Rückweg berücksichtigt Start, Vorbereitung und Nachbereitung. | Navigation, Review-Zustände und Datenbankmerkmal geprüft. Der Zugriff auf persönliche Originale am zweiten physischen Gerät steht aus. |
+| 20–22 · LTF | Freitext zum Indikatorbezug entfällt. Chart-Zeiteinheit wird nach Bestätigung übernommen. Aufgeschobene Analysen bleiben als Review-Punkt offen. Nachträge verwenden eine eigene serverseitige Zeitmarke. | Neuer SQL-Pfad mit Wiederholung und Prüfung des unveränderten Entry-Snapshots bestanden. Chromium prüft gruppierte Beobachtungen, Bildablage und Zuordnung. |
+| 23 · Zeit bis Entry | Direkter Weg von der Setup-Auswahl zu Konto und Risiko. Der Entwurf wird pro Sicherung in einem Schreibvorgang aufgebaut. | Vergleich unterhalb der Tabelle. |
+| 24 · Regression | Bildeingabe, laufender Trade, SL, Exit, separate P&L-Behandlung, Gebühren, Review, Gegenmaßnahmen und Trainingsbezug geprüft. | Chromium-Journalablauf und SQL-Lebenszyklus mit unterschiedlicher Kontraktzahl, Teilabrechnung und historischen Tarifen bestanden. |
+| 25–26 · Mobile Bedienung und Mehrwert | Kapitelstatus im Inhaltsfluss, kompakte Navigation, optionaler Freitext und optionale Dokumentation hinter Bedienelementen. | Chromium-Geometrieprüfung über sieben Breiten, sechs Farbschemata sowie Textgröße und Zoom. Echte iOS-Systemtastatur und subjektive Bediengeschwindigkeit im Handel offen. |
+| 27 · Sicherheit | Benutzergebundene Entwurfsrevisionen, explizite Funktionsrechte und atomare Nachträge. Der bestehende private Screenshot-Bucket begrenzt Dateien auf 10 MiB und JPEG, PNG oder WebP. | RLS für Trades, Konten, Sessions, Ausführungen, Ergebnisse und Entwürfe auf dem Zielsystem kontrolliert. Funktionstests mit Rollenwechsel und Rollback. Keine vollständige externe Sicherheitsprüfung. |
+| 28 · Berechnung | Kontoausführungen und Handelsentscheidung sind getrennt. Pro Trade gespeicherte Gebührentarife und Initialrisiken bleiben erhalten. | SQL-Test mit 230 USD Initialrisiko und 110 USD Bruttoergebnis, Gebühren 4,25 und 6,24 USD. UI-Fall mit drei Ausführungen und 900 USD Initialrisiko. |
+| 29 · Testumfang | Node-Tests, V8-Regression, Kalenderparser, SQL-Tests und Browserprüfungen. | 237 Node-Tests, 99 zusätzliche Regressionsfälle und 17 Python-Tests bestanden. Vier historische V7-Oberflächentests sind im V8-Lauf ausdrücklich übersprungen. |
+| 30–32 · Betrieb, Abnahme und Gesamtprüfung | Versionierte SQL-Dateien und inhaltsadressierte Frontend-Dateien. Rollback durch Rückkehr zur gesicherten V8.13-Oberfläche. | V8.13 kann die zusätzlichen Datenbankobjekte bestehen lassen. Authentifizierter Dauerbetrieb auf zwei physischen Geräten und Update einer bereits installierten iPhone-App bleiben offene Abnahmepunkte. |
+
+## Zeitmessung
+
+Gleiches Konto, ein MNQ, 40 Ticks SL, gleiches Setup und gleiche Richtung, ohne Screenshot. Fünf Chromium-Läufe je Fassung mit synthetischem Backend. Beginn war die Wahl der Erfassungsart, Ende der Eingang der Entry-Anfrage. Die sechs Skalen wurden per Tastatur bestätigt. Klicks und manuelle Feldaktionen werden getrennt gezählt. Browser-Neustart und Einrichtung der Testsession liegen außerhalb der Messung.
+
+| Messwert | V8.13 | V8.14 |
+|---|---:|---:|
+| Klicks | 7 | 6 |
+| Manuelle Feldaktionen | 7 | 6 |
+| Ansichtswechsel | 3 | 2 |
+| Median der automatisierten Bedienzeit | 481 ms | 370 ms |
+
+Der Median sank in dieser Messreihe um 23 %. Die absoluten Zeiten hängen von Hostlast und Browserautomatisierung ab. Die tatsächliche Zeitersparnis eines Traders erfordert einen Praxistest. Reproduktion mit scripts/benchmark-entry-v814.cjs aus dem jeweiligen gebauten Arbeitsverzeichnis.

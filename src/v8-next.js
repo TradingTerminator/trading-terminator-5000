@@ -215,20 +215,12 @@ for(const [heading,keys] of ltfGroups813){
 grid811.classList.add('tt-ltf-groups');
 const ltfNote813=el811('textarea');ltfNote813.id='v813LtfNote';ltfNote813.rows=2;ltfNote813.maxLength=500;ltfNote813.placeholder='Notiz · optional';ltfNote813.setAttribute('aria-label','LTF-Notiz');
 zone811.after(ltfNote813);
-const saveDefaults813=v8Button('Chart und Bezug als Standard speichern',()=>{
- try{
-  if(!currentUser)return;
-  localStorage.setItem('tt8_ltf_defaults_'+currentUser.id,JSON.stringify({timeframe:$('v811Timeframe').value,reference:$('v811Reference').value.trim()}));
-  message('LTF-Standards gespeichert.');
- }catch(e){message('LTF-Standards nicht gespeichert: '+e.message,true);}
-},'ghost');
-context811.append(saveDefaults813);
 function ltfDefaults813(){
  if(!currentUser)return;
  try{
   const defaults=JSON.parse(localStorage.getItem('tt8_ltf_defaults_'+currentUser.id)||'{}');
   if(!$('v811Timeframe').value)$('v811Timeframe').value=defaults.timeframe||'';
-  if(!$('v811Reference').value)$('v811Reference').value=defaults.reference||'';
+
  }catch(_){}
 }
 function syncLtf813(legacy=false){
@@ -241,18 +233,16 @@ function syncLtf813(legacy=false){
 ltf811.addEventListener('change',()=>syncLtf813());
 ltfSnapshot811=function(){
  const status=$('v811LtfStatus').value||(V811.mode==='retrospective'?'not_reviewed':'');
+ if(status==='not_reviewed'||!status)return {schema:813,status:'not_reviewed',values:{},images:[],timing:'pending',observed_at:null};
  const values={};
  if(status==='reviewed')for(const [key,{checkbox,field}] of ltfChecks813)if(checkbox.checked&&field.value)values[key]=field.value;
- return {schema:813,status,values,timeframe:$('v811Timeframe').value||null,reference:$('v811Reference').value.trim()||null,
+ return {schema:813,status,values,timeframe:$('v811Timeframe').value||null,
   zone:status==='reviewed'?$('v811Zone').value.trim()||null:null,note:ltfNote813.value.trim()||null,
   images:[...V811.ltf.images],image_absence:V811.ltf.images.length?null:$('v811ImageAbsence').value||null,
   observed_at:V811.ltf.observed_at||null,timing:V811.mode==='retrospective'?'retrospective':'before_documented_entry'};
 };
 function validEntryLtf813(){
  const snapshot=ltfSnapshot811();
- if(V811.mode==='planned'&&snapshot.status!=='reviewed'){
-  entryFeedback('LTF vor einem geplanten Entry bewusst prüfen.',$('v811LtfStatus'));return false;
- }
  if(V811.uploading||chosenImages(ltfImages811).length){
   entryFeedback('Ausgewählte Originale speichern oder einzeln entfernen.',saveLtf813);return false;
  }
@@ -265,7 +255,7 @@ const renderStage813=showEntryStage;
 showEntryStage=function(n,scroll=true){
  renderStage813(n,scroll);
  if(n===4&&V811.mode==='planned')$('entryStageTitle').textContent='Trade vorbereitet · Entry & Risiko';
- if(n===3){ltfDefaults813();syncLtf813();$('v811LtfStatus').onchange();}
+ if(n===3){if(!$('v811LtfStatus').value)$('v811LtfStatus').value='not_reviewed';ltfDefaults813();syncLtf813();$('v811LtfStatus').onchange();}
  if(n===2)redrawReentry813();
  if(n===4)drawAccountDeviations813();
 };
@@ -336,28 +326,21 @@ sessionFeedback=function(text){
   if(invalid){markField813(invalid,text);break;}
  }
 };
-const save813=saveWorkspace;
-saveWorkspace=function(){
- save813();
- if(!currentUser||workspaceRestoring)return;
- try{
-  const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
-  if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)){item.v813={reentry:reentry813.value};storage.setItem(workspaceKey(),JSON.stringify(item));}
- }catch(_){}
-};
+workspaceWriters.push(item=>{item.v813={reentry:reentry813.value};});
 const entryContext813=v811EntryContext;
 v811EntryContext=function(){
  return {...entryContext813(),idea_note:ideaNotiz813.value.trim()||null,planned_tp_ticks:tp813.value?Number(tp813.value):null,reentry_trade_id:reentry813.value||null,actual_entry_at:V811.mode==='retrospective'?actualTime813(retrospectiveAt813):null};
 };
 
 const copySession813=el811('input');copySession813.id='v813SessionCopy';copySession813.type='checkbox';
-const copyLabel813=label813('Konten beim Entry im Copy-Modus übernehmen',copySession813);copyLabel813.className='account-pick';
-$('v8TradingMinutes').closest('label').after(copyLabel813);
+const copyLabel813=label813('Konten gemeinsam handeln – Copy-Modus',copySession813);copyLabel813.className='account-pick';
+copyLabel813.append(document.createTextNode(' · Ausgewählte Konten werden beim Entry gemeinsam vorgeschlagen.'));
+$('sessionAccountList').after(copyLabel813);
 copySession813.addEventListener('change',saveWorkspace);
 const plan813=v8HtfPlan;
 v8HtfPlan=function(){return {...plan813(),entry_copy_v813:copySession813.checked};};
 const restorePlan813=v8RestoreHtf;
-v8RestoreHtf=function(...args){restorePlan813(...args);copySession813.checked=!!currentSession?.htf_context?.htf_v8?.plan?.entry_copy_v813;};
+v8RestoreHtf=function(...args){restorePlan813(...args);copySession813.checked=currentSession?.htf_context?.selected_accounts?.[0]?.copy_mode??!!currentSession?.htf_context?.htf_v8?.plan?.entry_copy_v813;};
 function drawAccountDeviations813(){
  const ids=currentSession?.htf_context?.selected_accounts||[];
  for(const row of $('allocationList').querySelectorAll('.account')){
@@ -729,9 +712,11 @@ function renderManualEvents813(){
   const row=el811('details');row.open=true;row.append(el811('summary',event.title||'Eigener Termin'));
   const title=el811('input');title.maxLength=200;title.id=event.id+'-title';
   const when=el811('input');when.type='datetime-local';when.id=event.id+'-when';
+  const unknown=el811('input');unknown.type='checkbox';unknown.checked=!!event.unknown;when.disabled=unknown.checked;
+  unknown.onchange=()=>{event.unknown=unknown.checked;when.disabled=event.unknown;if(event.unknown){event.when='';when.value='';}v8UpdatePreparation();saveWorkspace();};
   const rule=select811(event.id+'-rule','Handelsregel',{avoid:'Nicht handeln',wait:'Reaktion abwarten',observe:'Beobachten'},row);
   rule.options[0].text='Allgemeine Handelsregel';
-  rule.closest('label').before(label813('Termin',title),label813('Uhrzeit · Deutschland',when));
+  rule.closest('label').before(label813('Termin',title),label813('Uhrzeit · Deutschland',when),label813('Uhrzeit noch offen',unknown));
   const from=el811('input'),to=el811('input');from.type=to.type='datetime-local';from.id=event.id+'-from';to.id=event.id+'-to';
   row.append(label813('Warnfenster ab · Deutschland',from),label813('Warnfenster bis · Deutschland',to));
   for(const [key,field] of Object.entries({title,when,rule,from,to})){
@@ -770,23 +755,13 @@ v8PreparationMissing=function(){
  ));
  for(const event of manualEvents813){
   if(!event.title.trim()){issues.push(['Terminbezeichnung eingeben oder Zeile entfernen',event.id+'-title']);continue;}
-  if(!event.when)issues.push(['Uhrzeit für '+event.title+' ergänzen',event.id+'-when']);
+  if(!event.when&&!event.unknown)issues.push(['Uhrzeit für '+event.title+' ergänzen',event.id+'-when']);
  }
  for(const event of manual)if(event.rule==='avoid'&&(!event.from||!event.to||Date.parse(event.to)<=Date.parse(event.from)))
   issues.push(['Gültiges Warnfenster für '+event.title+' angeben',event.id+'-from']);
  return issues;
 };
-const eventWorkspace813=saveWorkspace;
-saveWorkspace=function(){
- eventWorkspace813();
- if(!currentUser||workspaceRestoring)return;
- try{
-  const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
-  if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)&&item.v813){
-   item.v813.manualEvents=manualEvents813;storage.setItem(workspaceKey(),JSON.stringify(item));
-  }
- }catch(_){}
-};
+workspaceWriters.push(item=>{item.v813.manualEvents=manualEvents813;});
 const eventRestore813=restoreWorkspace;
 restoreWorkspace=function(item){
  eventRestore813(item);
