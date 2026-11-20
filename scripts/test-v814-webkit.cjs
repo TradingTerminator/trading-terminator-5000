@@ -8,10 +8,11 @@ const stub=fs.readFileSync('scripts/test-v809-browser.cjs','utf8').match(/const 
  try{
  for(const viewport of [{width:390,height:844},{width:844,height:390},{width:390,height:410}]){
  const context=await browser.newContext({...devices['iPhone 13'],viewport});
- await routeBuild(context);await context.route('**/vendor/supabase-*.js',r=>r.fulfill({contentType:'application/javascript',body:stub}));
+ const origin='https://tt814.test';await routeBuild(context,origin);await context.route('**/vendor/supabase-*.js',r=>r.fulfill({contentType:'application/javascript',body:stub}));
  await context.route('https://*.supabase.co/**',r=>r.abort());
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('http://127.0.0.1:4173/v8.html');await page.evaluate(fixture);
+ page.on('console',m=>{if(m.type()==='error')console.error(m.text());});
+ await page.goto(origin+'/v8.html');assert.deepEqual(errors,[]);await page.evaluate(fixture);
  await page.evaluate(()=>{$('loginView').classList.add('hidden');$('tabs').classList.remove('hidden');showView('session');v8ShowPrepStep(4,false);selectChapter814(0);});
  for(const title of ['Sentiment','Technik','Makro']){
   await page.getByRole('button',{name:new RegExp('^'+title+' ·')}).tap();
