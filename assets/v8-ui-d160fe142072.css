@@ -171,3 +171,8 @@ h1,h2,h3,h4,.v8-kicker,label{overflow-wrap:anywhere}
 }
 
 body[data-tt-theme=light] .tt-field-error{color:#a12620}
+
+.tt-calendar-event {display:flex;align-items:center;gap:.7rem;min-height:44px;padding:.45rem .2rem;cursor:pointer}
+.tt-calendar-event input {width:auto;flex:none}
+.tt-calendar-event span {display:grid;gap:.15rem;min-width:0}
+.tt-calendar-event strong {overflow-wrap:break-word}

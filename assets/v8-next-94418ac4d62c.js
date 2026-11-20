@@ -351,8 +351,9 @@ v811EntryContext=function(){
 };
 
 const copySession813=el811('input');copySession813.id='v813SessionCopy';copySession813.type='checkbox';
-const copyLabel813=label813('Konten beim Entry im Copy-Modus übernehmen',copySession813);copyLabel813.className='account-pick';
-$('v8TradingMinutes').closest('label').after(copyLabel813);
+const copyLabel813=label813('Konten gemeinsam handeln – Copy-Modus',copySession813);copyLabel813.className='account-pick';
+copyLabel813.append(document.createTextNode(' · Ausgewählte Konten werden beim Entry gemeinsam vorgeschlagen.'));
+$('sessionAccountList').after(copyLabel813);
 copySession813.addEventListener('change',saveWorkspace);
 const plan813=v8HtfPlan;
 v8HtfPlan=function(){return {...plan813(),entry_copy_v813:copySession813.checked};};
