@@ -46,7 +46,7 @@ v8RefreshHome();
 
 const exceptions810=exceptionItems;exceptionItems=function(t){return [...exceptions810(t),...(t.observations?.session_rules_v810?.issues||[]).map((x,i)=>({id:'session-rule-'+i,type:'plan_violation',label:({preparation_missing:'Vorbereitung beim Entry nicht bestätigt',time_limit:'Entry nach geplanter Handelszeit',loss_limit:'Entry nach erreichtem Verlustmaximum'})[x.type]||x.type,reason:x.classification==='review_required'?(t.observations.session_rules_v810.reason||'Ausführungszeitpunkt rückblickend prüfen'):null}))];};
 
-const endFooter810=v8Button('Handelssession beenden',()=>v810OpenClose(),'secondary');endFooter810.id='v810EndAction';v8BackBar.append(endFooter810);const syncBack810=v8SyncBack;v8SyncBack=function(){syncBack810();endFooter810.hidden=!currentSession||!['session','decision','journal'].includes(V8.route);};v8SyncBack();
+const endFooter810=v8Button('Session beenden',()=>v810OpenClose(),'secondary');endFooter810.id='v810EndAction';v8BackBar.append(endFooter810);const syncBack810=v8SyncBack;v8SyncBack=function(){syncBack810();endFooter810.hidden=!currentSession||!['session','decision','journal'].includes(V8.route);};v8SyncBack();
 $('sessionFinishPanel').querySelector('h3+p').textContent='Handelssession-Ende und Trade-Ende sind getrennt. Offene Trades und Reviews bleiben dokumentierbar.';
 
 // Remaining open trades stay visible after their session has ended.

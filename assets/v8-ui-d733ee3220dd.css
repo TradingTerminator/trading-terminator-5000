@@ -109,7 +109,7 @@ body.v8-has-context main,main{margin-left:auto!important;margin-right:auto!impor
 /* V8.12: one container-sized footer. Never derive inner padding from viewport width. */
 #v8BackBar,#v8BackBar.v8-prep-footer{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;max-width:100%;padding-inline:max(14px,env(safe-area-inset-left,0px)) max(14px,env(safe-area-inset-right,0px));}
 #v8BackBar[hidden]{display:none!important}
-#v8BackBar>button,#v8BackBar.v8-prep-footer>button{flex:1 1 14ch;min-inline-size:min(100%,14ch);max-inline-size:100%;min-height:44px;height:auto;margin:0;justify-content:center;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:manual;line-height:1.35;padding:10px 12px;box-sizing:border-box}
+#v8BackBar>button,#v8BackBar.v8-prep-footer>button{flex:1 1 14ch;min-inline-size:min(100%,max(124px,14ch));max-inline-size:100%;min-height:44px;height:auto;margin:0;justify-content:center;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:manual;line-height:1.35;padding:10px 12px;box-sizing:border-box}
 #v8BackBar>button[hidden],#v8BackBar>button.hidden{display:none!important}
 #v8BackBar>button:not(.secondary):not(.ghost){flex-grow:1.4}
 body.v8-has-back main,body.v8-has-back.v8-has-context main{padding-bottom:calc(var(--tt-footer-height,160px) + 24px)}
@@ -128,3 +128,46 @@ h1,h2,h3,h4,.v8-kicker,label{max-inline-size:100%;overflow-wrap:break-word;word-
 header{flex-wrap:wrap}header>div{flex:1 1 14ch;min-inline-size:0}header>button{flex:0 1 auto;white-space:normal}
 #app{overflow-wrap:anywhere}
 h1,h2,h3,h4,.v8-kicker,label{overflow-wrap:anywhere}
+
+/* V8.13 workflow. Use the existing theme variables and shared footer. */
+[aria-invalid="true"]{outline:2px solid #ee665d;outline-offset:2px}
+.tt-field-error{display:block;color:#f1786e;font-weight:650;margin:.25rem 0 .5rem}
+.tt-ltf-groups,.tt-fee-settings fieldset,.tt-exit-completion fieldset{display:grid;gap:.5rem;min-width:0}
+.tt-ltf-groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tt-ltf-groups fieldset,.tt-fee-settings fieldset,.tt-exit-completion fieldset{min-inline-size:0;border:1px solid var(--line,#777);border-radius:8px;padding:.65rem}
+.tt-fee-settings fieldset{grid-template-columns:repeat(4,minmax(0,1fr));margin:.5rem 0}
+.tt-ltf-groups .account-pick{margin:.15rem 0;min-height:40px}
+.tt-ltf-groups select,.tt-fee-settings input,.tt-fee-settings select,.tt-exit-completion input{min-width:0}
+.tt-saved-screenshots,.pending-image-preview{display:flex;flex-wrap:wrap;gap:.5rem}
+.tt-saved-screenshots .chart-thumb{max-width:16rem}
+.image-paste-field{min-height:44px;min-width:0;border:1px dashed currentColor;border-radius:6px;padding:.25rem}
+.image-paste-field:empty::before{content:"Bild hier einfügen";opacity:.8;pointer-events:none}
+.tt-trade-screenshots{margin:.75rem 0}
+.tt-trade-screenshots>button{margin:.5rem 0}
+#allocationList .account{display:grid;grid-template-columns:minmax(8rem,1fr) auto minmax(0,4fr);gap:.35rem .55rem;padding:.4rem .55rem}
+#allocationList .account-fields{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(7rem,1fr);gap:.5rem;align-items:end}
+#allocationList .account-fields>.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+#allocationList .acct-risk-preview{margin:0;align-self:center}
+#allocationList .v811-standard{grid-column:1/-1;margin:0}
+.exit-editor [data-scale-group="exitCommitEmotion"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+.exit-editor .tt-close-trade{width:100%;min-height:48px;}
+.tt-exit-completion{display:grid;gap:.6rem}
+@media(max-width:700px){
+ .tt-ltf-groups,.tt-fee-settings fieldset{grid-template-columns:1fr}
+ #allocationList .account{grid-template-columns:minmax(0,1fr) auto}
+ #allocationList .account-fields{grid-column:1/-1;grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+ #allocationList .acct-risk-preview{grid-column:1/-1}
+ .exit-editor [data-scale-group="exitCommitEmotion"]{grid-template-columns:1fr}
+}
+.tt-calendar-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:.9rem}
+.tt-calendar-table th,.tt-calendar-table td{text-align:left;padding:.25rem;overflow-wrap:anywhere}
+.tt-calendar-table th:nth-child(1){width:4.5rem}
+.tt-calendar-table th:nth-child(2){width:6rem}
+.tt-calendar-table th:nth-child(3),.tt-calendar-table th:nth-child(4){width:4rem}
+@media(max-width:560px){
+ .tt-calendar-table th:nth-child(1){width:3.3rem}
+ .tt-calendar-table th:nth-child(2){width:3.7rem}
+ .tt-calendar-table th:nth-child(3),.tt-calendar-table th:nth-child(4){width:3rem}
+}
+
+body[data-tt-theme=light] .tt-field-error{color:#a12620}
