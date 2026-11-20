@@ -21,7 +21,7 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
 
-  browser-v813:
+  browser-v814:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -37,3 +37,45 @@ jobs:
       - run: npm run build
       - name: Desktop and mobile acceptance through Chromium
         run: npm run test:browser:v813
+
+      - name: Fast entry through the journal interface
+        run: node scripts/benchmark-entry-v814.cjs
+
+  postgres-v814:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: isolated-test-only
+          POSTGRES_DB: tt810
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: PostgreSQL 17 lifecycle and isolation acceptance
+        env:
+          PGPASSWORD: isolated-test-only
+        run: |
+          python3 scripts/prepare-v810-sql-test.py
+          psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -f tests/sql/bootstrap_v810.sql
+          psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -f /tmp/tt810-baseline.sql
+          psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -c 'GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO authenticated;'
+          for file in sql/security_v735.sql sql/review_types_v735.sql sql/training_focus_v735.sql sql/flow_v736.sql sql/ratings_v737.sql sql/idea_learning_v740.sql sql/guided_flow_v741.sql db/v8_htf_learning.sql db/v8_htf_backup.sql db/v8_08_preparation.sql db/v8_09_learning.sql db/v8_10_session_lifecycle.sql db/v8_11_execution.sql db/v8_13_workflow.sql db/v8_14_drafts.sql db/v8_14_entry.sql db/v8_14_playbook.sql tests/sql/verify_v810.sql tests/sql/verify_v811.sql tests/sql/verify_v812.sql tests/sql/verify_v813.sql tests/sql/verify_v814_drafts.sql tests/sql/verify_v814_entry.sql; do psql -h 127.0.0.1 -U postgres -d tt810 -v ON_ERROR_STOP=1 -f "$file"; done
+
+  webkit-v814:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps webkit
+      - run: npm run build
+      - run: node scripts/test-v814-webkit.cjs

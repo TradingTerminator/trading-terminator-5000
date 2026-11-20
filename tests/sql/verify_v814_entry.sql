@@ -22,6 +22,9 @@ BEGIN
  answer:=public.finish_ltf_v814(t,'reviewed','{"delta":"positive"}');
  IF answer->>'timing'<>'after_entry' OR public.finish_ltf_v814(t,'reviewed','{"delta":"positive"}')<>answer THEN RAISE EXCEPTION 'Nachträgliche Analyse oder Replay falsch'; END IF;
  IF (SELECT observations#>>'{entry_context_v736,ltf_v811,timing}' FROM public.trades WHERE id=t)<>'pending' THEN RAISE EXCEPTION 'Ursprüngliche Entry-Analyse überschrieben'; END IF;
+ IF (SELECT playbook_reference_v814 FROM public.trades WHERE id=t) IS DISTINCT FROM false THEN RAISE EXCEPTION 'Unexpected default reference';END IF;
+ UPDATE public.trades SET playbook_reference_v814=true WHERE id=t AND NOT playbook_reference_v814;
+ IF NOT FOUND THEN RAISE EXCEPTION 'Unable to mark reference';END IF;
  SELECT id INTO aid FROM public.trade_account_allocations WHERE trade_id=t AND account_id=a;
  SELECT id INTO bid FROM public.trade_account_allocations WHERE trade_id=t AND account_id=b;
  UPDATE public.trading_accounts SET fee_schedule_v813='{"NQ":{"amount":99,"basis":"side","currency":"USD"}}' WHERE id=a;
@@ -44,4 +47,4 @@ BEGIN
  EXECUTE 'RESET ROLE';
 END $$;
 ROLLBACK;
-SELECT 'PASS V813 sparse LTF, immutable fee rates, partial-fill contract sides, exit time, TP reason, replay and user isolation' AS result;
+SELECT 'PASS V814 deferred LTF and reference, sparse LTF, immutable fee rates, partial-fill contract sides, exit time, TP reason, replay and user isolation' AS result;

@@ -68,12 +68,22 @@ mountTradePanes=function(trade,...args){
 };
 
 // The last confirmed session supplies defaults on every device, even before HTF completion.
+const leaderField814=el811('label','Quellkonto für Copy-Dokumentation'),leaderChoice814=el811('select');
+leaderChoice814.id='sessionLeader814';leaderField814.append(leaderChoice814);copyLabel813.after(leaderField814);
+function syncLeader814(preferred){
+ const selected=getSessionSelection(),previous=preferred||leaderChoice814.value;
+ leaderField814.hidden=!copySession813.checked||selected.length<2;
+ leaderChoice814.replaceChildren(...selected.map(row=>new Option(allAccounts.find(a=>a.id===row.account_id)?.account_name||row.account_id,row.account_id)));
+ if(selected.some(a=>a.account_id===previous))leaderChoice814.value=previous;
+}
+copySession813.addEventListener('change',()=>syncLeader814());
+$('sessionAccountList').addEventListener('change',()=>syncLeader814());
 const accountDefaults814=renderSessionAccounts;
 let accountInput814=0;
 $('sessionAccountList').addEventListener('input',()=>accountInput814++);
 copySession813.addEventListener('change',()=>accountInput814++);
 renderSessionAccounts=function(...args){
- accountDefaults814(...args);
+ accountDefaults814(...args);syncLeader814(currentSession?.htf_context?.selected_accounts?.find(a=>a.copy_leader)?.account_id);
  if(!currentUser||currentSession||workspaceRestoring||sessionDraftMode!=='start')return;
  const owner=currentUser.id,stamp=++accountInput814;
  const original=JSON.stringify(captureFields($('sessionAccountList')));
@@ -88,7 +98,7 @@ renderSessionAccounts=function(...args){
    if(row){card.querySelector('.sess-qty').value=row.planned_quantity;card.querySelector('.sess-sl').value=row.initial_sl_ticks;card.querySelector('.sess-instrument').value=row.instrument;}
   }
   copySession813.checked=selected[0]?.copy_mode??data.htf_context.htf_v8?.plan?.entry_copy_v813??false;
-  updateSessionCheckStatus();
+  syncLeader814(selected.find(a=>a.copy_leader)?.account_id);updateSessionCheckStatus();
  })().catch(e=>sessionFeedback('Kontovorgaben konnten nicht geladen werden: '+e.message));
 };
 $('v8RememberStandards').closest('label').hidden=true;
@@ -159,29 +169,26 @@ v8NextPrep=function(){
 const saveChapter814=$('saveHtf').onclick;
 $('saveHtf').onclick=function(...args){
  for(let i=0;i<2;i++)if(!confirmations814.has(i)){selectChapter814(i);v8SyncPrepControls();return;}
+ const issue=v8PreparationMissing()[0];if(issue){confirmations814.delete(2);v8FocusPreparation(issue[1]);return;}
  confirmations814.add(2);return saveChapter814.apply(this,args);
 };
+let pauseDecision814=null;
 const clearChapter814=clearSession811;
-clearSession811=function(...args){clearChapter814(...args);confirmations814.clear();editedChapters814.clear();selectChapter814(0);};
+clearSession811=function(...args){clearChapter814(...args);pauseDecision814=null;confirmations814.clear();editedChapters814.clear();selectChapter814(0);};
 const planChapter814=v8HtfPlan;
 v8HtfPlan=function(){return {...planChapter814(),chapter_confirmations:[...confirmations814]};};
 selectChapter814(0);
 
 // Chapter acknowledgements and the active chapter belong to the same draft as the fields.
-const saveReview814=saveWorkspace;
-saveWorkspace=function(){
- saveReview814();if(!currentUser||workspaceRestoring)return;
- try{
-  const storage=ttRemember?localStorage:sessionStorage,key=workspaceKey(),item=JSON.parse(storage.getItem(key)||'null');
-  if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)){
-   item.chapters814={active:chapter814,confirmed:[...confirmations814],edited:[...editedChapters814]};storage.setItem(key,JSON.stringify(item));
-  }
- }catch(e){draftStatus814.textContent='Entwurf nicht gesichert: '+e.message;}
-};
+workspaceWriters.push(item=>{
+ item.pauseDecision814=pauseDecision814;
+ item.chapters814={active:chapter814,confirmed:[...confirmations814],edited:[...editedChapters814]};
+});
 const restoreReview814=restoreWorkspace;
 restoreWorkspace=function(item){
  restoreReview814(item);
  if(item?.owner!==currentUser?.id||item.session!==(currentSession?.id||null))return;
+ pauseDecision814=item.pauseDecision814||null;
  const state=item.chapters814;if(!state)return;
  confirmations814.clear();editedChapters814.clear();
  for(const i of state.confirmed||[])if(Number.isInteger(i)&&i>=0&&i<3)confirmations814.add(i);
@@ -210,11 +217,10 @@ buildScaleGroup=function(group,phase,values){
 };
 buildScaleGroup($('sessionMoodOptions'),'session');buildScaleGroup($('entryEmotionOptions'),'entryEmotion');
 
-let pauseDecision814=null;
 const decidePause814=el811('dialog');
 $('app').append(decidePause814);
 function askPause814(items,phase,advance){
- if(!items.some(x=>x.severe)||V811.mode==='retrospective'&&phase==='entry')return advance();
+ if(!(items.some(x=>x.severe)||phase==='session'&&items.length>=3)||V811.mode==='retrospective'&&phase==='entry')return advance();
  decidePause814.replaceChildren(el811('h3','Trotz dieser Warnsignale fortfahren?'));
  for(const w of items)decidePause814.append(el811('p',w.title+' · '+w.value+'/10'));
  decidePause814.append(v8Button('Pause starten',()=>{decidePause814.close();v8ChoosePause();}),
@@ -265,3 +271,60 @@ function filterCards814(){
 }
 bookFilters814.addEventListener('change',filterCards814);
 $('playbookLexicon').addEventListener('toggle',()=>queueMicrotask(filterCards814),true);
+
+// The scalping path validates the same setup before taking the trader straight to risk.
+let deferFromSetup814=false;
+const fastEntry814=v8Button('Direkt zu Konto & Risiko · Analyse später',()=>{
+ if(entryStage!==2)return;
+ deferFromSetup814=true;
+ try{$('entryStageNext').click();}finally{deferFromSetup814=false;}
+});
+fastEntry814.id='fastEntry814';
+document.querySelector('[data-entry-stage="2"]').append(fastEntry814);
+const stageLabel814=showEntryStage;
+showEntryStage=function(stage,...args){
+ stageLabel814(stage,...args);
+ if(stage===2)$('entryStageNext').textContent='LTF-Analyse öffnen';
+};
+
+const sessionAdvice814=v8MentalAdvice;
+v8MentalAdvice=function(values){
+ const advice=sessionAdvice814(values);
+ const keys=new Set(advice.items.map(w=>w.key));
+ for(const w of M9.warnings(values))if(!keys.has(w.key))advice.items.push(w);
+ return advice;
+};
+const noticeMinutes814=select811('newsLead814','Erinnerung vor markierten Terminen',{0:'Aus',5:'5 Minuten',15:'15 Minuten',30:'30 Minuten'},$('settingsView'));
+noticeMinutes814.options[0].remove();noticeMinutes814.value='15';
+personalControls814.push('newsLead814');
+const newsNotice814=el811('div');newsNotice814.setAttribute('role','status');
+newsWarning811.before(newsNotice814);
+const drawNotice814=drawNewsWarning811;
+drawNewsWarning811=function(){
+ drawNotice814();
+ const minutes=Number(noticeMinutes814.value),now=Date.now();
+ const upcoming=(currentSession?.htf_context?.htf_v8?.plan?.news_windows||[]).filter(e=>Date.parse(e.at)>=now&&Date.parse(e.at)<=now+minutes*60000);
+ newsNotice814.replaceChildren();newsNotice814.hidden=!minutes||!upcoming.length;
+ for(const event of upcoming)newsNotice814.append(el811('p',v8DateTime(event.at)+' · '+event.title));
+};
+document.addEventListener('click',e=>{
+ if(e.target.closest('#setupCards,.direction-choice,#entryStageNext,#fastEntry814,#v8PreparationNext,#v8CalendarRows,#v811Ltf .tt-ltf-choices'))queueMicrotask(captureChange814);
+});
+setInterval(()=>{if(V8.route==='decision'&&!document.hidden)drawNewsWarning811();},30000);
+
+function referenceButton814(trade){
+ const button=v8Button('',async()=>{
+  const owner=currentUser?.id,old=!!trade.playbook_reference_v814;
+  button.disabled=true;
+  try{
+   const {data,error}=await client.from('trades').update({playbook_reference_v814:!old})
+    .eq('id',trade.id).eq('owner_id',owner).eq('playbook_reference_v814',old).select('id').maybeSingle();
+   if(error)throw error;if(!data)throw Error('Referenzstatus auf einem anderen Gerät geändert. Playbook erneut öffnen.');
+   if(owner!==currentUser?.id)return;
+   trade.playbook_reference_v814=!old;
+   for(const b of $('playbookLexicon').querySelectorAll('[data-reference-id]'))if(b.dataset.referenceId===trade.id)paint(b);
+  }catch(e){if(owner===currentUser?.id)message(e.message,true);}finally{button.disabled=false;}
+ },'secondary');
+ function paint(b){b.textContent=trade.playbook_reference_v814?'★ Referenztrade':'Als Referenztrade markieren';b.setAttribute('aria-pressed',String(!!trade.playbook_reference_v814));}
+ button.dataset.referenceId=trade.id;paint(button);return button;
+}

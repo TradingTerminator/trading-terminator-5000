@@ -8,6 +8,8 @@ for(const title of ['navigation identifies the active main area when training or
 source=source.replaceAll("currentSession={","currentSession={status:'open',").replaceAll('record_trade_attempt_v736','record_trade_attempt_v814');
 source=source.replace("details.open=false;await","details.open=false;b.w.eval(\"V811.mode='retrospective';V810.documenting=true;document.getElementById('tt9Executed').checked=true;document.getElementById('direction').value='long';document.getElementById('v811LtfStatus').value='not_reviewed';document.getElementById('v811ImageAbsence').value='not_captured'\");await");
 source=source.replaceAll('#playbookView #setupManager','#settingsView #setupManager');
+// Six core ratings remain directly visible. Optional ratings live in a disclosure.
+source=source.replace("doc.querySelectorAll('#entryEmotionOptions details').length,0","doc.querySelectorAll('#entryEmotionOptions details:not([open])').length,1").replace("doc.querySelectorAll('#entryEmotionOptions [data-scale]').length,6","[...doc.querySelectorAll('#entryEmotionOptions [data-scale]')].filter(el=>!el.closest('details')).length,6");
 // Match field-level feedback and the V8 optional note contract.
 source=source.replaceAll("b.w.document.getElementById('entryFeedback').textContent","[...b.w.document.querySelectorAll('.tt-field-error')].map(e=>e.textContent).join(' ')").replaceAll("doc.getElementById('entryFeedback').textContent","[...doc.querySelectorAll('.tt-field-error')].map(e=>e.textContent).join(' ')");
 source=source.replace("assert.equal(payload.p_new_idea.thesis,'These')","assert.equal(payload.p_new_idea,null);assert.equal(payload.p_entry_context.idea_note,'These')");

@@ -33,15 +33,8 @@ function preserveUnbound812(includeCurrent=false){
   storage.setItem(prior?key+':'+crypto.randomUUID():key,raw);
  }return true;}catch(e){message('Lokaler Entwurf konnte nicht gesichert werden: '+e.message+' · bisheriger Speicherstand bleibt erhalten.',true);return false;}
 }
-const saveWorkspace812=saveWorkspace;
-saveWorkspace=function(){
- if(!currentUser||workspaceRestoring||$('app').classList.contains('hidden')||!preserveUnbound812())return;saveWorkspace812();
- try{const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
-  if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)){
-   item.preparation_v812={owner:currentUser.id,session:currentSession?.id||null};storage.setItem(workspaceKey(),JSON.stringify(item));
-  }
- }catch(_){/* The existing draft-save failure handling remains authoritative. */}
-};
+workspaceMayWrite=preserveUnbound812;
+workspaceWriters.push(item=>{item.preparation_v812={owner:item.owner,session:item.session};});
 const restoreWorkspace812=restoreWorkspace;
 restoreWorkspace=function(item){
  if(!currentUser||item?.owner!==currentUser.id||item.session!==(currentSession?.id||null))return;

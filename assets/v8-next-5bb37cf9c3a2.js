@@ -326,15 +326,7 @@ sessionFeedback=function(text){
   if(invalid){markField813(invalid,text);break;}
  }
 };
-const save813=saveWorkspace;
-saveWorkspace=function(){
- save813();
- if(!currentUser||workspaceRestoring)return;
- try{
-  const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
-  if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)){item.v813={reentry:reentry813.value};storage.setItem(workspaceKey(),JSON.stringify(item));}
- }catch(_){}
-};
+workspaceWriters.push(item=>{item.v813={reentry:reentry813.value};});
 const entryContext813=v811EntryContext;
 v811EntryContext=function(){
  return {...entryContext813(),idea_note:ideaNotiz813.value.trim()||null,planned_tp_ticks:tp813.value?Number(tp813.value):null,reentry_trade_id:reentry813.value||null,actual_entry_at:V811.mode==='retrospective'?actualTime813(retrospectiveAt813):null};
@@ -720,9 +712,11 @@ function renderManualEvents813(){
   const row=el811('details');row.open=true;row.append(el811('summary',event.title||'Eigener Termin'));
   const title=el811('input');title.maxLength=200;title.id=event.id+'-title';
   const when=el811('input');when.type='datetime-local';when.id=event.id+'-when';
+  const unknown=el811('input');unknown.type='checkbox';unknown.checked=!!event.unknown;when.disabled=unknown.checked;
+  unknown.onchange=()=>{event.unknown=unknown.checked;when.disabled=event.unknown;if(event.unknown){event.when='';when.value='';}v8UpdatePreparation();saveWorkspace();};
   const rule=select811(event.id+'-rule','Handelsregel',{avoid:'Nicht handeln',wait:'Reaktion abwarten',observe:'Beobachten'},row);
   rule.options[0].text='Allgemeine Handelsregel';
-  rule.closest('label').before(label813('Termin',title),label813('Uhrzeit · Deutschland',when));
+  rule.closest('label').before(label813('Termin',title),label813('Uhrzeit · Deutschland',when),label813('Uhrzeit noch offen',unknown));
   const from=el811('input'),to=el811('input');from.type=to.type='datetime-local';from.id=event.id+'-from';to.id=event.id+'-to';
   row.append(label813('Warnfenster ab · Deutschland',from),label813('Warnfenster bis · Deutschland',to));
   for(const [key,field] of Object.entries({title,when,rule,from,to})){
@@ -761,23 +755,13 @@ v8PreparationMissing=function(){
  ));
  for(const event of manualEvents813){
   if(!event.title.trim()){issues.push(['Terminbezeichnung eingeben oder Zeile entfernen',event.id+'-title']);continue;}
-  if(!event.when)issues.push(['Uhrzeit für '+event.title+' ergänzen',event.id+'-when']);
+  if(!event.when&&!event.unknown)issues.push(['Uhrzeit für '+event.title+' ergänzen',event.id+'-when']);
  }
  for(const event of manual)if(event.rule==='avoid'&&(!event.from||!event.to||Date.parse(event.to)<=Date.parse(event.from)))
   issues.push(['Gültiges Warnfenster für '+event.title+' angeben',event.id+'-from']);
  return issues;
 };
-const eventWorkspace813=saveWorkspace;
-saveWorkspace=function(){
- eventWorkspace813();
- if(!currentUser||workspaceRestoring)return;
- try{
-  const storage=ttRemember?localStorage:sessionStorage,item=JSON.parse(storage.getItem(workspaceKey())||'null');
-  if(item?.owner===currentUser.id&&item.session===(currentSession?.id||null)&&item.v813){
-   item.v813.manualEvents=manualEvents813;storage.setItem(workspaceKey(),JSON.stringify(item));
-  }
- }catch(_){}
-};
+workspaceWriters.push(item=>{item.v813.manualEvents=manualEvents813;});
 const eventRestore813=restoreWorkspace;
 restoreWorkspace=function(item){
  eventRestore813(item);

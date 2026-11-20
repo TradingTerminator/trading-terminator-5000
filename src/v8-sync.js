@@ -17,9 +17,10 @@ async function resolvePreSession814(){
  const epoch=data?.id||'first';
  preSession814={owner,epoch};
  localStorage.setItem('tt814-epoch:'+owner,epoch);
+ provisional814=provisional814?.owner===owner?provisional814:JSON.parse(localStorage.getItem('tt814-provisional:'+owner)||'null');
  if(provisional814?.owner===owner){
   const scope=draftScope814(),state=readQueue814(scope);
-  state.next=provisional814;storeQueue814(scope,state);provisional814=null;
+  state.next=provisional814;storeQueue814(scope,state);provisional814=null;localStorage.removeItem('tt814-provisional:'+owner);
  }
 }
 function draftScope814(){
@@ -40,9 +41,8 @@ function captureChange814(){
  const scope=draftScope814();
  if(!currentUser||applyRemote814||workspaceRestoring)return;
  try{
-  saveWorkspace();
-  const item=readWorkspace();
-  if(!scope){if(item?.owner===currentUser.id){provisional814=item;void syncDraft814();}return;}
+  const item=saveWorkspace();
+  if(!scope){if(item?.owner===currentUser.id){provisional814=item;localStorage.setItem('tt814-provisional:'+currentUser.id,JSON.stringify(item));void syncDraft814();}return;}
   if(item?.owner!==scope.owner||item.session!==(currentSession?.id||null))return;
   const state=readQueue814(scope);
   state.next=item;
