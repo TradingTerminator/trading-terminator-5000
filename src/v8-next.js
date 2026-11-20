@@ -215,20 +215,12 @@ for(const [heading,keys] of ltfGroups813){
 grid811.classList.add('tt-ltf-groups');
 const ltfNote813=el811('textarea');ltfNote813.id='v813LtfNote';ltfNote813.rows=2;ltfNote813.maxLength=500;ltfNote813.placeholder='Notiz · optional';ltfNote813.setAttribute('aria-label','LTF-Notiz');
 zone811.after(ltfNote813);
-const saveDefaults813=v8Button('Chart und Bezug als Standard speichern',()=>{
- try{
-  if(!currentUser)return;
-  localStorage.setItem('tt8_ltf_defaults_'+currentUser.id,JSON.stringify({timeframe:$('v811Timeframe').value,reference:$('v811Reference').value.trim()}));
-  message('LTF-Standards gespeichert.');
- }catch(e){message('LTF-Standards nicht gespeichert: '+e.message,true);}
-},'ghost');
-context811.append(saveDefaults813);
 function ltfDefaults813(){
  if(!currentUser)return;
  try{
   const defaults=JSON.parse(localStorage.getItem('tt8_ltf_defaults_'+currentUser.id)||'{}');
   if(!$('v811Timeframe').value)$('v811Timeframe').value=defaults.timeframe||'';
-  if(!$('v811Reference').value)$('v811Reference').value=defaults.reference||'';
+
  }catch(_){}
 }
 function syncLtf813(legacy=false){
@@ -241,18 +233,16 @@ function syncLtf813(legacy=false){
 ltf811.addEventListener('change',()=>syncLtf813());
 ltfSnapshot811=function(){
  const status=$('v811LtfStatus').value||(V811.mode==='retrospective'?'not_reviewed':'');
+ if(status==='not_reviewed'||!status)return {schema:813,status:'not_reviewed',values:{},images:[],timing:'pending',observed_at:null};
  const values={};
  if(status==='reviewed')for(const [key,{checkbox,field}] of ltfChecks813)if(checkbox.checked&&field.value)values[key]=field.value;
- return {schema:813,status,values,timeframe:$('v811Timeframe').value||null,reference:$('v811Reference').value.trim()||null,
+ return {schema:813,status,values,timeframe:$('v811Timeframe').value||null,
   zone:status==='reviewed'?$('v811Zone').value.trim()||null:null,note:ltfNote813.value.trim()||null,
   images:[...V811.ltf.images],image_absence:V811.ltf.images.length?null:$('v811ImageAbsence').value||null,
   observed_at:V811.ltf.observed_at||null,timing:V811.mode==='retrospective'?'retrospective':'before_documented_entry'};
 };
 function validEntryLtf813(){
  const snapshot=ltfSnapshot811();
- if(V811.mode==='planned'&&snapshot.status!=='reviewed'){
-  entryFeedback('LTF vor einem geplanten Entry bewusst prüfen.',$('v811LtfStatus'));return false;
- }
  if(V811.uploading||chosenImages(ltfImages811).length){
   entryFeedback('Ausgewählte Originale speichern oder einzeln entfernen.',saveLtf813);return false;
  }
@@ -265,7 +255,7 @@ const renderStage813=showEntryStage;
 showEntryStage=function(n,scroll=true){
  renderStage813(n,scroll);
  if(n===4&&V811.mode==='planned')$('entryStageTitle').textContent='Trade vorbereitet · Entry & Risiko';
- if(n===3){ltfDefaults813();syncLtf813();$('v811LtfStatus').onchange();}
+ if(n===3){if(!$('v811LtfStatus').value)$('v811LtfStatus').value='not_reviewed';ltfDefaults813();syncLtf813();$('v811LtfStatus').onchange();}
  if(n===2)redrawReentry813();
  if(n===4)drawAccountDeviations813();
 };
@@ -358,7 +348,7 @@ copySession813.addEventListener('change',saveWorkspace);
 const plan813=v8HtfPlan;
 v8HtfPlan=function(){return {...plan813(),entry_copy_v813:copySession813.checked};};
 const restorePlan813=v8RestoreHtf;
-v8RestoreHtf=function(...args){restorePlan813(...args);copySession813.checked=!!currentSession?.htf_context?.htf_v8?.plan?.entry_copy_v813;};
+v8RestoreHtf=function(...args){restorePlan813(...args);copySession813.checked=currentSession?.htf_context?.selected_accounts?.[0]?.copy_mode??!!currentSession?.htf_context?.htf_v8?.plan?.entry_copy_v813;};
 function drawAccountDeviations813(){
  const ids=currentSession?.htf_context?.selected_accounts||[];
  for(const row of $('allocationList').querySelectorAll('.account')){
