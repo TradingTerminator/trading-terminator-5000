@@ -191,3 +191,5 @@ body[data-tt-theme=light] .tt-field-error{color:#a12620}
 #playbookLexicon [data-grade="A+"],#playbookLexicon [data-grade=A] {border-inline-start-color:var(--accent)}
 #playbookLexicon [data-grade=B] {border-inline-start-color:#917320}
 #playbookLexicon [data-grade=C] {border-inline-start-color:#a65343}
+
+.tt-data-panel button,dialog[aria-labelledby="ttDataDialogTitle"] button{min-height:44px;margin:.3rem}.tt-danger-zone{margin-block:2rem 1rem;padding:1rem;border:1px solid currentColor;border-radius:.6rem}.tt-danger-zone [data-reset],dialog .danger{background:#a91d2c;color:white}dialog[aria-labelledby="ttDataDialogTitle"]{max-width:min(30rem,90vw);max-height:85dvh;overflow:auto;border-radius:1rem;padding:1.2rem}dialog::backdrop{background:#0009}.tt-mada summary{display:grid;gap:.6rem;cursor:pointer}.tt-mada summary div{display:grid;place-items:center;min-height:7rem;background:#263345;color:#fff;border-radius:.5rem}.tt-mada small{font-weight:600}
