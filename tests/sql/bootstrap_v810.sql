@@ -1,7 +1,7 @@
 -- Local-only bootstrap; production never executes this file.
 CREATE ROLE anon; CREATE ROLE authenticated;
 CREATE SCHEMA auth;CREATE SCHEMA storage;
-CREATE TABLE auth.users(id uuid PRIMARY KEY,aud text,role text);
+CREATE TABLE auth.users(id uuid PRIMARY KEY,aud text,role text,raw_user_meta_data jsonb);
 CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$SELECT (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid$$;
 CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $$SELECT nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'role'$$;
 CREATE TABLE storage.buckets(id text PRIMARY KEY,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);

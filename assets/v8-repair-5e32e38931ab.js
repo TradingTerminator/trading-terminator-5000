@@ -24,7 +24,7 @@ renderSession=function(...args){
 // Keep older unbound drafts recoverable without reusing them as new-session decisions.
 function preserveUnbound812(includeCurrent=false){
  if(!currentUser)return true;
- try{for(const storage of [localStorage,sessionStorage]){
+ try{for(const storage of [ttLocalStore,ttSessionStore]){
   const raw=storage.getItem(workspaceKey());if(!raw)continue;let item;try{item=JSON.parse(raw);}catch(_){const key=workspaceKey()+':unbound-backup:unreadable';const prior=storage.getItem(key);if(prior!==raw)storage.setItem(prior?key+':'+crypto.randomUUID():key,raw);continue;}
   if(item?.owner!==currentUser.id||item.session!==null||!includeCurrent&&item.preparation_v812)continue;
   if(item.preparation_v812&&!item.sessionFields?.some(f=>f.rated==='true'||['checkbox','radio'].includes(f.type)&&f.checked&&!['v8NoProfitGoal','v8RememberStandards'].includes(f.id)||f.value?.trim()&&!['range','checkbox','radio','file'].includes(f.type)&&!f.account&&!['v8CalendarWindow','v8LimitScope','v8HtfPointTemplate'].includes(f.id)))continue;

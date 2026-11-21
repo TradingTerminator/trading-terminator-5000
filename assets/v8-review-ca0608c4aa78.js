@@ -31,7 +31,7 @@ const nextEntry814=$('entryStageNext').onclick;
 $('entryStageNext').onclick=function(){
  const stage=entryStage;nextEntry814();
  if(stage===3&&entryStage===4&&ltfSelect814.value==='reviewed'&&$('v811Timeframe').value&&currentUser)
-  try{localStorage.setItem('tt8_ltf_defaults_'+currentUser.id,JSON.stringify({timeframe:$('v811Timeframe').value}));rememberPreference814('timeframe',$('v811Timeframe').value);}catch(e){message(e.message,true);}
+  try{ttLocalStore.setItem('tt8_ltf_defaults_'+currentUser.id,JSON.stringify({timeframe:$('v811Timeframe').value}));rememberPreference814('timeframe',$('v811Timeframe').value);}catch(e){message(e.message,true);}
 };
 const mountLtf814=mountTradePanes;
 mountTradePanes=function(trade,...args){

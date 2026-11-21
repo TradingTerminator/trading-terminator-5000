@@ -16,33 +16,33 @@ async function resolvePreSession814(){
  if(data?.status==='open'){await v810Sync();return;}
  const epoch=data?.id||'first';
  preSession814={owner,epoch};
- localStorage.setItem('tt814-epoch:'+owner,epoch);
- provisional814=provisional814?.owner===owner?provisional814:JSON.parse(localStorage.getItem('tt814-provisional:'+owner)||'null');
+ ttLocalStore.setItem('tt814-epoch:'+owner,epoch);
+ provisional814=provisional814?.owner===owner?provisional814:JSON.parse(ttLocalStore.getItem('tt814-provisional:'+owner)||'null');
  if(provisional814?.owner===owner){
   const scope=draftScope814(),state=readQueue814(scope);
-  state.next=provisional814;storeQueue814(scope,state);provisional814=null;localStorage.removeItem('tt814-provisional:'+owner);
+  state.next=provisional814;storeQueue814(scope,state);provisional814=null;ttLocalStore.removeItem('tt814-provisional:'+owner);
  }
 }
 function draftScope814(){
  if(!currentUser||$('app').classList.contains('hidden'))return null;
  const owner=currentUser.id;
- const epoch=preSession814?.owner===owner?preSession814.epoch:localStorage.getItem('tt814-epoch:'+owner);
+ const epoch=preSession814?.owner===owner?preSession814.epoch:ttLocalStore.getItem('tt814-epoch:'+owner);
  if(!currentSession&&!epoch)return null;
  const documentKey=currentSession?'preparation:'+currentSession.id:'before-session:'+epoch;
  return {owner:currentUser.id,documentKey,key:'tt814:'+currentUser.id+':'+documentKey};
 }
 function readQueue814(scope){
- return JSON.parse(localStorage.getItem(scope.key)||'{"revision":0}');
+ return JSON.parse(ttLocalStore.getItem(scope.key)||'{"revision":0}');
 }
 function storeQueue814(scope,state){
- localStorage.setItem(scope.key,JSON.stringify(state));
+ ttLocalStore.setItem(scope.key,JSON.stringify(state));
 }
 function captureChange814(){
  const scope=draftScope814();
  if(!currentUser||applyRemote814||workspaceRestoring)return;
  try{
   const item=saveWorkspace();
-  if(!scope){if(item?.owner===currentUser.id){provisional814=item;localStorage.setItem('tt814-provisional:'+currentUser.id,JSON.stringify(item));void syncDraft814();}return;}
+  if(!scope){if(item?.owner===currentUser.id){provisional814=item;ttLocalStore.setItem('tt814-provisional:'+currentUser.id,JSON.stringify(item));void syncDraft814();}return;}
   if(item?.owner!==scope.owner||item.session!==(currentSession?.id||null))return;
   const state=readQueue814(scope);
   state.next=item;
@@ -98,7 +98,7 @@ async function syncDraft814(){
       const fresh=readQueue814(scope);
       if(fresh.revision!==state.revision)return;
       const mine=fresh.next||fresh.pending?.payload;
-      if(mine)localStorage.setItem(scope.key+':conflict:'+crypto.randomUUID(),JSON.stringify(mine));
+      if(mine)ttLocalStore.setItem(scope.key+':conflict:'+crypto.randomUUID(),JSON.stringify(mine));
       if(!useLocal)applyDraft814(scope,data.payload);
       storeQueue814(scope,useLocal?{revision:data.revision,next:mine}:{revision:data.revision});
       draftStatus814.replaceChildren();void syncDraft814();
@@ -129,19 +129,20 @@ let preferenceWrite814=false;
 let preferenceOwner814=null, preferenceRevision814=-1;
 function preferenceKey814(owner){return 'tt814:preferences:'+owner;}
 function applyPreferences814(values){
+ if(activeGeneration&&values.emotionLabels){ttLocalStore.setItem('tt8_emotions_'+currentUser.id,JSON.stringify(values.emotionLabels));applyEmotionLabels();}
  for(const id of personalControls814){
   const field=$(id),v=values[id];if(!field||!Array.from(field.options).some(o=>o.value===v))continue;
   field.value=v;
-  if(id==='ttThemeSelect'||id==='ttLayoutSelect')localStorage.setItem(id==='ttThemeSelect'?'tt8_theme':'tt8_layout',v);
+  if(id==='ttThemeSelect'||id==='ttLayoutSelect')ttLocalStore.setItem(id==='ttThemeSelect'?'tt8_theme':'tt8_layout',v);
   else field.onchange?.();
  }
  ttAppearance();
- if(values.timeframe)localStorage.setItem('tt8_ltf_defaults_'+currentUser.id,JSON.stringify({timeframe:values.timeframe}));
+ if(values.timeframe)ttLocalStore.setItem('tt8_ltf_defaults_'+currentUser.id,JSON.stringify({timeframe:values.timeframe}));
 }
 function rememberPreference814(id,value){
  if(!currentUser)return;
- const key=preferenceKey814(currentUser.id),state=JSON.parse(localStorage.getItem(key)||'{"revision":0}');
- state.edits={...state.edits,[id]:value};localStorage.setItem(key,JSON.stringify(state));
+ const key=preferenceKey814(currentUser.id),state=JSON.parse(ttLocalStore.getItem(key)||'{"revision":0}');
+ state.edits={...state.edits,[id]:value};ttLocalStore.setItem(key,JSON.stringify(state));
  void syncPreferences814();
 }
 async function syncPreferences814(){
@@ -149,7 +150,7 @@ async function syncPreferences814(){
  preferenceWrite814=true;
  const owner=currentUser.id,key=preferenceKey814(owner);
  try{
-  const get=()=>JSON.parse(localStorage.getItem(key)||'{"revision":0}');
+  const get=()=>JSON.parse(ttLocalStore.getItem(key)||'{"revision":0}');
   let state=get();
   const {data,error}=await client.from('workspace_revisions_v814').select('revision,payload').eq('owner_id',owner).eq('document_key','preferences').order('revision',{ascending:false}).limit(1).maybeSingle();
   if(error)throw error;if(owner!==currentUser?.id)return;
@@ -165,7 +166,7 @@ async function syncPreferences814(){
      const button=document.createElement('button');button.type='button';button.textContent=name;
      button.onclick=()=>{if(owner!==currentUser?.id)return;const fresh=get();if(fresh.pending?.id!==attempt.id)return;
       fresh.edits=mine?{...attempt.edits,...fresh.edits}:fresh.edits;delete fresh.pending;fresh.revision=version;fresh.values=remote;
-      localStorage.setItem(key,JSON.stringify(fresh));preferenceStatus814.replaceChildren();void syncPreferences814();};
+      ttLocalStore.setItem(key,JSON.stringify(fresh));preferenceStatus814.replaceChildren();void syncPreferences814();};
      preferenceStatus814.append(button);
     }return;
    }
@@ -177,7 +178,7 @@ async function syncPreferences814(){
   }else{
    state.revision=version;state.values=remote;
   }
-  localStorage.setItem(key,JSON.stringify(state));
+  ttLocalStore.setItem(key,JSON.stringify(state));
   if(!state.pending&&!Object.keys(state.edits||{}).length&&(preferenceOwner814!==owner||preferenceRevision814!==state.revision)){applyPreferences814(state.values);preferenceRevision814=state.revision;}
   preferenceOwner814=owner;preferenceStatus814.textContent='';
   if(state.pending||Object.keys(state.edits||{}).length)setTimeout(syncPreferences814,0);

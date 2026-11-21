@@ -218,7 +218,7 @@ zone811.after(ltfNote813);
 function ltfDefaults813(){
  if(!currentUser)return;
  try{
-  const defaults=JSON.parse(localStorage.getItem('tt8_ltf_defaults_'+currentUser.id)||'{}');
+  const defaults=JSON.parse(ttLocalStore.getItem('tt8_ltf_defaults_'+currentUser.id)||'{}');
   if(!$('v811Timeframe').value)$('v811Timeframe').value=defaults.timeframe||'';
 
  }catch(_){}
@@ -419,7 +419,7 @@ SCALE_DEFS.exitCommitEmotion.push(
 const logout813=$('logout').onclick;
 $('logout').onclick=async function(...args){
  const owner=currentUser?.id;
- if(owner)for(const storage of [localStorage,sessionStorage])for(const key of Object.keys(storage))if(key.startsWith('tt8_draft_exit_completion_'+owner+':'))storage.removeItem(key);
+ if(owner)for(const storage of [ttLocalStore,ttSessionStore])for(const key of Object.keys(storage))if(key.startsWith('tt8_draft_exit_completion_'+owner+':'))storage.removeItem(key);
  return logout813.apply(this,args);
 };
 const exitSnapshot813=snapshotExitDraft;
@@ -515,7 +515,7 @@ function finishExit813(root,trade,allocations){
  actualTp.name='actual-tp';tpReason.name='tp-reason';tpReason.maxLength=500;noteField.name='exit-note';noteField.rows=2;noteField.maxLength=1000;
  const changeTp=el811('details');changeTp.append(el811('summary',planned?'Geplanter TP '+planned+' Ticks · Abweichung dokumentieren':'Tatsächlicher TP · optional'),label813('Tatsächlicher TP · Ticks',actualTp),label813('Grund der TP-Abweichung',tpReason));
  const readDraft=()=>{
-  try{const s=ttRemember?localStorage:sessionStorage;return JSON.parse(s.getItem('tt8_draft_exit_completion_'+currentUser.id+':'+trade.id)||'{}');}catch(_){return {};}
+  try{const s=ttRemember?ttLocalStore:ttSessionStore;return JSON.parse(s.getItem('tt8_draft_exit_completion_'+currentUser.id+':'+trade.id)||'{}');}catch(_){return {};}
  };
  const owner=currentUser?.id,initial=readDraft(),fields=new Map([['reason',reason],['actualTp',actualTp],['tpReason',tpReason],['note',noteField]]);
  form.append(changeTp,label813('Notiz · optional',noteField));
@@ -556,7 +556,7 @@ function finishExit813(root,trade,allocations){
  form.addEventListener('input',()=>{
   refresh();
   if(owner!==currentUser?.id)return;
-  try{(ttRemember?localStorage:sessionStorage).setItem('tt8_draft_exit_completion_'+owner+':'+trade.id,JSON.stringify(Object.fromEntries([...fields].map(([key,field])=>[key,field.value]))));}catch(_){}
+  try{(ttRemember?ttLocalStore:ttSessionStore).setItem('tt8_draft_exit_completion_'+owner+':'+trade.id,JSON.stringify(Object.fromEntries([...fields].map(([key,field])=>[key,field.value]))));}catch(_){}
  });
  const feedback=el811('p');feedback.setAttribute('role','status');
  const save=v8Button('Nachdokumentation abschließen',async()=>{
@@ -580,7 +580,7 @@ function finishExit813(root,trade,allocations){
    if(error)throw error;
    if(data?.trade_id!==trade.id)throw Error('Keine Speicherbestätigung.');
    if(owner!==currentUser?.id||!form.isConnected)return;
-   for(const s of [sessionStorage,localStorage])s.removeItem('tt8_draft_exit_completion_'+owner+':'+trade.id);
+   for(const s of [ttSessionStore,ttLocalStore])s.removeItem('tt8_draft_exit_completion_'+owner+':'+trade.id);
    await loadSessionTrades();await openJournalTradeById(trade.id);selectTradePane('review');void v8PollSessionLimits();
   }catch(e){feedback.textContent='Nachdokumentation nicht bestätigt: '+e.message;}
   finally{save.disabled=false;}

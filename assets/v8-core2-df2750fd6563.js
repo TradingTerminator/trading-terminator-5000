@@ -1,7 +1,7 @@
 
 (function(){
  'use strict';
- const TT_VERSION='8.14';
+ const TT_VERSION='8.14.1';
 const $=id=>document.getElementById(id);
  const connection=$('ttConnection');
  const updateConnectivity=()=>{
@@ -23,7 +23,7 @@ const $=id=>document.getElementById(id);
    check('Layout aktiv', ['comfortable','compact'].includes(document.body.dataset.ttLayout));
    check('Farben werden angewandt',getComputedStyle(document.body).backgroundColor!=='rgba(0, 0, 0, 0)');
    check('Supabase SDK geladen',!!window.supabase&&typeof window.supabase.createClient==='function');
-   check('Browser unterstützt lokale Speicherung',(()=>{try{const k='tt8_diagnostic_probe';localStorage.setItem(k,'1');const ok=localStorage.getItem(k)==='1';localStorage.removeItem(k);return ok}catch(_){return false}})());
+   check('Browser unterstützt lokale Speicherung',(()=>{try{const k='tt8_diagnostic_probe';ttLocalStore.setItem(k,'1');const ok=ttLocalStore.getItem(k)==='1';ttLocalStore.removeItem(k);return ok}catch(_){return false}})());
    check('Sicherer Kontext für Bild-APIs',window.isSecureContext===true);
    const fail=lines.filter(x=>x.startsWith('✗')).length;
    $('ttDiagnosticsResult').textContent=lines.join('\n')+'\n'+(fail?fail+' lokale Prüfpunkte fehlgeschlagen.':'Alle lokalen Prüfpunkte bestanden. Keine Aussage zur Serververbindung oder Anmeldung.');

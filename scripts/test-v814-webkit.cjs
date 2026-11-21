@@ -19,6 +19,20 @@ const stub=fs.readFileSync('scripts/test-v809-browser.cjs','utf8').match(/const 
   assert.equal(await page.locator('.tt-chapters [aria-current=step]').textContent().then(v=>v.startsWith(title)),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
  }
+ await page.evaluate(()=>{showView('settings');window.__ttRpc=(name)=>({data:name==='tt_prepare_reset_v8141'?'test-ticket':null,error:null});});
+ await page.getByRole('button',{name:'Alle Daten löschen',exact:true}).tap();
+ await page.getByRole('button',{name:'Abbrechen',exact:true}).tap();
+ assert.equal(await page.locator('dialog[open]').count(),0);
+ await page.getByRole('button',{name:'Alle Daten löschen',exact:true}).tap();
+ await page.getByRole('button',{name:'Weiter zur endgültigen Bestätigung'}).tap();
+ const finalButton=page.getByRole('button',{name:'Jetzt endgültig löschen'});
+ assert.equal(await finalButton.isDisabled(),true);
+ await page.locator('dialog[open] input').fill('ALLES ENDGÜLTIG LÖSCHEN ');
+ assert.equal(await finalButton.isDisabled(),true);
+ await page.locator('dialog[open] input').fill('ALLES ENDGÜLTIG LÖSCHEN');
+ assert.equal(await finalButton.isEnabled(),true);
+ await page.getByRole('button',{name:'Abbrechen',exact:true}).tap();
+ assert.equal(await page.locator('dialog[open]').count(),0);
  assert.deepEqual(errors,[]);await context.close();console.log('PASS WebKit HTF navigation '+viewport.width+'x'+viewport.height);
  }
  }finally{await browser.close();}

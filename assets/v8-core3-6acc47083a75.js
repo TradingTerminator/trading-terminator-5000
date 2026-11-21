@@ -52,7 +52,7 @@ async function allRows(table){
 }
 function collectLocalDrafts(ownerId){
  const prefix=`tt8_draft_v3:${ownerId}:`,latest=new Map();
- for(const storage of [localStorage,sessionStorage]){
+ for(const storage of [ttLocalStore,ttSessionStore]){
   try{
    for(let i=0;i<storage.length;i++){
     const key=storage.key(i);

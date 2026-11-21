@@ -5,8 +5,8 @@ v8PauseScreen.id='v8PauseScreen';v8PauseScreen.hidden=true;v8PauseScreen.setAttr
 v8PauseScreen.innerHTML='<div class="v8-pause-card"><h2 id="v8PauseTitle">Wie lange möchtest du pausieren?</h2><div id="v8PauseChoice"><div class="v8-pause-presets" role="group" aria-label="Pausendauer"><button type="button" data-pause-minutes="5">5 Minuten</button><button type="button" data-pause-minutes="10">10 Minuten</button><button type="button" data-pause-minutes="15">15 Minuten</button></div><label>Eigene Dauer in Minuten<input id="v8PauseMinutes" type="number" min="1" max="180" step="1" value="5" inputmode="numeric"></label><p id="v8PauseError" role="status"></p><button id="v8PauseStart" type="button">Pause starten</button></div><div id="v8PauseRunning" hidden><p id="v8PauseTimer" role="timer" aria-label="Verbleibende Pausenzeit">05:00</p><p id="v8PauseEndTime"></p><p id="v8PauseExercise"></p><p class="compact-help">Atme sanft, ohne Luft anzuhalten. Bei Unwohlsein abbrechen.</p><p id="v8PauseState" role="status"></p></div><button type="button" id="v8PauseExit" class="secondary">Zurück ohne Pause</button></div>';
 $('app').append(v8PauseScreen);
 function v8PauseKey(){return currentUser?.id?'tt8_voluntary_pause_'+currentUser.id:null;}
-function v8PauseStorage(){return ttRemember?localStorage:sessionStorage;}
-function v8PersistPause(){const key=v8PauseKey();if(!key)return;try{v8PauseStorage().setItem(key,JSON.stringify({owner:V8P.owner,session:V8P.session,until:V8P.until,started:V8P.started,origin:V8P.origin}));(ttRemember?sessionStorage:localStorage).removeItem(key);}catch(_){}}
+function v8PauseStorage(){return ttRemember?ttLocalStore:ttSessionStore;}
+function v8PersistPause(){const key=v8PauseKey();if(!key)return;try{v8PauseStorage().setItem(key,JSON.stringify({owner:V8P.owner,session:V8P.session,until:V8P.until,started:V8P.started,origin:V8P.origin}));(ttRemember?ttSessionStore:ttLocalStore).removeItem(key);}catch(_){}}
 function v8PauseVisible(){return !v8PauseScreen.hidden;}
 function v8SetPauseOpen(open){v8PauseScreen.hidden=!open;document.body.classList.toggle('v8-voluntary-pause',open);$('tabs').inert=open;document.querySelector('header').inert=open;for(const node of $('app').children)if(node!==v8PauseScreen)node.inert=open;}
 function v8ChoosePause(){
@@ -30,7 +30,7 @@ function v8StartPause(){
  V8P.started=Date.now();V8P.until=V8P.started+minutes*60000;saveWorkspace();v8PersistPause();v8ShowRunningPause();
 }
 function v8EndPause(){
- const wasRunning=!!V8P.until,key=v8PauseKey();if(key)try{localStorage.removeItem(key);sessionStorage.removeItem(key);}catch(_){}
+ const wasRunning=!!V8P.until,key=v8PauseKey();if(key)try{ttLocalStore.removeItem(key);ttSessionStore.removeItem(key);}catch(_){}
  const origin=V8P.origin;V8P.until=null;V8P.started=null;V8P.origin=null;v8SetPauseOpen(false);if(wasRunning){const target=TTSession810.pauseTarget(origin,currentUser?.id,currentSession);if(target!=='live'&&origin?.workspace)restoreWorkspace(origin.workspace);showView(target);if(target==='session')v8ShowPrepStep(origin.step||1,false);if(target==='decision')showEntryStage(origin.stage||1);window.scrollTo({top:target==='live'?0:origin.y||0,behavior:'instant'});if(origin?.focus)$(origin.focus)?.focus({preventScroll:true});}else if(V8P.returnFocus?.isConnected)V8P.returnFocus.focus();saveWorkspace();
 }
 function v8RestorePause(){
