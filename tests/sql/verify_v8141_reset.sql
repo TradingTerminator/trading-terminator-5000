@@ -46,6 +46,13 @@ BEGIN
  IF (SELECT fees_usd FROM public.account_trade_results WHERE allocation_id=aid)<>4.25 OR (SELECT fees_usd FROM public.account_trade_results WHERE allocation_id=bid)<>6.24 THEN RAISE EXCEPTION 'Fee formula incorrect';END IF;
  DECLARE ticket uuid; generation text; outcome jsonb; original_name text:='Eigene Strategie'; BEGIN
  INSERT INTO public.trading_setup_catalog(owner_id,name) VALUES(u,original_name);
+ EXECUTE 'RESET ROLE';PERFORM set_config('request.jwt.claims','{}',true);
+ INSERT INTO public.test_setups_v8141(owner_id,name,source_id,source_data) VALUES(u,'A',a,'{}'),(v,'B',b,'{}') ON CONFLICT(owner_id,source_id) DO NOTHING;
+ INSERT INTO public.test_setups_v8141(owner_id,name,source_id,source_data) VALUES(u,'A',a,'{}') ON CONFLICT(owner_id,source_id) DO NOTHING;
+ INSERT INTO storage.objects(bucket_id,name) VALUES('trading-chart-screenshots',u::text||'/trade/'||t::text||'/old.png'),('trading-chart-screenshots',v::text||'/trade/keep/old.png');
+ EXECUTE 'SET LOCAL ROLE authenticated';PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ IF (SELECT count(*) FROM public.test_setups_v8141)<>1 OR public.tt_remove_tests_v8141(ARRAY(SELECT id FROM public.test_setups_v8141))<>1 THEN RAISE EXCEPTION 'Fixture isolation failed';END IF;
+ IF NOT EXISTS(SELECT FROM public.trading_setup_catalog WHERE owner_id=u) OR NOT EXISTS(SELECT FROM public.trades WHERE id=t) THEN RAISE EXCEPTION 'Personal history removed';END IF;
  ticket:=public.tt_prepare_reset_v8141();
  IF NOT EXISTS(SELECT FROM public.trades WHERE id=t) THEN RAISE EXCEPTION 'Preparation modified data';END IF;
  denied:=false;BEGIN PERFORM public.tt_begin_reset_v8141(ticket,'falsch');EXCEPTION WHEN raise_exception THEN denied:=true;END;
@@ -55,13 +62,18 @@ BEGIN
  denied:=false;BEGIN PERFORM public.tt_finish_reset_v8141(ticket);EXCEPTION WHEN raise_exception THEN denied:=true;END;
  IF NOT denied THEN RAISE EXCEPTION 'Foreign reset accepted';END IF;
  PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ denied:=false;BEGIN PERFORM public.tt_finish_reset_v8141(ticket);EXCEPTION WHEN raise_exception THEN denied:=true;END;
+ IF NOT denied OR (SELECT count(*) FROM public.tt_reset_files_v8141(ticket))<>1 THEN RAISE EXCEPTION 'Storage guard failed';END IF;
+ EXECUTE 'RESET ROLE';
+ DELETE FROM storage.objects WHERE bucket_id='trading-chart-screenshots' AND name=u::text||'/trade/'||t::text||'/old.png';
+ EXECUTE 'SET LOCAL ROLE authenticated';
  outcome:=public.tt_finish_reset_v8141(ticket);
  IF outcome->>'phase'<>'ready' OR EXISTS(SELECT FROM public.trades WHERE id=t) OR EXISTS(SELECT FROM public.trading_setup_catalog WHERE owner_id=u) THEN RAISE EXCEPTION 'Reset incomplete';END IF;
  IF public.tt_finish_reset_v8141(ticket)<>outcome THEN RAISE EXCEPTION 'Retry mismatch';END IF;
  denied:=false;BEGIN INSERT INTO public.trading_setup_catalog(owner_id,name) VALUES(u,'stale');EXCEPTION WHEN serialization_failure THEN denied:=true;END;
  IF NOT denied THEN RAISE EXCEPTION 'Offline replay accepted';END IF;
  PERFORM set_config('request.headers',jsonb_build_object('x-tt-generation',generation)::text,true);
- INSERT INTO public.trading_setup_catalog(owner_id,name) VALUES(u,'fresh');END;
+ INSERT INTO public.trading_setup_catalog(owner_id,name) VALUES(u,'fresh');EXECUTE 'RESET ROLE';IF NOT EXISTS(SELECT FROM auth.users WHERE id=u) OR NOT EXISTS(SELECT FROM public.test_setups_v8141 WHERE owner_id=v) OR NOT EXISTS(SELECT FROM storage.objects WHERE name=v::text||'/trade/keep/old.png') THEN RAISE EXCEPTION 'Isolation failed';END IF;END;
  EXECUTE 'RESET ROLE';
 END $$;
 ROLLBACK;
