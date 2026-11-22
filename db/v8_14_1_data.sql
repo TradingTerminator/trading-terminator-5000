@@ -70,7 +70,7 @@ CREATE FUNCTION public.tt_reset_files_v8141(ticket uuid) RETURNS TABLE(path text
  SELECT o.name FROM storage.objects o JOIN tt_private.reset_state s ON s.owner_id=auth.uid() AND s.phase='files' AND s.request_id=ticket
  WHERE o.bucket_id='trading-chart-screenshots' AND split_part(o.name,'/',1)=s.owner_id::text ORDER BY o.name LIMIT 100
 $$;
-CREATE FUNCTION public.tt_finish_reset_v8141(ticket uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $
+CREATE FUNCTION public.tt_finish_reset_v8141(ticket uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE u uuid:=auth.uid();s tt_private.reset_state;t text;remaining boolean;
 BEGIN
  PERFORM tt_private.lock_owner(u,true);SELECT * INTO s FROM tt_private.reset_state WHERE owner_id=u FOR UPDATE;
@@ -112,7 +112,7 @@ BEGIN
  UPDATE auth.users SET raw_user_meta_data=raw_user_meta_data-'tt8_emotion_labels' WHERE id=u AND raw_user_meta_data?'tt8_emotion_labels';
  UPDATE tt_private.reset_state SET phase='ready' WHERE owner_id=u;
  RETURN public.tt_data_state_v8141();
-END $;
+END $$;
 CREATE FUNCTION public.tt_remove_tests_v8141(expected uuid[]) RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE u uuid:=auth.uid();ids uuid[];n integer;
 BEGIN
