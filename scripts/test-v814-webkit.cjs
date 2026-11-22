@@ -19,6 +19,15 @@ const stub=fs.readFileSync('scripts/test-v809-browser.cjs','utf8').match(/const 
   assert.equal(await page.locator('.tt-chapters [aria-current=step]').textContent().then(v=>v.startsWith(title)),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
  }
+ const cards=await page.evaluate(async()=>{
+  const names=['Momentum','Liquidity Play','Absorption','Trendbruch','VWAP/VPOC','Countertrade','Manipulation + Ungleichgewicht','Rücklauf nach Ungleichgewicht','Kampagne Long','Kampagne Short'];
+  const rows=names.map((name,i)=>({id:String(i),name,is_test_data:true,source_data:{approved:false,checklist:[]}}));
+  window.__ttQuery=table=>({data:table==='test_setups_v8141'?rows:[],error:null});
+  await loadSetupCatalog();await renderBook();
+  const cards=[...document.querySelectorAll('[data-mada-card]')];
+  return [cards.length,cards.every(card=>card.textContent.includes('Musterbild fehlt')&&card.textContent.includes('Nicht freigegeben')),entrySetups8141().filter(row=>row.is_test_data).length];
+ });
+ assert.deepEqual(cards,[10,true,10]);
  await page.evaluate(()=>{showView('settings');window.__ttRpc=(name)=>({data:name==='tt_prepare_reset_v8141'?'test-ticket':null,error:null});});
  await page.getByRole('button',{name:'Alle Daten löschen',exact:true}).tap();
  await page.getByRole('button',{name:'Abbrechen',exact:true}).tap();
