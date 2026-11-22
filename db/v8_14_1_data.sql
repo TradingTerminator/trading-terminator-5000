@@ -70,7 +70,7 @@ CREATE FUNCTION public.tt_reset_files_v8141(ticket uuid) RETURNS TABLE(path text
  SELECT o.name FROM storage.objects o JOIN tt_private.reset_state s ON s.owner_id=auth.uid() AND s.phase='files' AND s.request_id=ticket
  WHERE o.bucket_id='trading-chart-screenshots' AND split_part(o.name,'/',1)=s.owner_id::text ORDER BY o.name LIMIT 100
 $$;
-CREATE FUNCTION public.tt_finish_reset_v8141(ticket uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+CREATE FUNCTION public.tt_finish_reset_v8141(ticket uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $
 DECLARE u uuid:=auth.uid();s tt_private.reset_state;t text;remaining boolean;
 BEGIN
  PERFORM tt_private.lock_owner(u,true);SELECT * INTO s FROM tt_private.reset_state WHERE owner_id=u FOR UPDATE;
@@ -78,13 +78,41 @@ BEGIN
  IF s.phase='ready' THEN RETURN public.tt_data_state_v8141();END IF;
  IF EXISTS(SELECT FROM public.tt_reset_files_v8141(ticket)) THEN RAISE EXCEPTION 'Bilddateien ausstehend';END IF;
  UPDATE tt_private.reset_state SET phase='purging' WHERE owner_id=u;
- FOREACH t IN ARRAY tt_private.tables_v8141() LOOP EXECUTE format('DELETE FROM public.%I WHERE owner_id=$1',t) USING u;END LOOP;
+ DELETE FROM public.trade_attempts_v733 WHERE owner_id=u;
+ DELETE FROM public.trade_entry_requests_v735 WHERE owner_id=u;
+ DELETE FROM public.stop_requests_v811 WHERE owner_id=u;
+ DELETE FROM public.stop_adjustments WHERE owner_id=u;
+ DELETE FROM public.account_fills WHERE owner_id=u;
+ DELETE FROM public.account_trade_results WHERE owner_id=u;
+ DELETE FROM public.trade_reviews WHERE owner_id=u;
+ DELETE FROM public.trade_errors WHERE owner_id=u;
+ DELETE FROM public.trade_events WHERE owner_id=u;
+ DELETE FROM public.playbook_entries WHERE owner_id=u;
+ DELETE FROM public.screenshots WHERE owner_id=u;
+ DELETE FROM public.training_goals_v7 WHERE owner_id=u;
+ DELETE FROM public.session_events_v810 WHERE owner_id=u;
+ DELETE FROM public.v8_htf_assessments WHERE owner_id=u;
+ DELETE FROM public.trade_account_allocations WHERE owner_id=u;
+ DELETE FROM public.allocation_change_log WHERE owner_id=u;
+ DELETE FROM public.trades WHERE owner_id=u;
+ DELETE FROM public.trade_ideas_v733 WHERE owner_id=u;
+ DELETE FROM public.trade_ideas WHERE owner_id=u;
+ DELETE FROM public.trading_sessions WHERE owner_id=u;
+ DELETE FROM public.account_group_members WHERE owner_id=u;
+ DELETE FROM public.account_groups WHERE owner_id=u;
+ DELETE FROM public.trading_accounts WHERE owner_id=u;
+ DELETE FROM public.corrective_actions WHERE owner_id=u;
+ DELETE FROM public.training_countermeasures WHERE owner_id=u;
+ DELETE FROM public.trading_setup_catalog WHERE owner_id=u;
+ DELETE FROM public.v8_htf_preferences WHERE owner_id=u;
+ DELETE FROM public.workspace_revisions_v814 WHERE owner_id=u;
+ DELETE FROM public.test_setups_v8141 WHERE owner_id=u;
  FOREACH t IN ARRAY tt_private.tables_v8141() LOOP EXECUTE format('SELECT EXISTS(SELECT FROM public.%I WHERE owner_id=$1)',t) INTO remaining USING u;
  IF remaining THEN RAISE EXCEPTION 'Bereinigung unvollständig';END IF;END LOOP;
  UPDATE auth.users SET raw_user_meta_data=raw_user_meta_data-'tt8_emotion_labels' WHERE id=u AND raw_user_meta_data?'tt8_emotion_labels';
  UPDATE tt_private.reset_state SET phase='ready' WHERE owner_id=u;
  RETURN public.tt_data_state_v8141();
-END $$;
+END $;
 CREATE FUNCTION public.tt_remove_tests_v8141(expected uuid[]) RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE u uuid:=auth.uid();ids uuid[];n integer;
 BEGIN
