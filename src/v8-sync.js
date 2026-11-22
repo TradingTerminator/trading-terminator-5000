@@ -129,6 +129,7 @@ let preferenceWrite814=false;
 let preferenceOwner814=null, preferenceRevision814=-1;
 function preferenceKey814(owner){return 'tt814:preferences:'+owner;}
 function applyPreferences814(values){
+ if(activeGeneration&&values.emotionLabels){localStorage.setItem('tt8_emotions_'+currentUser.id,JSON.stringify(values.emotionLabels));applyEmotionLabels();}
  for(const id of personalControls814){
   const field=$(id),v=values[id];if(!field||!Array.from(field.options).some(o=>o.value===v))continue;
   field.value=v;
