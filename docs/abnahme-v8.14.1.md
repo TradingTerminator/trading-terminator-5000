@@ -1,6 +1,6 @@
 # Freigabeprotokoll V8.14.1
 
-Basis ist die veröffentlichte V8.14. Die Änderungen betreffen ausschließlich V8. Prüfstand ist der Commit 5d93eb78483e168b9e351ef3c3492b65730c9023.
+Basis ist die veröffentlichte V8.14. Die Änderungen betreffen ausschließlich V8. Der initiale Prüfstand war 5d93eb78483e168b9e351ef3c3492b65730c9023. Die Freigabeprüfung läuft für jeden nachfolgenden Commit erneut.
 
 | Auftrag | Umsetzung und Prüfung |
 |---|---|
@@ -11,6 +11,6 @@ Basis ist die veröffentlichte V8.14. Die Änderungen betreffen ausschließlich 
 | Synchronisation | Test mit zwei authentifizierten Sitzungen und echtem Storage einer isolierten Supabase-Instanz bestanden. Alte Schreibversuche und veraltete Uploads wurden abgewiesen. Neue Daten ließen sich in der neuen Generation anlegen. |
 | Bedienbarkeit | Chromium und emuliertes iPhone in WebKit bestanden. Die zweite Schaltfläche blieb bei falschem Text deaktiviert, auch bei einem zusätzlichen Leerzeichen. Abbruch vor Ausführung geprüft. |
 | Regression | GitHub Actions Verify release, Lauf 44920292461. Alle fünf Jobs erfolgreich einschließlich PostgreSQL, Chromium, WebKit und Auth/Storage. |
-| Veröffentlichung | Produktiv sind Importtabelle, zehn Vorlagen, Schreibschutz für 29 Tabellen, Storage-Generationsprüfung und die gesperrten Vorbereitungsfunktionen installiert. Der Abschluss-RPC fehlt. Vollständiges Zurücksetzen ist für angemeldete Nutzer gesperrt. Bestehender App-Zugang liefert weiterhin V8.14. |
+| Produktive Datenbank | Am 22.11.2026 wurden die Abschlussfunktion und die Testdatenbereinigung installiert. Die Rechteprüfung bestätigte sieben Funktionen mit Ausführungsrecht für angemeldete Nutzer und ohne anonymes Ausführungsrecht. Zehn Testvorlagen lagen vor. Es wurde kein produktiver Reset ausgelöst. |
 
-Für die kontrollierte Fortsetzung der Migration ist nur der Abschnitt ab `CREATE FUNCTION public.tt_finish_reset_v8141` bis Dateiende in `db/v8_14_1_data.sql` erforderlich. Die bereits installierten Abschnitte dürfen nicht erneut blind angewandt werden. Vor der Freigabe die RPCs, Zugriffsrechte und den Online-Stand erneut prüfen. Aufbewahrungsfristen externer Backups sind vom jeweiligen Betreiber und Tarif abhängig. Ein vollständiger Reset wurde im Produktivkonto nicht ausgelöst.
+Der Löschabschluss verwendet für jede der 29 Tabellen eine explizite, auf den aktuellen Nutzer eingeschränkte DELETE-Anweisung. Eine abschließende Prüfung auf verbliebene Datensätze gehört zur gleichen Transaktion. Die konkrete Aufbewahrungsfrist externer Backups wurde nicht geprüft. Die Abnahme auf einem physischen iPhone und Windows-PC ist offen.
