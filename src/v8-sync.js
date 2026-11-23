@@ -1,7 +1,11 @@
 // Draft revisions are scoped separately from confirmed sessions and recorded trades.
 const draftStatus814=document.createElement('div');
 draftStatus814.setAttribute('role','status');
-$('app').prepend(draftStatus814);
+draftStatus814.className='tt-sync-status';
+$('settingsView').prepend(draftStatus814);
+const syncLiveStatus=document.createElement('output');syncLiveStatus.className='tt-sync-indicator';
+$('v8Navigation').after(syncLiveStatus);
+new MutationObserver(()=>{const status=draftStatus814.textContent;syncLiveStatus.hidden=!status;syncLiveStatus.textContent=status.includes('Beide Geräte')?'Sync-Konflikt · Einstellungen öffnen':status;}).observe(draftStatus814,{subtree:true,childList:true,characterData:true});
 let activeSync814=false;
 let applyRemote814=false;
 let delay814;

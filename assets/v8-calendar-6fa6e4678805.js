@@ -7,7 +7,7 @@ const selectedCalendar=document.createElement('div');selectedCalendar.id='v8Sele
 function v8ValidCalendarEvent(row){return row&&/^[a-f0-9]{24}$/.test(row.id)&&['BLS','BEA','FED','ISM'].includes(row.source)&&typeof row.title==='string'&&row.title.length>0&&row.title.length<=300&&Number.isFinite(Date.parse(row.at))&&row.url===({BLS:'https://www.bls.gov/schedule/',BEA:'https://www.bea.gov/news/schedule',FED:'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm',ISM:'https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/'})[row.source];}
 function v8CalendarDay(iso){return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(iso));}
 function v8CalendarFresh(data){
- return data?.version===1&&['BLS','BEA'].every(key=>data.sources?.[key]?.ok===true)
+ return data?.version===1&&Math.abs(Date.now()-Date.parse(data.checked_at))<24*3600000&&['BLS','BEA'].every(key=>data.sources?.[key]?.ok===true)
   &&['FED','ISM'].every(key=>!!data.sources?.[key]?.fetched_at);
 }
 function v8RenderSelectedCalendar(){const host=$('v8SelectedCalendar');host.replaceChildren();$('v8HtfNews').closest('label').firstChild.textContent=V8H.calendarSelected.length?'Zusätzlicher eigener Termin (optional)':'Termin';for(const row of V8H.calendarSelected){const line=document.createElement('div');line.className='v8-calendar-selection';const text=document.createElement('span');text.textContent=v8DateTime(row.at)+' · '+row.title+' · '+row.source;line.append(text,v8Button('Entfernen',()=>{V8H.calendarSelected=V8H.calendarSelected.filter(e=>e.id!==row.id);V8H.request=null;v8RenderSelectedCalendar();v8DrawMacroCalendar();v8UpdatePreparation();saveWorkspace();},'ghost'));host.append(line);}}
@@ -15,7 +15,7 @@ function v8PickCalendar(row){if(!v8ValidCalendarEvent(row)||V8H.calendarSelected
 function v8DrawMacroCalendar(){
  const host=$('v8CalendarRows'),status=$('v8CalendarStatus'),data=V8C.data;
  host.replaceChildren();
- if(!data){status.textContent='Terminübersicht nicht verfügbar. Forex Factory separat prüfen.';return;}
+ if(!data){status.textContent='Kalenderdaten nicht verfügbar.';return;}
  const fresh=v8CalendarFresh(data);
  status.textContent=fresh?'US-Veröffentlichungen · Abruf '+v8DateTime(data.checked_at):'Quellenabruf unvollständig · '+v8DateTime(data.checked_at);
  status.classList.toggle('notice',!fresh);
@@ -25,9 +25,9 @@ function v8DrawMacroCalendar(){
   line.textContent=key+' · '+(info?.mode==='manual'?'manuell geprüft':info?.ok?'Abruf erfolgreich':'Abruf fehlt oder ausgefallen')+(info?.fetched_at?' · '+v8DateTime(info.fetched_at):'');
   sources.append(line);
  }
- const now=Date.now(),today=v8CalendarDay(new Date(now)),week=$('v8CalendarWindow').value==='week',last=v8CalendarDay(new Date(now+6*86400000));
+ const now=Date.now(),today=v8CalendarDay(new Date(now)),week=$('v8CalendarWindow').value==='week',last=new Date(Date.parse(today+'T12:00:00Z')+6*86400000).toISOString().slice(0,10);
  const rows=data.events.filter(row=>{const day=v8CalendarDay(row.at);return week?day>=today&&day<=last:day===today;}).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at));
- if(!rows.length){host.textContent='Keine Termine in der Übersicht. Extern auf weitere Termine prüfen.';return;}
+ if(!rows.length){host.textContent='Keine Ereignisse im gewählten Zeitraum und Datenstand.';return;}
  const list=document.createElement('div');
  for(const item of rows){
   const row=document.createElement('label'),pick=document.createElement('input');
@@ -41,7 +41,7 @@ function v8DrawMacroCalendar(){
   const summary=document.createElement('span'),time=document.createElement('small'),title=document.createElement('strong');
   const options={timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'};
   if(week)Object.assign(options,{weekday:'short',day:'2-digit',month:'2-digit'});
-  time.textContent=new Intl.DateTimeFormat('de-DE',options).format(new Date(item.at))+' Uhr · USD';
+  time.textContent=new Intl.DateTimeFormat('de-DE',options).format(new Date(item.at))+' Uhr · USD · '+(item.impact||'Impact unbekannt');
   title.textContent=item.title;
   summary.append(time,title);row.append(pick,summary);list.append(row);
  }
@@ -56,4 +56,3 @@ const calendarDraftRestore=restoreWorkspace;restoreWorkspace=function(item){if(i
 const calendarShow=showView;showView=function(view){calendarShow(view);if(view==='session')void v8LoadMacroCalendar();};
 const calendarReset=resetPrivateState;resetPrivateState=function(...args){V8H.calendarSelected=[];V8C.data=null;V8C.loaded=0;V8C.seq++;V8C.loading=null;calendarReset(...args);v8RenderSelectedCalendar();};
 
-const calendarMissing=v8PreparationMissing;v8PreparationMissing=function(){const missing=calendarMissing();if(!$('v8CalendarReviewed').checked||V8H.calendarReviewed!==localDate())missing.push(['Heutigen Wirtschaftskalender und Quellenlücken prüfen','v8CalendarReviewed']);return missing;};

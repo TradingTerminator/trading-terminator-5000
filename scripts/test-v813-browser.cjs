@@ -49,7 +49,7 @@ fs.mkdirSync('evidence',{recursive:true});
  });
  await page.locator('#recordEntry').click();await page.waitForFunction(()=>$('tradeDetails').dataset.tradeId==='trade-811');
  assert.equal(await page.evaluate(()=>__811.trade.initial_risk_usd),900);assert.deepEqual(await page.evaluate(()=>__811.allocs.map(a=>a.initial_risk_usd)),[200,200,500]);
- assert.equal(await page.locator('.trade-panes button:visible').count(),2);await page.locator('[data-pane-button=stop]').focus();await page.locator('[data-pane-button=stop]').press('ArrowRight');assert.equal(await page.locator('[data-pane-button=exit]').getAttribute('aria-selected'),'true');assert.equal(await page.locator('.trade-identity h3').textContent(),'Trade 1 · LONG NQ · Momentum');
+ assert.equal(await page.locator('.trade-panes button:visible').count(),4);await page.locator('[data-pane-button=stop]').focus();await page.locator('[data-pane-button=stop]').press('ArrowRight');assert.equal(await page.locator('[data-pane-button=exit]').getAttribute('aria-selected'),'true');assert.equal(await page.locator('.trade-identity h3').textContent(),'Trade 1 · LONG NQ · Momentum');
  await page.locator('[data-pane-button=exit]').click();assert.equal(await page.locator('.exit-amount').first().isVisible(),false);await page.locator('[data-pane-button=stop]').click();
  const stop=page.locator('.stop-panel').first();await stop.locator('.stop-reason').selectOption('profit_protection');await stop.locator('.save-stop').click();assert.equal(await page.evaluate(()=>__811.stops.length),0,'Empty is not BE');
  await stop.locator('.stop-new').fill('0');await stop.locator('.save-stop').click();await page.waitForFunction(()=>__811.stops.length===1);assert.equal(await stop.locator('.save-stop').getAttribute('data-previous'),'0');
@@ -58,7 +58,7 @@ fs.mkdirSync('evidence',{recursive:true});
  for(const rating of await page.locator('.exit-editor input[data-scale]').all()){await rating.focus();await rating.press('Home');}
  await page.locator('.tt-close-trade').click();await page.waitForFunction(()=>__811.trade.exit_at&&document.querySelector('.tt-exit-completion'));
  await page.locator('#ttExitReason').selectOption('manual');
- for(const card of await page.locator('.tt-exit-completion fieldset').all()){await card.locator('input').nth(0).fill('15');await card.locator('input').nth(1).fill('0');}
+ for(const card of await page.locator('.tt-exit-completion fieldset').all()){await card.locator('input').nth(0).fill('15');await card.getByText('Gebührenkorrektur',{exact:true}).click();await card.locator('input').nth(1).fill('0');}
  await page.getByRole('button',{name:'Nachdokumentation abschließen'}).click();await page.waitForFunction(()=>!__811.trade.observations.results_pending_v808);assert.equal(await page.evaluate(()=>__811.trade.initial_risk_usd),900);
  await page.screenshot({path:'evidence/v813-exit-'+width+'.png',fullPage:false});
  // Existing persisted session on a second client has the same data, no server-state rewrite.
