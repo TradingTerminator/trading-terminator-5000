@@ -224,3 +224,6 @@ body[data-workspace-area=settings]{--workspace-accent:#8194aa}
 body[data-workspace-area=live] #v8Navigation button[aria-current=page]{color:white}
 .tt-rate-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,8rem),1fr));gap:.4rem;margin:0;min-width:0}
 #v8CrossMarkets .tt-rate-group .card{border:0;padding:0}
+.tt-rate-group>*{min-inline-size:0;max-inline-size:100%;box-sizing:border-box}
+.tt-gallery figure[hidden]{display:none}
+@media(max-width:600px){#v8CrossMarkets .tt-rate-group{display:flex;flex-direction:column;min-inline-size:0;max-inline-size:100%;box-sizing:border-box}}
