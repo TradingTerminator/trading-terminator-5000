@@ -15,7 +15,7 @@ async function serveBuild(){
   const type={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json'}[path.extname(file)];
   res.setHeader('Content-Type',type||'application/octet-stream');
   if(file.endsWith('v8.html')||path.basename(file)===core){
-   const fixture=fs.readFileSync(file,'utf8').replaceAll(config[1],backend).replaceAll(config[2],key).replace(/ integrity="[^"]+"/g,'');
+   const fixture=fs.readFileSync(file,'utf8').replaceAll(config[1],backend).replaceAll(config[2],key).replace('; upgrade-insecure-requests','').replace(/ integrity="[^"]+"/g,'');
    return res.end(fixture);
   }
   fs.createReadStream(file).pipe(res);
@@ -35,10 +35,7 @@ async function main(){
   mobile=await webkit.launch();
   async function open(browser,options){
    const context=await browser.newContext(options);
-   await context.route('**/*',route=>{
-    if(new URL(route.request().url()).hostname!=='127.0.0.1')return route.abort();
-    return route.continue();
-   });
+   await context.route('https://**/*',route=>route.abort());
    const page=await context.newPage();await page.goto(origin+'/v8.html');
    const ok=await page.evaluate(async credentials=>!(await client.auth.signInWithPassword(credentials)).error,{email,password});
    assert.equal(ok,true);await page.waitForFunction(()=>currentUser&&!$('app').classList.contains('hidden'));
