@@ -78,19 +78,29 @@ async function syncDraft814(){
    delete state.next;
    storeQueue814(scope,state);
   }
+  // Check the remote base before replaying an offline write. The RPC still
+  // compares revisions atomically if a second writer arrives after this read.
+  const latest=()=>client.from('workspace_revisions_v814').select('revision,request_id,payload').eq('owner_id',scope.owner).eq('document_key',scope.documentKey).order('revision',{ascending:false}).limit(1).maybeSingle();
+  let remote=await latest();
+  if(remote.error)throw remote.error;
+  if(draftScope814()?.key!==scope.key)return;
+  state=readQueue814(scope);
   if(state.pending){
    const attempt=state.pending;
-   const {data,error}=await client.rpc('save_workspace_revision_v814',{p_document:scope.documentKey,p_base:attempt.base,p_request:attempt.id,p_payload:attempt.payload});
-   if(draftScope814()?.key!==scope.key)return;
-   if(error&&error.code!=='40001')throw error;
-   state=readQueue814(scope);
-   if(!error&&state.pending?.id===attempt.id){
-    delete state.pending;state.revision=data;storeQueue814(scope,state);
+   const alreadySaved=remote.data?.request_id===attempt.id;
+   if(alreadySaved||(remote.data?.revision||0)<=attempt.base){
+    const reply=alreadySaved?{data:remote.data.revision}:await client.rpc('save_workspace_revision_v814',{p_document:scope.documentKey,p_base:attempt.base,p_request:attempt.id,p_payload:attempt.payload});
+    if(draftScope814()?.key!==scope.key)return;
+    if(reply.error&&reply.error.code!=='40001')throw reply.error;
+    state=readQueue814(scope);
+    if(!reply.error&&state.pending?.id===attempt.id){
+     delete state.pending;state.revision=reply.data;storeQueue814(scope,state);
+    }
+    if(!alreadySaved){remote=await latest();if(remote.error)throw remote.error;}
    }
   }
-  const {data,error}=await client.from('workspace_revisions_v814').select('revision,payload').eq('owner_id',scope.owner).eq('document_key',scope.documentKey).order('revision',{ascending:false}).limit(1).maybeSingle();
-  if(error)throw error;
   if(draftScope814()?.key!==scope.key)return;
+  const data=remote.data;
   state=readQueue814(scope);
   if(data&&data.revision>state.revision){
    if(state.next||state.pending){

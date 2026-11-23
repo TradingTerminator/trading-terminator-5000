@@ -50,13 +50,15 @@ async function main(){
   const pc=await open(desktop,{viewport:{width:1280,height:800}});
   const phone=await open(mobile,devices['iPhone 13']);
   await pc.sync();await phone.sync();await phone.set(7);await phone.sync();await pc.sync();assert.equal(await pc.read(),7);
+  console.log('PASS phone to desktop');
   await pc.set(8);await pc.sync();await phone.sync();assert.equal(await phone.read(),8);
+  console.log('PASS desktop to phone');
   await phone.offline(true);await phone.set(3);await phone.sync();await pc.set(9);await pc.sync();
   await phone.offline(false);await phone.sync();
   const status=await phone.page.evaluate(()=>draftStatus814.textContent);assert.match(status,/Beide Geräte/);
   await phone.page.evaluate(()=>draftStatus814.querySelector('button').click());await phone.sync();await pc.sync();
   assert.equal(await pc.read(),3);
-  await pc.page.reload();await pc.page.waitForFunction(()=>!!currentUser);await pc.sync();assert.equal(await pc.read(),3);
+  await pc.page.reload();await pc.page.waitForFunction(()=>currentUser&&!$('app').classList.contains('hidden'));await pc.sync();assert.equal(await pc.read(),3);
   console.log('PASS authenticated Chromium and iPhone WebKit, bidirectional edit, offline queue, conflict resolution and reload');
  }finally{server.close();await mobile?.close();await desktop.close();}
 }
