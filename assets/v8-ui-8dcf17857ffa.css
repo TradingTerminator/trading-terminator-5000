@@ -222,3 +222,5 @@ body[data-workspace-area=settings]{--workspace-accent:#8194aa}
 .tt-gallery .tt9-image{aspect-ratio:16/9;overflow:hidden}
 .stop-stepper:has(button:last-child[aria-label*="bestätigen"]){grid-template-columns:auto minmax(4rem,1fr) auto auto}
 body[data-workspace-area=live] #v8Navigation button[aria-current=page]{color:white}
+.tt-rate-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,8rem),1fr));gap:.4rem;margin:0;min-width:0}
+#v8CrossMarkets .tt-rate-group .card{border:0;padding:0}

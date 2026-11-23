@@ -27,7 +27,7 @@ function showFamily(){
 }
 function loadFamily(next){
  if(activeFamily)familyStates[activeFamily]=currentFamilyState();
- if(!activeFamily&&!Object.keys(familyStates).length&&next){activeFamily=next;showFamily();v8UpdatePreparation();captureChange814();return;}
+ if(!activeFamily&&!Object.keys(familyStates).length&&next&&!currentSession?.htf_context?.htf_v8?.plan){activeFamily=next;showFamily();v8UpdatePreparation();captureChange814();return;}
  activeFamily=next;
  const state=familyStates[next]||{};
  v8RenderTechnical(state.technical||V8H.points.map(({key,label})=>({key,label})));
@@ -80,7 +80,7 @@ const marketStage=showEntryStage;
 showEntryStage=function(...args){marketStage(...args);paintTradeMarket();};
 const marketEntryContext=v811EntryContext;
 v811EntryContext=function(){
- const prior=marketEntryContext(),family=marketFamilies[instrumentField.value],snapshot=currentSession?.htf_context?.htf_v8;
+ const prior=marketEntryContext(),family=marketFamilies[instrumentField.value],snapshot=entryAssessment(currentSession?.htf_context?.htf_v8);
  const analysis=snapshot?.plan?.family_analyses?.[family];
  return {...prior,market_context:{instrument:instrumentField.value,family:family||null,assessment_id:snapshot?.id||null,
  captured_at:snapshot?.captured_at||null,macro_direction:snapshot?.plan?.macro_direction||null,macro_reason:snapshot?.plan?.macro_reason||null,
@@ -97,13 +97,24 @@ for(const [key] of CROSS_MARKETS){
  if(select.options[0].value==='')select.options[0].text='Nicht bewertet';
  for(const o of select.options){if(o.value==='long')o.text='Steigend';if(o.value==='short')o.text='Fallend';if(o.value==='neutral')o.text='Seitwärts';}
 }
+function entryAssessment(snapshot){
+ if(V811.mode!=='retrospective'||!snapshot)return snapshot;
+ const entry=Date.parse(actualTime813(retrospectiveAt813)),assessment=Date.parse(snapshot.captured_at);
+ return Number.isFinite(entry)&&assessment<=entry?snapshot:null;
+}
 function snapshotForInstrument(snapshot,instrument){
- if(!snapshot?.plan?.family_analyses)return snapshot;
+ if(!snapshot)return null;
+ if(!snapshot.plan?.family_analyses)return {...snapshot,direction:null,plan:{
+  macro_direction:snapshot.plan?.macro_direction||null,macro_reason:snapshot.plan?.macro_reason||null,
+  personal_plan:snapshot.plan?.personal_plan,news:snapshot.plan?.news,news_behaviour:snapshot.plan?.news_behaviour,
+  news_behaviour_note:snapshot.plan?.news_behaviour_note,calendar_events:snapshot.plan?.calendar_events,cross_markets:snapshot.plan?.cross_markets,
+  technical:[],images:[],analysis_family:null,analysis_available:false,legacy_assessment_id:snapshot.id||null
+ }};
  const p=snapshot.plan,family=marketFamilies[instrument],state=p.family_analyses[family];
  return {...snapshot,direction:state?.direction||null,plan:{...p,analysis_family:family||null,
  technical:state?.technical||[],direction:state?.direction||'',sentiment:state?.sentiment||'',
  sentiment_reason:state?.sentiment_reason||'',technical_reason:state?.technical_reason||'',scenario_note:state?.when||state?.then?[state.when,state.then].filter(Boolean).join(' → '):'',
- images:state?.images||[],analysis_available:!!state}};
+ images:state?.images||[],analysis_available:!!(state?.direction&&state?.sentiment)}};
 }
 instrumentField.addEventListener('change',()=>{
  for(const card of $('allocationList').querySelectorAll('.account')){
@@ -250,3 +261,40 @@ $('allocationList').addEventListener('change',event=>{
  const row=event.target.closest('.account'),profile=profileFor(row.querySelector('.acct-check').dataset.id,event.target.value);
  if(profile){row.querySelector('.acct-qty').value=profile.quantity;row.querySelector('.acct-sl-ticks').value=profile.ticks;updateEntryRiskPreview();drawAccountDeviations813();}
 });
+// A pending LTF observation belongs to one contract until its entry is recorded.
+let ltfInstrument='',instrumentDrafts={};
+const enterInstrumentDraft=v810OpenEntry;
+v810OpenEntry=function(...args){
+ if(!V811.mode||V811.draftSession!==currentSession?.id){instrumentDrafts={};ltfInstrument='';}
+ const result=enterInstrumentDraft(...args);ltfInstrument=instrumentField.value;return result;
+};
+instrumentField.addEventListener('focus',()=>{ltfInstrument=instrumentField.value;});
+instrumentField.addEventListener('change',event=>{
+ const next=instrumentField.value;if(!ltfInstrument||next===ltfInstrument){ltfInstrument=next;return;}
+ if(V811.uploading||chosenImages(ltfImages811).length){
+  instrumentField.value=ltfInstrument;event.stopImmediatePropagation();
+  entryFeedback('Ausgewähltes LTF-Bild zuerst speichern oder entfernen.',saveLtf813);return;
+ }
+ instrumentDrafts[ltfInstrument]={fields:captureFields(ltf811),ltf:{...V811.ltf,images:[...V811.ltf.images]}};
+ ltfInstrument=next;const cached=instrumentDrafts[next];
+ for(const field of ltf811.querySelectorAll('input:not([type=file]),select,textarea')){
+  if(field.type==='checkbox')field.checked=false;else field.value='';
+ }
+ V811.ltf=cached?.ltf||{images:[]};if(cached)applyFields(ltf811,cached.fields);
+ syncLtf813();$('v811LtfStatus').onchange();
+},true);
+workspaceWriters.push(item=>{item.instrumentDrafts={instrument:ltfInstrument,drafts:instrumentDrafts};});
+const restoreInstrumentDraft=restoreWorkspace;
+restoreWorkspace=function(item){
+ restoreInstrumentDraft(item);
+ if(item?.owner!==currentUser?.id||item.session!==(currentSession?.id||null))return;
+ instrumentDrafts=item.instrumentDrafts?.drafts||{};ltfInstrument=item.instrumentDrafts?.instrument||instrumentField.value;
+};
+const clearInstruments=clearSession811;
+clearSession811=function(...args){ltfInstrument='';instrumentDrafts={};return clearInstruments(...args);};
+const rateGroup=el811('fieldset');rateGroup.className='tt-rate-group';rateGroup.append(el811('legend','Anleihen und Renditen'));
+const yieldsCard=$('v8Cross_yields').closest('.card'),bondCard=$('v8Cross_bonds').closest('.card');
+yieldsCard.before(rateGroup);rateGroup.append(yieldsCard,bondCard);
+for(const [key,title] of [['yields','Rendite'],['bonds','Anleihepreis']]){
+ const s=$('v8Cross_'+key);s.closest('label').firstChild.textContent=title;
+}
