@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "checked_at": "2026-11-23T19:16:53.741835Z",
+  "checked_at": "2026-11-24T01:29:42.748980Z",
   "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values. Manuell geprüfte ISM-PMI-Termine 2026 und FOMC November/Dezember 2026. Keine Fed-Reden, ISM-Prognoseberichte oder ungeplanten Ereignisse. Keine automatische Aktualisierung dieser beiden Quellen.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-23T19:16:53.741835Z",
+      "fetched_at": "2026-11-24T01:29:42.748980Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-23T19:16:53.741835Z",
+      "fetched_at": "2026-11-24T01:29:42.748980Z",
       "ok": true
     },
     "FED": {
