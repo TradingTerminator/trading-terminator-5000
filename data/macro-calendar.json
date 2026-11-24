@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "checked_at": "2026-11-24T07:38:37.189519Z",
+  "checked_at": "2026-11-24T13:32:55.884270Z",
   "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values. Manuell geprüfte ISM-PMI-Termine 2026 und FOMC November/Dezember 2026. Keine Fed-Reden, ISM-Prognoseberichte oder ungeplanten Ereignisse. Keine automatische Aktualisierung dieser beiden Quellen.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-24T07:38:37.189519Z",
+      "fetched_at": "2026-11-24T13:32:55.884270Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-24T07:38:37.189519Z",
+      "fetched_at": "2026-11-24T13:32:55.884270Z",
       "ok": true
     },
     "FED": {
@@ -182,13 +182,6 @@
       "title": "ISM Services PMI",
       "at": "2026-11-04T15:00:00Z",
       "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
-    },
-    {
-      "id": "c8ed8e0aada5b27b1275fcaf",
-      "source": "BLS",
-      "title": "U.S. Import and Export Price Indexes",
-      "at": "2026-11-17T13:30:00Z",
-      "url": "https://www.bls.gov/schedule/"
     },
     {
       "id": "88c6fc73a84d9e99d6666274",
