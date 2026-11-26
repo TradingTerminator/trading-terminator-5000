@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "checked_at": "2026-11-26T07:40:06.895797Z",
+  "checked_at": "2026-11-26T13:38:25.090443Z",
   "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values. Manuell geprüfte ISM-PMI-Termine 2026 und FOMC November/Dezember 2026. Keine Fed-Reden, ISM-Prognoseberichte oder ungeplanten Ereignisse. Keine automatische Aktualisierung dieser beiden Quellen.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-26T07:40:06.895797Z",
+      "fetched_at": "2026-11-26T13:38:25.090443Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-26T07:40:06.895797Z",
+      "fetched_at": "2026-11-26T13:38:25.090443Z",
       "ok": true
     },
     "FED": {
@@ -762,6 +762,13 @@
       "source": "BEA",
       "title": "Personal Income and Outlays",
       "at": "2027-11-24T13:30:00Z",
+      "url": "https://www.bea.gov/news/schedule"
+    },
+    {
+      "id": "4c9322fe669b1f544da889b6",
+      "source": "BEA",
+      "title": "Gross Domestic Product by County and Personal Income by County",
+      "at": "2027-12-01T13:30:00Z",
       "url": "https://www.bea.gov/news/schedule"
     }
   ]
