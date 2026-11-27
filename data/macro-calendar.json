@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "checked_at": "2026-11-27T13:33:43.059937Z",
+  "checked_at": "2026-11-27T19:14:33.712446Z",
   "coverage": "BLS and BEA scheduled releases only. No Fed, ISM, earnings, forecasts or actual values. Manuell geprüfte ISM-PMI-Termine 2026 und FOMC November/Dezember 2026. Keine Fed-Reden, ISM-Prognoseberichte oder ungeplanten Ereignisse. Keine automatische Aktualisierung dieser beiden Quellen.",
   "sources": {
     "BLS": {
       "url": "https://www.bls.gov/schedule/",
-      "fetched_at": "2026-11-27T13:33:43.059937Z",
+      "fetched_at": "2026-11-27T19:14:33.712446Z",
       "ok": true
     },
     "BEA": {
       "url": "https://www.bea.gov/news/schedule",
-      "fetched_at": "2026-11-27T13:33:43.059937Z",
+      "fetched_at": "2026-11-27T19:14:33.712446Z",
       "ok": true
     },
     "FED": {
@@ -189,13 +189,6 @@
       "title": "FOMC Minutes",
       "at": "2026-11-18T19:00:00Z",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
-    },
-    {
-      "id": "6e4b0bf4ab99108f281fee86",
-      "source": "BLS",
-      "title": "State Employment and Unemployment (Monthly)",
-      "at": "2026-11-20T15:00:00Z",
-      "url": "https://www.bls.gov/schedule/"
     },
     {
       "id": "363a0386c2646167d84e31a6",
