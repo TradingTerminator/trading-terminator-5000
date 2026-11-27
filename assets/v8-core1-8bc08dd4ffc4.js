@@ -36,13 +36,13 @@ function ttSetRemember(remember){
  if(currentUser?.id)draftMoveUser(currentUser.id,remember);
 }
 
-const TT_VERSION='8.14.1';
+const TT_VERSION='8.14.2';
 const $=id=>document.getElementById(id);
 let currentUser=null,currentSession=null,accounts=[],allAccounts=[],tradeCount=0,busy=false,sessionDraftMode="start",editingAccountId=null;
 const SCALE_DEFS={session:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Innere Anspannung','ruhig','stark angespannt'],['fatigue','Müdigkeit','wach','sehr müde'],['urge','Handelsdrang','kein Drang','sehr starker Drang']],entryEmotion:[['focus','Fokus','unkonzentriert','klar / konzentriert'],['pressure','Anspannung','ruhig','stark angespannt'],['fomo','FOMO','kein Drang','sehr stark'],['revenge','Verluste zurückholen','kein Drang','sehr stark'],['fear','Angst vor Verlust','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark']],duringTradeEmotion:[['fear','Angst','keine','sehr stark'],['greed','Gier / Gewinnzwang','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']],exitCommitEmotion:[['fear','Angst','keine','sehr stark'],['stress','Anspannung','ruhig','sehr stark'],['greed','Gier','keine','sehr stark'],['frustration','Frust','keiner','sehr stark'],['relief','Erleichterung','keine','sehr stark'],['uncertain','Unsicherheit','keine','sehr stark']]};
 function readScales(group){return Object.fromEntries([...(group?.querySelectorAll('[data-scale]')||[])].filter(el=>el.dataset.rated==='true').map(el=>[el.dataset.scale,Number(el.value)]));}
 function updateScaleLabels(root=document){root.querySelectorAll('[data-scale]').forEach(el=>{const output=el.closest('.rating-row')?.querySelector('output');if(output)output.textContent=el.dataset.rated==='true'?el.value+' / 10':'nicht bewertet';});}
-function buildScaleGroup(group,kind,values){if(!group)return;const prior=values||readScales(group);group.dataset.scaleGroup=kind;group.innerHTML=(SCALE_DEFS[kind]||[]).map(([key,label,low,high],i)=>`<div class="rating-row"><label><span>${escapeHtml(label)}</span><output></output><input type="range" min="1" max="10" step="1" value="${Number.isInteger(prior[key])&&prior[key]>=1&&prior[key]<=10?prior[key]:5}" data-scale="${key}" data-rated="${Number.isInteger(prior[key])&&prior[key]>=1&&prior[key]<=10}" aria-label="${escapeHtml(label)}"></label><div class="rating-ends"><span>1 · ${escapeHtml(low)}</span><span>10 · ${escapeHtml(high)}</span></div></div>`).join('');updateScaleLabels(group);}
+function buildScaleGroup(group,kind,values){if(!group)return;const prior=values||readScales(group);group.dataset.scaleGroup=kind;group.innerHTML=(SCALE_DEFS[kind]||[]).map(([key,label,low,high],i)=>`<div class="rating-row"><label><span>${escapeHtml(label)}</span><output></output><input type="range" min="1" max="10" step="1" value="${Number.isInteger(prior[key])&&prior[key]>=1&&prior[key]<=10?prior[key]:5}" ${group.id==='sessionMoodOptions'?'id="session-scale-'+key+'"':''} data-scale="${key}" data-rated="${Number.isInteger(prior[key])&&prior[key]>=1&&prior[key]<=10}" aria-label="${escapeHtml(label)}"></label><div class="rating-ends"><span>1 · ${escapeHtml(low)}</span><span>10 · ${escapeHtml(high)}</span></div></div>`).join('');updateScaleLabels(group);}
 function clearScales(group){group?.querySelectorAll('[data-scale]').forEach(el=>{el.dataset.rated='false';el.value='5';});updateScaleLabels(group);}
 function enhanceEmotionScales(root=document){root.querySelectorAll('[data-emotion-group]').forEach(group=>{const kind=group.dataset.emotionGroup;if(SCALE_DEFS[kind]&&!group.dataset.scaleGroup)buildScaleGroup(group,kind);});}
 function sessionContextText(){const notes=[...document.querySelectorAll('.htf-note')].filter(el=>el.value.trim()).map(el=>el.closest('.context-row').querySelector('label').textContent.trim()+': '+el.value.trim());if($('htf').value.trim())notes.push($('htf').value.trim());return notes.join('\n');}
@@ -363,7 +363,7 @@ function riskCard(a,names,closed,history=[]){
       <label>Ausnahmebegründung bei Risikoerhöhung (optional)<textarea class="stop-notes" rows="2" placeholder="Warum wurde der SL verschoben?"></textarea></label>
       <button type="button" class="secondary wide save-stop" data-id="${a.id}" data-previous="${history.length?history[0].new_stop_ticks:-pointsToTicks(a.initial_sl_points)}">SL-Verschiebung speichern</button>`:''}
       <div class="stop-feedback" role="status"></div><h3 style="margin-top:14px">SL-Verlauf</h3><div class="stop-history">
-      ${history.length?history.map(h=>`<div class="account"><strong>${escapeHtml(h.previous_stop_ticks)} → ${escapeHtml(h.new_stop_ticks)} Ticks</strong><div class="muted">${escapeHtml(berlinTime(h.changed_at))} · ${escapeHtml(stopReasonLabels[h.reason]||h.reason)}</div>${h.notes?`<small>${escapeHtml(h.notes)}</small>`:''}</div>`).join(''):'<p class="muted">Noch keine SL-Verschiebungen dokumentiert.</p>'}</div>
+      ${history.length?history.map(h=>`<div class="account"><strong>${escapeHtml(h.previous_stop_ticks)} → ${escapeHtml(h.new_stop_ticks)} Ticks</strong><div class="muted">${escapeHtml(berlinTime(h.changed_at))} · ${escapeHtml(stopReasonLabels[h.reason]||h.reason)}</div>${h.notes?`<small>${escapeHtml(h.notes)}</small>`:''}</div>`).join(''):'<p class="muted stop-empty">Noch keine SL-Verschiebungen dokumentiert.</p>'}</div>
       </div>
     </div>
   </div>`;
@@ -1429,7 +1429,7 @@ $('tradeDetails').addEventListener('click',e=>{
   if(btn.classList.contains('stop-preset'))field.value=btn.dataset.ticks;
   else{
     const raw=field.value.trim();const current=/^-?\d+$/.test(raw)?Number(raw):Number(panel.querySelector('.save-stop').dataset.previous);
-    field.value=String(current+(btn.classList.contains('stop-plus')?1:-1));
+    field.value=String(current+(btn.classList.contains('stop-plus')?1:-1)*Number($('stopStepTicks')?.value||1));
   }
 });
 $('tradeDetails').addEventListener('click',async e=>{
@@ -1457,7 +1457,7 @@ $('tradeDetails').addEventListener('click',async e=>{
     if(!data)throw new Error('Keine Bestätigung der Datenbank. Vor einem erneuten Versuch den Verlauf aktualisieren.');
     if(!panel.isConnected||$('tradeDetails').dataset.tradeId!==editedTradeId){message('SL-Verschiebung für den vorherigen Trade gespeichert.');return;}btn.dataset.previous=String(next);const current=panel.querySelector('.stop-current');if(current)current.textContent=stopLabel(next);
     panel.querySelector('.stop-feedback').textContent='Gespeichert: '+stopLabel(previous)+' → '+stopLabel(next);
-    const history=panel.querySelector('.stop-history');const line=document.createElement('p');line.textContent=stopLabel(previous)+' → '+stopLabel(next)+' · '+(stopReasonLabels[reason]||reason);history.prepend(line);
+    const history=panel.querySelector('.stop-history');const line=document.createElement('p');line.textContent=stopLabel(previous)+' → '+stopLabel(next)+' · '+(stopReasonLabels[reason]||reason);history.querySelector('.stop-empty')?.remove();history.prepend(line);
     const activeTrade=detailTradeById(editedTradeId);if(activeTrade){const card=panel.closest('.risk-card'),initialTicks=Number(card.querySelector('.risk-ticks').value);if(next < -initialTicks){activeTrade._stopExceptions=activeTrade._stopExceptions||[];activeTrade._stopExceptions.push({id:'stop-'+(typeof data==='string'?data:data.id),type:'stop_management',label:'Risiko über Initialrisiko erhöht',reason:panel.querySelector('.stop-notes').value.trim()});}try{const latest=await client.from('trades').select('observations,rule_deviation').eq('id',activeTrade.id).maybeSingle();if(!latest.error&&latest.data){applyTradePatch(activeTrade,latest.data);if(next < -initialTicks){const form=$('tradeDetails').querySelector('.review-editor');if(form){const errors=collectReviewErrors(form),decisions=collectExceptionDecisions(form);renderReviewErrors(form,{...activeTrade,observations:{...activeTrade.observations,review_errors:errors}},decisions);form.querySelector('.review-compliance').value='unknown';}}}}catch(_){}}
     message('SL-Verschiebung gespeichert: '+previous+' → '+next+' Ticks. Initialrisiko unverändert.');
   }catch(err){message('SL-Verschiebung nicht bestätigt: '+err.message+'\nVor erneutem Versuch den Verlauf kontrollieren.',true);}
@@ -1745,7 +1745,7 @@ function renderSetupCards(){
 function renderSetupManager(){
  const target=$('setupManagerList');target.replaceChildren();
  for(const item of setupCatalog){
-  const box=document.createElement('div');box.className='setup-manager-row';
+  const box=document.createElement('div');box.className='setup-manager-row';box.dataset.setupId=item.id;
   const name=document.createElement('input');name.value=item.name;name.maxLength=80;name.setAttribute('aria-label','Setup-Name');
   const description=document.createElement('textarea');description.value=item.description||'';description.maxLength=1000;description.rows=2;description.setAttribute('aria-label','Setup-Beschreibung');
   const imageRow=document.createElement('div');imageRow.className='setup-image-editor';
@@ -1761,7 +1761,7 @@ function renderSetupManager(){
   imageSave.addEventListener('click',async()=>{
    const file=imageInput.files?.[0];
    if(!file){setupNotice('Bitte zuerst ein Setup-Bild auswählen.',true);return;}
-   if(setupCatalogBusy)return;setupCatalogBusy=true;imageSave.disabled=true;
+   if(setupCatalogBusy||item.image_path&&!confirm('Musterbild für '+item.name+' ersetzen?'))return;setupCatalogBusy=true;imageSave.disabled=true;
    let uploaded=null;
    try{
     uploaded=chartPath('setup',item.id,crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_'));await uploadChart(file,uploaded);
@@ -1953,7 +1953,7 @@ $('recordEntry').onclick=async()=>{
       p_idea_id:entryIdeaId,
       p_warning_answers:entryWarningAnswers,
       p_new_idea:newIdea,
-      p_entry_context:{...v811EntryContext(),capture_version:$('tt9Executed')?.checked?736:737,documented_after_execution:!!$('tt9Executed')?.checked,warning_acknowledgements:typeof T9!=='undefined'?{...T9.acks}:{},htf_snapshot:currentSession.htf_context?.htf_v8||null,execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
+      p_entry_context:{...v811EntryContext(),capture_version:$('tt9Executed')?.checked?736:737,documented_after_execution:!!$('tt9Executed')?.checked,warning_acknowledgements:typeof T9!=='undefined'?{...T9.acks}:{},htf_snapshot:snapshotForInstrument(currentSession.htf_context?.htf_v8||null,$('instrument').value),execution_mode:$('entryCopy').checked?'copy':'independent',setup_snapshot:setupSnapshot(),account_overrides:[...$('allocationList').querySelectorAll('.acct-unlock:checked')].map(x=>x.dataset.id),idea_recording:newIdea?'with_entry':entryIdeaId?'previously_saved':'none',emotion_scales:readScales($('entryEmotionOptions'))},
       p_session_id:currentSession.id,
       p_setup_type:setup,
       p_instrument:$('instrument').value,

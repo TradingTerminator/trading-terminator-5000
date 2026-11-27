@@ -87,10 +87,18 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts && npm run build
+      - run: npx playwright install --with-deps chromium webkit
       - name: Start isolated Auth, REST and Storage
+        env:
+          SUPABASE_INTERNAL_IMAGE_REGISTRY: docker.io
         run: |
           npx --yes supabase@2.65.5 init
-          npx --yes supabase@2.65.5 start -x studio,inbucket,imgproxy,edge-runtime,logflare,vector,supavisor,realtime
+          npx --yes supabase@2.65.5 start -x studio,mailpit,postgres-meta,imgproxy,edge-runtime,logflare,vector,supavisor,realtime
           python3 scripts/prepare-v810-sql-test.py
           for file in /tmp/tt810-baseline.sql sql/security_v735.sql sql/review_types_v735.sql sql/training_focus_v735.sql sql/flow_v736.sql sql/ratings_v737.sql sql/idea_learning_v740.sql sql/guided_flow_v741.sql db/v8_htf_learning.sql db/v8_htf_backup.sql db/v8_08_preparation.sql db/v8_09_learning.sql db/v8_10_session_lifecycle.sql db/v8_11_execution.sql db/v8_13_workflow.sql db/v8_14_drafts.sql db/v8_14_entry.sql db/v8_14_playbook.sql db/v8_14_1_notion_fixtures.sql db/v8_14_1_data.sql; do
             psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -v ON_ERROR_STOP=1 -f "$file" >/dev/null
@@ -100,3 +108,4 @@ jobs:
           set -a
           . "$RUNNER_TEMP/tt-local.env"
           node scripts/test-v8141-storage.cjs
+          node scripts/test-v8142-clients.cjs

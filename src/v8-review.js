@@ -108,7 +108,7 @@ $('v8NewsBehaviour').closest('label').hidden=true;
 $('v8NewsBehaviourNote').closest('label').hidden=true;
 const previousMissing814=v8PreparationMissing;
 v8PreparationMissing=function(){
- const result=previousMissing814().filter(([,id])=>!['v8NewsBehaviour','v8NewsBehaviourNote'].includes(id));
+ const result=previousMissing814().filter(([,id])=>!['v8NewsBehaviour','v8NewsBehaviourNote','v8NewsState','v811ScenarioDecision'].includes(id));
  return Array.from(new Map(result.map(issue=>[issue[1],issue])).values());
 };
 const customEvent814=el811('details');customEvent814.append(el811('summary','+ Eigenen Termin hinzufügen'));
@@ -135,11 +135,14 @@ chapters814[2].details.append(scenario814);
 for(const [i,id] of ['v8MacroDirection','v8HtfSentiment','v8HtfDirection'].entries()){
  const chapter=chapters814[i],direction=$(id).closest('label');direction.classList.add('tt-chapter-direction');chapter.details.append(direction);
  chapter.summary.hidden=true;
- chapter.button=v8Button(chapter.label,()=>selectChapter814(i),'secondary');
+ chapter.button=v8Button(chapter.label,()=>{selectChapter814(i,true);v8SyncPrepControls();captureChange814();},'secondary');
  chapterNav814.append(chapter.button);
  chapter.details.addEventListener('input',()=>{confirmations814.delete(i);editedChapters814.add(i);paintChapters814();});
 }
-function selectChapter814(i){chapter814=i;paintChapters814();}
+function selectChapter814(i,scroll=false){
+ chapter814=i;paintChapters814();
+ if(scroll)requestAnimationFrame(()=>{if(chapter814===i)chapterNav814.scrollIntoView({block:'start',behavior:'instant'});});
+}
 function paintChapters814(){
  for(const [i,c] of chapters814.entries()){
   c.details.hidden=i!==chapter814;c.details.open=i===chapter814;
@@ -160,10 +163,10 @@ const nextPrep814=v8NextPrep;
 v8NextPrep=function(){
  if(V8Prep.step!==4)return nextPrep814();
  const issues=v8PreparationMissing();
- const missing=issues.find(([,id])=>v8PrepStageFor(id)<4)||issues.find(([,id])=>chapters814[chapter814].details.contains($(id)));
+ const missing=issues.find(([,id])=>v8PrepStageFor(id)<4||id==='analysisFamily')||issues.find(([,id])=>chapters814[chapter814].details.contains($(id)));
  if(missing){v8FocusPreparation(missing[1]);return;}
  confirmations814.add(chapter814);captureChange814();
- if(chapter814<2){selectChapter814(chapter814+1);v8SyncPrepControls();return;}
+ if(chapter814<2){selectChapter814(chapter814+1,true);v8SyncPrepControls();return;}
  nextPrep814();
 };
 const saveChapter814=$('saveHtf').onclick;
@@ -207,7 +210,7 @@ const extraScales814=[
 const required814=Object.fromEntries(['session','entryEmotion'].map(k=>[k,new Set(SCALE_DEFS[k].map(([id])=>id))]));
 for(const phase of Object.keys(required814))SCALE_DEFS[phase].push(...extraScales814.filter(([id])=>!required814[phase].has(id)));
 const missingScales814=missingScales;
-missingScales=function(group,phase){return missingScales814(group,phase).filter(k=>!required814[phase]||required814[phase].has(k));};
+missingScales=function(group,phase){if(phase==='entryEmotion'&&V811.mode==='retrospective')return [];return missingScales814(group,phase).filter(k=>!required814[phase]||required814[phase].has(k));};
 const buildScales814=buildScaleGroup;
 buildScaleGroup=function(group,phase,values){
  buildScales814(group,phase,values);if(!group||!required814[phase])return;
@@ -237,6 +240,7 @@ v8GoPrepStep=function(step){
 };
 const nextMood814=$('entryStageNext').onclick;
 $('entryStageNext').onclick=function(){
+ if(entryStage===1&&V811.mode==='retrospective'){showEntryStage(2);return;}
  if(entryStage===1&&V811.mode==='planned'&&!missingScales($('entryEmotionOptions'),'entryEmotion').length&&M9.warnings(readScales($('entryEmotionOptions'))).every(w=>T9.acks[w.key]===w.key+':'+w.value))return askPause814(M9.warnings(readScales($('entryEmotionOptions'))),'entry',nextMood814);
  nextMood814();
 };

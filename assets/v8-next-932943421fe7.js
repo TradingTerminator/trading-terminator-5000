@@ -13,7 +13,7 @@ function markField813(target,text){
  if(target.id==='direction')target=target.closest('.direction-field').querySelector('.direction-choice');
  for(let p=target.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
  const field=target.matches('input:not([type=hidden]),select,textarea,button')?target:
-  target.querySelector('[data-rated=false],input:not([type=hidden]):not([disabled]),select,textarea,button')||target;
+  target.querySelector('[data-rated=false]')||target.querySelector('input:not([type=hidden]):not([disabled]),select,textarea,button')||target;
  clearField813(field);
  const note=el811('small',text),description=field.getAttribute('aria-describedby');
  note.className='tt-field-error';note.id='tt-error-'+crypto.randomUUID();note.setAttribute('role','alert');
@@ -89,7 +89,7 @@ function drawPending813(zone){
  for(const file of files){
   const wrap=el811('div'),img=el811('img'),url=URL.createObjectURL(file);
   img.alt=file.name;img.onload=img.onerror=()=>URL.revokeObjectURL(url);img.src=url;
-  const remove=v8Button('Auswahl entfernen',()=>{
+  const remove=v8Button('×',()=>{
    URL.revokeObjectURL(url);
    zone.querySelector('input[type=file]').value='';
    const remaining=chosenImages(zone).filter(f=>f!==file);
@@ -149,7 +149,7 @@ uploadLtf811=async function(files){
 function tradePicker813(pane,trade,kind){
  if(!pane)return;
  const host=el811('details'),zone=el811('div'),input=el811('input'),status=el811('span'),gallery=el811('div');
- host.className='tt-trade-screenshots';host.append(el811('summary','Screenshots'),zone,gallery);
+ host.className='tt-trade-screenshots';host.append(el811('summary','Trade-Bilder · '+(kind==='exit'?'Exit-Bild ergänzen':'Management-Bild ergänzen')+' (optional)'),zone,gallery);
  input.type='file';input.accept='image/png,image/jpeg,image/webp';input.setAttribute('aria-label','Screenshot auswählen');
  zone.append(input,status);
  chartPicker813(zone,input,status,10);
@@ -291,7 +291,7 @@ function actualTime813(field){
  return parsed?new Date(Date.parse(parsed)+1000*Number(clock.slice(6,8)||0)).toISOString():null;
 }
 function showActualEntry813(){retrospectiveLabel813.hidden=V811.mode!=='retrospective';}
-capture811.addEventListener('change',showActualEntry813);showActualEntry813();
+capture811.addEventListener('change',()=>{showActualEntry813();warn9();});showActualEntry813();
 
 for(const field of [ideaNotiz813,tp813,reentry813])field.addEventListener('input',saveWorkspace);
 const openEntry813=v810OpenEntry;
@@ -342,6 +342,7 @@ v8HtfPlan=function(){return {...plan813(),entry_copy_v813:copySession813.checked
 const restorePlan813=v8RestoreHtf;
 v8RestoreHtf=function(...args){restorePlan813(...args);copySession813.checked=currentSession?.htf_context?.selected_accounts?.[0]?.copy_mode??!!currentSession?.htf_context?.htf_v8?.plan?.entry_copy_v813;};
 function drawAccountDeviations813(){
+ let deviates=false;
  const ids=currentSession?.htf_context?.selected_accounts||[];
  for(const row of $('allocationList').querySelectorAll('.account')){
   const check=row.querySelector('.acct-check');
@@ -354,9 +355,11 @@ function drawAccountDeviations813(){
   if(out){
    const labels={instrument:'Instrument',quantity:'Kontrakte',ticks:'SL'};
    const changes=[['Konto',standards],['Session',configured]].flatMap(([scope,values])=>TT811.changes(values,actual).map(x=>scope+' '+labels[x.field]+': '+x.expected+' → '+x.actual));
+   if(check.checked&&changes.length)deviates=true;
    out.textContent=check.checked?changes.join(' · '):'';out.hidden=!out.textContent;
   }
  }
+ deviation811.hidden=!deviates&&!deviationField811.value;
 }
 $('allocationList').addEventListener('input',drawAccountDeviations813);
 $('allocationList').addEventListener('change',drawAccountDeviations813);
@@ -451,6 +454,12 @@ function exitCapture813(editor,trade){
  const button=editor.querySelector('.close-trade-action');button.textContent='Trade beendet';
  button.classList.remove('close-trade-action');button.classList.add('tt-close-trade');
  button.before(anytime);
+ const historical=editor.querySelector('.tt9-historical-exit');
+ if(historical){
+  const historicalMode=()=>{reason.closest('label').hidden=!historical.checked;anytime.hidden=historical.checked;
+   editor.querySelector('[data-emotion-group=exitCommitEmotion]').hidden=historical.checked;};
+  historical.addEventListener('change',historicalMode);historicalMode();
+ }
  button.onclick=async()=>{
   if(busy)return;
   const group=editor.querySelector('[data-emotion-group=exitCommitEmotion]');
@@ -488,6 +497,33 @@ function feeEstimate813(rate,quantity,sides){
  const count=sides??quantity*2;
  return Math.round((Number(rate.amount)*count/(rate.basis==='round_turn'?2:1)+Number.EPSILON)*100)/100;
 }
+function positionChanges(detail,allocation,initial,trade){
+ const rows=el811('div');detail.append(rows);
+ function add(data={}){
+  const row=el811('fieldset'),type=select811('','Positionsänderung',{reduce:'Teilverkauf',add:'Aufstockung'},row);
+  type.removeAttribute('id');type.value=data.type||'reduce';
+  const quantity=el811('input'),price=el811('input'),at=el811('input');
+  quantity.type='number';quantity.min='1';quantity.step='1';price.inputMode='decimal';at.type='datetime-local';at.step='1';
+  quantity.value=data.quantity??'';price.value=data.price??'';at.value=data.at||'';
+  row.append(label813('Kontrakte',quantity),label813('Ausführungspreis',price),label813('Ausführung · Deutschland',at),
+   v8Button('Entfernen',()=>{row.remove();detail.dispatchEvent(new Event('input',{bubbles:true}));},'ghost'));
+  row.read=()=>({type:type.value,quantity:quantity.value,price:price.value,at:at.value});
+  rows.append(row);
+ }
+ const read=()=>[...rows.children].map(row=>row.read());
+ for(const value of Array.isArray(initial)?initial:[])add(value);
+ detail.append(v8Button('Positionsänderung ergänzen',()=>{add();detail.dispatchEvent(new Event('input',{bubbles:true}));},'ghost'));
+ return {read,evaluate(){
+  let open=Number(allocation.planned_quantity),sides=open,prior=Date.parse(trade.entry_at);
+  for(const row of rows.children){
+   const data=row.read(),q=Number(data.quantity),price=parseMoney(data.price),iso=actualTime813(row.querySelector('[type=datetime-local]')),time=Date.parse(iso);
+   if(!Number.isSafeInteger(q)||q<1||price===null||price<=0||!Number.isFinite(time)||time<prior||time>Date.parse(trade.exit_at)||!open||data.type==='reduce'&&q>open)
+    return {issue:row,changes:read()};
+   prior=time;open+=data.type==='add'?q:-q;sides+=q;
+  }
+  return {sides:rows.children.length?sides+open:null,changes:read()};
+ }};
+}
 function finishExit813(root,trade,allocations){
  const summary=root.querySelector('.exit-summary');
  if(!summary)return;
@@ -496,6 +532,11 @@ function finishExit813(root,trade,allocations){
  const note=observations.exit_completion_v813?.note;
  if(!observations.results_pending_v808){
   if(note)summary.append(el811('p',note));
+  for(const r of observations.exit_completion_v813?.results||[])for(const change of r.position_changes||[]){
+   const a=allocations.find(a=>a.id===r.allocation_id);
+   const name=allAccounts.find(account=>account.id===a?.account_id)?.account_name||a?.instrument||'Konto';
+   summary.append(el811('p',name+' · '+(change.type==='add'?'Aufstockung':'Teilverkauf')+' · '+change.quantity+' × '+change.price+' · '+change.at.replace('T',' ')+' (Deutschland)'));
+  }
   const fees=observations.fee_result_v813;
   if(fees&&allocations.every(a=>fees[a.id]?.fee_usd!=null)){
    const costs=allocations.reduce((sum,a)=>sum+Number(fees[a.id].fee_usd),0),net=Number(trade.realized_pnl_usd)-costs;
@@ -518,27 +559,32 @@ function finishExit813(root,trade,allocations){
   try{const s=ttRemember?ttLocalStore:ttSessionStore;return JSON.parse(s.getItem('tt8_draft_exit_completion_'+currentUser.id+':'+trade.id)||'{}');}catch(_){return {};}
  };
  const owner=currentUser?.id,initial=readDraft(),fields=new Map([['reason',reason],['actualTp',actualTp],['tpReason',tpReason],['note',noteField]]);
- form.append(changeTp,label813('Notiz · optional',noteField));
+ if(initial.actualTp||initial.tpReason)form.append(changeTp);
+ else if(planned){form.append(label813('Grund für erweitertes Ziel',tpReason));const update=()=>tpReason.closest('label').hidden=reason.value!=='extended_tp';reason.addEventListener('change',update);update();}
+ form.append(label813('Notiz · optional',noteField));
  const rows=[];
  for(const a of allocations){
   const card=el811('fieldset'),name=allAccounts.find(x=>x.id===a.account_id)?.account_name||a.instrument;
   card.append(el811('legend',name+' · '+a.instrument+' × '+a.planned_quantity));
   const pnl=el811('input'),fee=el811('input'),sides=el811('input'),totals=el811('p');
   pnl.inputMode='decimal';fee.inputMode='decimal';sides.type='number';sides.min='1';sides.step=1;
-  card.append(label813('Brutto-P&L · USD',pnl),label813('Gebühren korrigieren · USD',fee));
+  const correction=el811('details');correction.append(el811('summary','Gebührenkorrektur'),label813('Abgerechnete Gebühren · USD',fee));
+  card.append(label813('Brutto-P&L · USD',pnl),correction);
   const other=el811('details');other.append(el811('summary','Teilverkauf / Aufstockung'),label813('Tatsächliche Kontraktseiten',sides));card.append(other,totals);form.append(card);
   for(const [key,input] of Object.entries({pnl,fee,sides}))fields.set(a.id+':'+key,input);
-  rows.push({a,pnl,fee,sides,totals,rate:snapshot[a.id]});
+  const changes=positionChanges(other,a,initial[a.id+':changes'],trade);
+  rows.push({a,pnl,fee,sides,totals,changes,rate:snapshot[a.id]});
  }
  for(const [key,field] of fields)if(typeof initial[key]==='string')field.value=initial[key];
  const overall=el811('p');overall.setAttribute('role','status');form.append(overall);
  function values(row){
-  const count=row.sides.value===''?null:Number(row.sides.value);
+  const movements=row.changes.evaluate();row.sides.closest('label').hidden=movements.changes.length>0;
+  const count=movements.sides??(row.sides.value===''?null:Number(row.sides.value));
   const valid=count===null||Number.isSafeInteger(count)&&count>=1&&count<=99999999;
-  const estimated=valid?feeEstimate813(row.rate,Number(row.a.planned_quantity),count):null;
+  const estimated=valid&&!movements.issue?feeEstimate813(row.rate,Number(row.a.planned_quantity),count):null;
   const manual=row.fee.value.trim()===''?null:parseMoney(row.fee.value);
   const fee=row.fee.value.trim()===''?estimated:manual;
-  return {count,valid,estimated,manual,fee,pnl:parseMoney(row.pnl.value)};
+  return {count,valid,estimated,manual,fee,movements,pnl:parseMoney(row.pnl.value)};
  }
  function refresh(){
   let gross=0,net=0,risk=0,complete=rows.length>0,riskKnown=complete;
@@ -547,16 +593,16 @@ function finishExit813(root,trade,allocations){
    row.fee.placeholder=result.estimated===null?'USD-Gebühr offen':usd(result.estimated)+' automatisch';
    const known=result.pnl!==null&&result.fee!==null&&result.fee>=0;
    row.totals.textContent=known?'Netto '+usd(result.pnl-result.fee)+' USD'+(r>0?' · Netto-R '+((result.pnl-result.fee)/r).toFixed(2):''):
-    row.rate?.currency&&row.rate.currency!=='USD'?'Tarif in '+row.rate.currency+' · abgerechneten USD-Betrag erfassen.':'Netto offen';
+    row.rate?.currency&&row.rate.currency!=='USD'?'Tarif in '+row.rate.currency+' · abgerechneten USD-Betrag erfassen.':result.fee===null?'Gebühren unbekannt · Netto offen':'Netto offen';
    if(r>0)risk+=r;else riskKnown=false;
    if(known){gross+=result.pnl;net+=result.pnl-result.fee;}else complete=false;
   }
-  overall.textContent=complete?'Gesamt brutto '+usd(gross)+' USD · netto '+usd(net)+' USD'+(riskKnown?' · Brutto-R '+(gross/risk).toFixed(2)+' · Netto-R '+(net/risk).toFixed(2):''):'Gesamtergebnis offen';
+  overall.hidden=rows.length===1;overall.textContent=complete?'Gesamt brutto '+usd(gross)+' USD · netto '+usd(net)+' USD'+(riskKnown?' · Brutto-R '+(gross/risk).toFixed(2)+' · Netto-R '+(net/risk).toFixed(2):''):'Gesamtergebnis offen';
  }
  form.addEventListener('input',()=>{
   refresh();
   if(owner!==currentUser?.id)return;
-  try{(ttRemember?ttLocalStore:ttSessionStore).setItem('tt8_draft_exit_completion_'+owner+':'+trade.id,JSON.stringify(Object.fromEntries([...fields].map(([key,field])=>[key,field.value]))));}catch(_){}
+  try{(ttRemember?ttLocalStore:ttSessionStore).setItem('tt8_draft_exit_completion_'+owner+':'+trade.id,JSON.stringify({...Object.fromEntries([...fields].map(([key,field])=>[key,field.value])),...Object.fromEntries(rows.map(row=>[row.a.id+':changes',row.changes.read()]))}));}catch(_){}
  });
  const feedback=el811('p');feedback.setAttribute('role','status');
  const save=v8Button('Nachdokumentation abschließen',async()=>{
@@ -569,10 +615,11 @@ function finishExit813(root,trade,allocations){
   const results=[];
   for(const row of rows){
    const value=values(row);
+   if(value.movements.issue){markField813(value.movements.issue,'Menge, Preis und chronologische Zeit innerhalb des Trades prüfen.');return;}
    if(!value.valid){markField813(row.sides,'Gültige ganze Kontraktseiten erfassen.');return;}
    if(value.pnl===null){markField813(row.pnl,'Gültigen realisierten Brutto-P&L eingeben.');return;}
    if(value.fee===null||value.fee<0){markField813(row.fee,'Abgerechnete USD-Gebühr angeben.');return;}
-   results.push({allocation_id:row.a.id,realized_pnl_usd:value.pnl,manual_fee_usd:value.manual,contract_sides:value.count});
+   results.push({allocation_id:row.a.id,realized_pnl_usd:value.pnl,manual_fee_usd:value.manual,contract_sides:value.count,...(value.movements.changes.length?{position_changes:value.movements.changes}:{})});
   }
   save.disabled=true;
   try{
